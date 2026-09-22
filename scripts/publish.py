@@ -90,7 +90,24 @@ def send_max(p):
     r = http(f"{base}/messages?chat_id={urllib.parse.quote(chat)}", body, headers={"Authorization": token})
     print("MAX: отправлено"); return True
 
+def check_telegram():
+    """Проверка: токен рабочий, бот администратор канала и может публиковать."""
+    token, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_CHANNEL") or "@smekai_ru"
+    if not token:
+        print("ПРОВЕРКА: нет секрета TG_BOT_TOKEN"); return False
+    try:
+        me = http(f"https://api.telegram.org/bot{token}/getMe")["result"]
+        print("ПРОВЕРКА: бот", "@" + me["username"])
+        m = http(f"https://api.telegram.org/bot{token}/getChatMember?chat_id={urllib.parse.quote(chat)}&user_id={me['id']}")["result"]
+    except Exception as e:
+        print("ПРОВЕРКА: ошибка Telegram:", e); return False
+    ok = m.get("status") == "administrator" and m.get("can_post_messages", False)
+    print("ПРОВЕРКА: в канале", chat, "статус", m.get("status"), "может публиковать:", m.get("can_post_messages"))
+    return ok
+
 def main():
+    if not check_telegram():
+        print("Проверка не пройдена, публикация остановлена"); sys.exit(1)
     state = json.loads(STATE.read_text(encoding="utf-8"))
     done = set(state.get("published", []))
     now = datetime.now(MSK)
