@@ -18,7 +18,7 @@ POSTS = ROOT / "posts"
 STATE = ROOT / "state" / "published.json"
 MSK = timezone(timedelta(hours=3))
 LINKS = {
-    "quiz": os.environ.get("QUIZ_URL") or "https://yarnick86.github.io/smekai/",
+    "quiz": os.environ.get("QUIZ_URL") or "https://yarnick86.github.io/Smekai/",
     "boosty": "https://boosty.to/smekai",
     "telegram": "https://t.me/smekai_ru",
 }
