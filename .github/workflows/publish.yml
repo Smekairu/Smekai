@@ -1,0 +1,37 @@
+name: Публикация постов
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # каждые 10 минут
+  workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Отправить посты, у которых подошло время
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHANNEL: ${{ vars.TG_CHANNEL }}
+          MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
+          MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID }}
+          QUIZ_URL: ${{ vars.QUIZ_URL }}
+        run: python scripts/publish.py
+      - name: Сохранить отметки об отправке
+        run: |
+          git config user.name "smekai-bot"
+          git config user.email "smekai-bot@users.noreply.github.com"
+          git add state/published.json
+          git diff --cached --quiet || git commit -m "Отмечены опубликованные посты"
+          git push
