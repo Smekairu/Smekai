@@ -1,7 +1,7 @@
 """Мыслик: телеграм-бот с подпиской и разбором заданий.
 
-Первый этап: математика 1-6 класса, подсказки вместо готового ответа,
-подписка через Tribute, доступ в закрытый канал.
+Математика 1-11 класса, подсказки вместо готового ответа,
+подписка через Tribute, доступ в закрытый канал. Тексты общие с ботом MAX (common.py).
 
 Запуск: python main.py
 Переменные окружения перечислены в README.md
@@ -17,36 +17,19 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton, InlineKeyboardMa
                            Message, ReplyKeyboardMarkup, KeyboardButton)
 
 import ai, db, report, stickers, tasks, voice
-
-
-def who(user):
-    """Персонаж по классу: 1–3 младший Мыслик, 4–8 Мыслик, 9–11 Лев. Другие стикеры и голос."""
-    try:
-        g = (user["grade"] or 0) if user else 0
-    except (KeyError, IndexError, TypeError):
-        g = 0
-    return "lev" if g >= 9 else "junior" if 0 < g <= 3 else "myslik"
+from common import (who, esc, PRAISE, SOFT, GRADE_ROWS, VOICE_NAMES, HELLO, AFTER_VOICE, HOW,
+                    LIMIT_OVER, SUB_TEXT, PARENT_HOW, WRONG_ADD, WRONG_ADD_DEFAULT, progress_text,
+                    PAY_URL, FREE_LIMIT, PAID_LIMIT)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("myslik")
 
 TOKEN = os.environ["TG_BOT_TOKEN"]
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "0"))
-PAY_URL = os.environ.get("PAY_URL", "https://boosty.to/smekai")
 CLOSED_CHANNEL = os.environ.get("TG_CHANNEL_CLOSED", "")
-FREE_LIMIT = int(os.environ.get("FREE_LIMIT", "3"))
-PAID_LIMIT = int(os.environ.get("PAID_LIMIT", "30"))
 
 bot = Bot(TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher()
-
-def esc(t):
-    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
-
-PRAISE = ["Верно!", "Точно!", "Да, именно так.", "Отлично, правильно."]
-SOFT = ["Пока не то.", "Почти, но нет.", "Не сходится."]
-
 
 class Reg(StatesGroup):
     name = State()
@@ -86,11 +69,7 @@ async def start(m: Message, state: FSMContext):
     if u and u["grade"]:
         await m.answer(f"С возвращением, {u['name']}. Что делаем?", reply_markup=menu())
         return
-    await m.answer(
-        "Привет! Я Мыслик, помощник по учёбе.\n\n"
-        "Я не решаю задания за тебя. Я задаю вопросы и даю подсказки, "
-        "а решение ты находишь сам. Так знания остаются в голове.\n\n"
-        "Как тебя зовут?")
+    await m.answer(HELLO)
     await state.set_state(Reg.name)
 
 
@@ -100,7 +79,7 @@ async def reg_name(m: Message, state: FSMContext):
     await state.update_data(name=name)
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=str(g), callback_data=f"grade:{g}") for g in row]
-        for row in ([1, 2, 3], [4, 5, 6])
+        for row in GRADE_ROWS
     ])
     await m.answer(f"Приятно познакомиться, {name}. В каком ты классе?", reply_markup=kb)
     await state.set_state(Reg.grade)
@@ -114,7 +93,7 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
     await state.clear()
     await c.message.edit_text(f"Записал: {grade} класс.")
     await c.answer()
-    await stickers.send_mood(bot, c.message.chat.id, "wave", "lev" if grade >= 9 else "junior" if grade <= 3 else "myslik")
+    await stickers.send_mood(bot, c.message.chat.id, "wave", who({"grade": grade}))
     await c.message.answer("Каким голосом мне с тобой говорить?", reply_markup=voice_kb())
 
 
@@ -134,15 +113,11 @@ async def set_voice(c: CallbackQuery):
     if profile in ("boy", "girl") and who(u) == "lev":
         profile = "lev"      # у старшеклассников говорит Лев
     db.set_voice(c.from_user.id, profile)
-    names = {"boy": "бодрый, как с другом", "girl": "тёплый, с улыбкой", "parent": "спокойный, по делу", "lev": "Лев, спокойный", "off": "выключен"}
-    await c.message.edit_text(f"Голос: {names.get(profile, profile)}.")
+    await c.message.edit_text(f"Голос: {VOICE_NAMES.get(profile, profile)}.")
     await c.answer()
     if profile != "off" and not voice.available():
         await c.message.answer("Голосовые сообщения включатся, когда на сервере появится ключ Яндекса. Пока отвечаю текстом.")
-    await c.message.answer(
-        "Три задания в день бесплатно. Нажимай «Задание», и начнём.\n"
-        "С подпиской можно присылать фотографию задания из учебника.",
-        reply_markup=menu())
+    await c.message.answer(AFTER_VOICE, reply_markup=menu())
 
 
 @dp.message(Command("voice"))
@@ -175,10 +150,7 @@ async def give_task(m: Message, user):
     left = db.attempts_left(user["id"], FREE_LIMIT, PAID_LIMIT)
     if left <= 0:
         await stickers.send_mood(bot, m.chat.id, "sleepy", who(user))
-        await m.answer(
-            "На сегодня бесплатные задания кончились.\n\n"
-            "С подпиской их 30 в день, плюс разбор домашки и отчёт родителю.",
-            reply_markup=pay_kb())
+        await m.answer(LIMIT_OVER, reply_markup=pay_kb())
         return
     t = tasks.make(user["grade"])
     db.set_current(user["id"], t)
@@ -187,6 +159,7 @@ async def give_task(m: Message, user):
 
 
 @dp.message(F.text == "📚 Задание")
+@dp.message(Command("task"))
 async def task_btn(m: Message):
     user = db.get_user(m.from_user.id)
     if not user:
@@ -269,12 +242,7 @@ async def check_answer(m: Message):
         tries = cur["tries"] + 1
         if tries == 2:
             await stickers.send_mood(bot, m.chat.id, "sad", who(user))
-        if tries == 1:
-            add = "Проверь, что нашёл именно то, о чём спрашивают."
-        elif tries == 2:
-            add = "Попробуй записать условие в черновике и посчитать по шагам."
-        else:
-            add = "Возьми подсказку, она ниже."
+        add = WRONG_ADD.get(tries, WRONG_ADD_DEFAULT)
         await m.answer(f"{random.choice(SOFT)} {add}",
                        reply_markup=hint_kb(cur["hint_used"] < len(cur["hints"])))
 
@@ -352,6 +320,7 @@ async def ai_done(c: CallbackQuery):
 # ---------------- родитель ----------------
 
 @dp.message(F.text == "👨‍👩‍👧 Родителю")
+@dp.message(Command("parent"))
 async def parent_menu(m: Message):
     kids = db.children_of(m.from_user.id)
     if kids:
@@ -368,12 +337,7 @@ async def parent_menu(m: Message):
         return
     user = db.get_user(m.from_user.id)
     code = db.make_code(user["id"]) if user else None
-    await m.answer(
-        "<b>Как подключить отчёты</b>\n\n"
-        "Отчёт получает тот, кто привяжет ребёнка к себе.\n\n"
-        "1. Откройте этого бота с телефона ребёнка и нажмите «Родителю», там будет код.\n"
-        "2. Пришлите мне этот код со своего телефона: просто отправьте его сообщением.\n\n"
-        + (f"Ваш код для родителя: <b>{code}</b>" if code else ""))
+    await m.answer(PARENT_HOW + (f"Ваш код для родителя: <b>{code}</b>" if code else ""))
 
 
 CODE_RE = re.compile(r"^[A-Z0-9]{6}$")
@@ -416,37 +380,22 @@ async def sub(m: Message):
         until = db.paid_until(user["id"])
         await m.answer(f"Подписка активна до {until}.\nЗаданий в день: {PAID_LIMIT}.")
         return
-    await m.answer(
-        "<b>Что даёт подписка</b>\n\n"
-        f"• {PAID_LIMIT} заданий в день вместо {FREE_LIMIT}\n"
-        "• разбор домашки: присылаешь задание, Мыслик ведёт к ответу\n"
-        "• закрытый канал с ежедневными заданиями по классу\n"
-        "• отчёт родителю раз в неделю\n\n"
-        "390 рублей в месяц, отменить можно в любой момент.",
-        reply_markup=pay_kb())
+    await m.answer(SUB_TEXT, reply_markup=pay_kb())
 
 
 @dp.message(F.text == "📊 Мой прогресс")
+@dp.message(Command("progress"))
 async def progress(m: Message):
     user = db.get_user(m.from_user.id)
     if not user:
         return
-    s = db.stats(user["id"])
-    await m.answer(
-        f"<b>{user['name']}, {user['grade']} класс</b>\n\n"
-        f"Сегодня решено: {s['today']}\n"
-        f"Всего решено: {s['total']}\n"
-        f"Без подсказок: {s['clean']}\n"
-        f"Дней подряд: {s['streak']}")
+    await m.answer(progress_text(user, db.stats(user["id"])))
 
 
 @dp.message(F.text == "❓ Как это работает")
+@dp.message(Command("help"))
 async def how(m: Message):
-    await m.answer(
-        "Я даю задание по твоему классу. Ты отвечаешь числом.\n\n"
-        "Ошибся — подскажу, куда смотреть. Нужна помощь — нажми «Подсказка», их три.\n"
-        "Совсем застрял — «Показать решение», там разбор по шагам.\n\n"
-        "Готовый ответ сразу я не даю специально: списанное забывается к утру.")
+    await m.answer(HOW)
 
 
 @dp.message(Command("grant"))

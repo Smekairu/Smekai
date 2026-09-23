@@ -1,8 +1,11 @@
-# Мыслик: бот с подпиской и разбором заданий
+# Мыслик: боты Telegram и MAX с подпиской и разбором заданий
+
+Два бота из одной папки: `main.py` для Telegram и `max_bot.py` для MAX. Тексты и логика общие.
+Короткая инструкция по настройке и запуску: `docs/boty.md`.
 
 Что умеет:
 
-- задания по математике 1-6 класса, ответ проверяется вычислением, а не нейросетью;
+- задания по математике 1-11 класса, ответ проверяется вычислением, а не нейросетью;
 - три подсказки вместо готового ответа, разбор по шагам только после попыток;
 - разбор домашки по фотографии: распознаёт текст и ведёт к ответу вопросами;
 - недельный отчёт родителю, привязка родителя к ребёнку по коду;
@@ -16,7 +19,11 @@
 
 | Файл | Зачем |
 |---|---|
-| `main.py` | сам бот |
+| `main.py` | бот Telegram |
+| `max_bot.py` | бот MAX, та же логика через Bot API MAX |
+| `common.py` | общие тексты, команды, персонаж по классу |
+| `setup_bots.py` | имя, описание, команды и аватар обоим ботам (workflow «Настроить ботов») |
+| `run_local.py`, `start-windows.bat` | запуск обоих ботов на своём компьютере, пока нет сервера |
 | `webhook.py` | приём уведомлений об оплате |
 | `db.py` | база SQLite, создаётся сама |
 | `tasks.py` | генератор заданий с подсказками |
@@ -29,8 +36,12 @@
 
 | Имя | Обязательна | Что это |
 |---|---|---|
-| `TG_BOT_TOKEN` | да | токен бота |
+| `TG_BOT_TOKEN` | да | токен бота Telegram |
 | `ADMIN_ID` | да | ваш telegram id, для команды `/grant` |
+| `MAX_BOT_TOKEN` | для MAX | токен бота MAX от @MasterBot |
+| `MAX_ADMIN_ID` | для MAX | ваш user_id в MAX (бот покажет по `/id`) |
+| `MAX_CHANNEL_INVITE` | нет | ссылка-приглашение в закрытый канал MAX, уходит после `/grant` |
+| `MAX_DB_PATH` | нет | база бота MAX, по умолчанию myslik-max.db |
 | `PAY_URL` | да | ссылка на оплату в Tribute или Boosty |
 | `TG_CHANNEL_CLOSED` | нет | id закрытого канала, для выдачи приглашений |
 | `PAY_WEBHOOK_SECRET` | нет | ключ, который площадка шлёт в заголовке `X-Api-Key` |
@@ -90,10 +101,11 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Второй такой же для `webhook.py` с именем `myslik-pay.service` и `ExecStart=... webhook.py`.
+Второй такой же для `webhook.py` с именем `myslik-pay.service` и `ExecStart=... webhook.py`,
+третий для `max_bot.py` с именем `myslik-max.service`.
 
 ```bash
-sudo systemctl enable --now myslik myslik-pay
+sudo systemctl enable --now myslik myslik-max myslik-pay
 sudo journalctl -u myslik -f     # смотреть логи
 ```
 
@@ -127,7 +139,8 @@ sudo update-ca-certificates
 Без ключей бот отвечает текстом, а выбор голоса просто запоминается на будущее.
 Профиль меняется командой `/voice`. Ударения для трудных слов лежат в словаре в `voice.py`.
 
-Стикеры берутся из `assets/anim`: `myslik-<настроение>.webm` для Telegram. После первой отправки
+Стикеры берутся из `assets/anim`: `<персонаж>-<настроение>.webm` для Telegram, в MAX уходят картинки
+из `assets/pack/sticker`. После первой отправки
 file_id запоминается в базе, и файл больше не грузится. Настроения: wave, yay, party, think, sad,
 angry, surprised, sleepy, love, idle.
 
@@ -143,6 +156,7 @@ angry, surprised, sleepy, love, idle.
 
 ```
 0 19 * * 0 cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py
+5 19 * * 0 cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py --max
 ```
 
 Посмотреть тексты, ничего не отправляя: `python report.py --dry`.

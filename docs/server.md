@@ -1,7 +1,7 @@
 # Сервер Смекай: что на нём крутится
 
-Один сервер в России, Ubuntu 24.04, самый простой тариф. На нём живут три вещи:
-бот Мыслик, приём оплаты и публикация постов. GitHub остаётся хранилищем кода
+Один сервер в России, Ubuntu 24.04, самый простой тариф. На нём живут четыре вещи:
+бот Мыслик в Telegram, бот Мыслик в MAX, приём оплаты и публикация постов. GitHub остаётся хранилищем кода
 и запасным публикатором.
 
 ## 1. Подготовка
@@ -26,9 +26,10 @@ sudo cp sub.pem  /usr/local/share/ca-certificates/russian_trusted_sub_ca.crt
 sudo update-ca-certificates
 ```
 
-## 2. Бот и приём оплаты
+## 2. Боты и приём оплаты
 
-Два сервиса systemd, файлы `/etc/systemd/system/myslik.service` и `myslik-pay.service`:
+Три сервиса systemd: `/etc/systemd/system/myslik.service` (Telegram), `myslik-max.service` (MAX)
+и `myslik-pay.service` (оплата):
 
 ```ini
 [Unit]
@@ -46,13 +47,17 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-Во втором файле меняется только `Description` и `ExecStart=... webhook.py`.
+В остальных файлах меняются только `Description` и `ExecStart`: `... max_bot.py` и `... webhook.py`.
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now myslik myslik-pay
+sudo systemctl enable --now myslik myslik-max myslik-pay
 sudo journalctl -u myslik -f
+sudo journalctl -u myslik-max -f
 ```
+
+Настройка ботов (имя, описание, команды, аватар) делается из GitHub: Actions → «Настроить ботов».
+Подробности и что делается руками: `docs/boty.md`.
 
 ## 3. Публикация постов с сервера
 
@@ -84,11 +89,12 @@ crontab -e
 ```
 */10 6-18 * * *  /root/Smekai/publish-cron.sh >> /root/publish.log 2>&1
 0 19 * * 0       cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py >> /root/report.log 2>&1
+5 19 * * 0       cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py --max >> /root/report.log 2>&1
 ```
 
 Первая строка это публикация каждые десять минут с 9 до 21 по Москве, если на сервере
 московское время. Проверить: `timedatectl`, поставить: `sudo timedatectl set-timezone Europe/Moscow`.
-Вторая строка это отчёт родителям по воскресеньям в 19:00.
+Вторая и третья строки это отчёт родителям по воскресеньям в 19:00, в Telegram и в MAX.
 
 Чтобы сервер мог возвращать отметки в GitHub, ему нужен токен с правом Contents: Read and write.
 Кладётся в файл `/root/.git-credentials` командой:
@@ -104,7 +110,7 @@ cd /root/Smekai && git pull      # спросит логин и токен од�
 ## 4. Проверка после установки
 
 ```bash
-systemctl status myslik myslik-pay --no-pager
+systemctl status myslik myslik-max myslik-pay --no-pager
 tail -20 /root/publish.log
 curl -s http://127.0.0.1:8080/health
 ```

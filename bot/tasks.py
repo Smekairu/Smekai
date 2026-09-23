@@ -1,4 +1,4 @@
-"""Задания для бота: математика 1-6 класса с подсказками и разбором по шагам.
+"""Задания для бота: математика 1-11 класса с подсказками и разбором по шагам.
 
 Ответ всегда число, оно считается программой, а не нейросетью.
 Поэтому ошибиться в проверке бот не может.
@@ -12,7 +12,11 @@ def make(grade):
         return random.choice([_add, _sub, _mult_small, _rows])()
     if grade <= 4:
         return random.choice([_mult, _div, _order, _price])()
-    return random.choice([_order5, _part, _percent, _speed, _two_parts])()
+    if grade <= 6:
+        return random.choice([_order5, _part, _percent, _speed, _two_parts])()
+    if grade <= 8:
+        return random.choice([_linear, _raise, _pythagoras, _mean])()
+    return random.choice([_quadratic, _progression, _power, _discount])()
 
 
 # ---------- 1-2 класс ----------
@@ -146,3 +150,92 @@ def _two_parts():
                       f"Разделите {total} на {k + 1}."],
             "steps": f"Всего частей {k + 1}; {total} : {k + 1} = {small}; "
                      f"большее число {small * k}"}
+
+
+# ---------- 7-8 класс ----------
+
+def _linear():
+    x, a, b = random.randint(2, 12), random.randint(2, 9), random.randint(3, 20)
+    return {"q": f"Решите уравнение: {a}x + {b} = {a * x + b}", "a": x,
+            "hints": ["Перенесите свободный член вправо, знак поменяется.",
+                      f"{a}x = {a * x + b} − {b} = {a * x}.",
+                      f"Разделите обе части на {a}."],
+            "steps": f"{a}x = {a * x}; x = {a * x} : {a} = {x}"}
+
+
+def _raise():
+    p, w = random.choice([15, 18, 24, 35]), random.choice([200, 400, 800, 1200])
+    return {"q": f"Товар стоил {w} рублей и подорожал на {p} процентов. Какой стала цена?",
+            "a": w + w * p // 100,
+            "hints": ["Сначала найдите, сколько рублей составляют проценты.",
+                      f"{w} · {p} : 100 = {w * p // 100}.",
+                      "Прибавьте к старой цене."],
+            "steps": f"{w} · {p} : 100 = {w * p // 100}; {w} + {w * p // 100} = {w + w * p // 100}"}
+
+
+def _pythagoras():
+    a, b = random.choice([(3, 4), (6, 8), (5, 12), (9, 12), (8, 15)])
+    c = round((a * a + b * b) ** .5)
+    return {"q": f"Катеты прямоугольного треугольника {a} и {b}. Найдите гипотенузу.", "a": c,
+            "hints": ["Теорема Пифагора: квадрат гипотенузы равен сумме квадратов катетов.",
+                      f"{a}² + {b}² = {a * a + b * b}.",
+                      f"Извлеките корень из {a * a + b * b}."],
+            "steps": f"{a}² + {b}² = {a * a + b * b}; √{a * a + b * b} = {c}"}
+
+
+def _mean():
+    n = random.randint(3, 5)
+    m = random.randint(4, 9)
+    nums = [m + d for d in random.sample([-3, -2, -1, 0, 1, 2, 3], n)]
+    nums[-1] += m * n - sum(nums)      # подгоняем, чтобы среднее было целым
+    return {"q": f"Найдите среднее арифметическое чисел: {', '.join(map(str, nums))}.", "a": m,
+            "hints": ["Среднее это сумма всех чисел, делённая на их количество.",
+                      f"Сумма равна {sum(nums)}.",
+                      f"Разделите {sum(nums)} на {n}."],
+            "steps": f"{' + '.join(map(str, nums))} = {sum(nums)}; {sum(nums)} : {n} = {m}"}
+
+
+# ---------- 9-11 класс ----------
+
+def _quadratic():
+    r1, r2 = random.randint(-6, 6), random.randint(-6, 6)
+    if r1 == r2:
+        r2 += 1
+    b, c = -(r1 + r2), r1 * r2
+    sb = f"+ {b}" if b >= 0 else f"− {-b}"
+    sc = f"+ {c}" if c >= 0 else f"− {-c}"
+    return {"q": f"Решите уравнение и введите больший корень: x² {sb}x {sc} = 0", "a": max(r1, r2),
+            "hints": ["Теорема Виета: сумма корней равна второму коэффициенту с обратным знаком, "
+                      "произведение равно свободному члену.",
+                      f"Сумма корней {r1 + r2}, произведение {c}.",
+                      f"Подберите два числа: {min(r1, r2)} и {max(r1, r2)}."],
+            "steps": f"x₁ = {r1}, x₂ = {r2}; больший корень {max(r1, r2)}"}
+
+
+def _progression():
+    a1, d, n = random.randint(2, 9), random.randint(2, 7), random.randint(8, 20)
+    return {"q": f"Арифметическая прогрессия: первый член {a1}, разность {d}. Найдите {n}-й член.",
+            "a": a1 + d * (n - 1),
+            "hints": ["Формула: aₙ = a₁ + d(n − 1).",
+                      f"d(n − 1) = {d} · {n - 1} = {d * (n - 1)}.",
+                      "Прибавьте первый член."],
+            "steps": f"a{n} = {a1} + {d} · {n - 1} = {a1 + d * (n - 1)}"}
+
+
+def _power():
+    base, e = random.choice([2, 3, 5]), random.randint(2, 5)
+    return {"q": f"Решите уравнение: {base}ˣ = {base ** e}", "a": e,
+            "hints": [f"Представьте правую часть как степень числа {base}.",
+                      f"{base} · {base} · … сколько раз даст {base ** e}?",
+                      "Если основания равны, равны и показатели."],
+            "steps": f"{base ** e} = {base}^{e}, значит x = {e}"}
+
+
+def _discount():
+    w, p = random.choice([1500, 2400, 3200, 4800]), random.choice([10, 15, 20, 25])
+    return {"q": f"Куртка стоила {w} рублей, на распродаже скидка {p} процентов. "
+                 f"Сколько рублей стоит куртка со скидкой?", "a": w - w * p // 100,
+            "hints": ["Скидка это часть цены. Найдите её в рублях.",
+                      f"{w} · {p} : 100 = {w * p // 100}.",
+                      "Вычтите скидку из цены."],
+            "steps": f"{w} · {p} : 100 = {w * p // 100}; {w} − {w * p // 100} = {w - w * p // 100}"}
