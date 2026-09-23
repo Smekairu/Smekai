@@ -60,8 +60,16 @@ def http(url, data=None, headers=None, files=None):
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode() or "{}")
 
+def tg_chat(p):
+    """Открытый канал по умолчанию, закрытый если в посте указано channel: closed."""
+    if str(p.get("channel", "")).strip().lower() in ("closed", "закрытый"):
+        return os.environ.get("TG_CHANNEL_CLOSED") or ""
+    return os.environ.get("TG_CHANNEL") or "@smekai_ru"
+
 def send_telegram(p):
-    token, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_CHANNEL") or "@smekai_ru"
+    token, chat = os.environ.get("TG_BOT_TOKEN"), tg_chat(p)
+    if not chat:
+        print("Telegram: не задан канал для этого поста, пропускаю"); return None
     if not token:
         print("Telegram: нет TG_BOT_TOKEN, пропускаю"); return False
     base = f"https://api.telegram.org/bot{token}"

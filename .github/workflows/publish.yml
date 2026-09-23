@@ -38,6 +38,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHANNEL: ${{ vars.TG_CHANNEL || secrets.TG_CHANNEL }}
+          TG_CHANNEL_CLOSED: ${{ vars.TG_CHANNEL_CLOSED || secrets.TG_CHANNEL_CLOSED }}
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
           MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
           QUIZ_URL: ${{ vars.QUIZ_URL }}
