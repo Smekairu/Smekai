@@ -2,7 +2,7 @@ name: Публикация постов
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # каждые 10 минут
+    - cron: "0 */3 * * *"   # каждые 3 часа
   workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
 
 permissions:

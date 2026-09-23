@@ -7,7 +7,7 @@
 - `assets/`: логотипы и аватары Мыслика.
 - `posts/`: посты. Один файл = один пост.
 - `state/published.json`: список уже отправленных постов, ведётся автоматически.
-- `scripts/publish.py` и `.github/workflows/publish.yml`: автопубликация, запускается каждые 10 минут.
+- `scripts/publish.py` и `.github/workflows/publish.yml`: автопубликация, запускается каждые 3 часа.
 
 ## Как добавить пост
 1. Откройте папку `posts` → Add file → Create new file.
@@ -27,6 +27,6 @@ image: assets/myslik-navy.png
 
 `button`, `link`, `image` необязательны. `link`: quiz, boosty или полный адрес. Время московское.
 
-4. Commit changes. Пост уйдёт в канал в указанное время (с задержкой до 10–20 минут).
+4. Commit changes. Пост уйдёт в канал в указанное время (с задержкой до 3 часов).
 
 Отправить сразу: вкладка Actions → «Публикация постов» → Run workflow.
