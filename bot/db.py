@@ -26,6 +26,14 @@ def init():
     CREATE TABLE IF NOT EXISTS log(
       id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, day TEXT,
       solved INTEGER, hints INTEGER, tries INTEGER, ts TEXT DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS parents(
+      parent_id INTEGER, child_id INTEGER, created TEXT DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY(parent_id, child_id));
+    CREATE TABLE IF NOT EXISTS codes(
+      code TEXT PRIMARY KEY, child_id INTEGER, created TEXT DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS photo(
+      id INTEGER PRIMARY KEY, user_id INTEGER, task TEXT, step INTEGER DEFAULT 0,
+      history TEXT DEFAULT '[]', started TEXT);
     CREATE TABLE IF NOT EXISTS payments(
       id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, amount REAL,
       days INTEGER, source TEXT, ts TEXT DEFAULT CURRENT_TIMESTAMP);
@@ -146,4 +154,77 @@ def week_report(uid):
     c = conn()
     r = c.execute("SELECT COUNT(*) n, SUM(solved) s, SUM(hints) h FROM log "
                   "WHERE user_id=? AND day>=?", (uid, since)).fetchone()
-    return {"tasks": r["n"] or 0, "solved": r["s"] or 0, "hints": r["h"] or 0}
+    d = c.execute("SELECT COUNT(DISTINCT day) d FROM log WHERE user_id=? AND day>=?",
+                  (uid, since)).fetchone()["d"]
+    wh = c.execute("SELECT COUNT(*) n FROM log WHERE user_id=? AND day>=? AND solved=1 AND hints>0",
+                   (uid, since)).fetchone()["n"]
+    return {"tasks": r["n"] or 0, "solved": r["s"] or 0, "hints": r["h"] or 0,
+            "days": d or 0, "with_hints": wh or 0}
+
+
+# ---------- связь родителя и ребёнка ----------
+
+def make_code(child_id):
+    """Короткий код, который ребёнок показывает родителю."""
+    import random, string
+    code = "".join(random.choice(string.ascii_uppercase.replace("O", "") + "23456789") for _ in range(6))
+    c = conn()
+    c.execute("DELETE FROM codes WHERE child_id=?", (child_id,))
+    c.execute("INSERT INTO codes(code, child_id) VALUES(?,?)", (code, child_id))
+    c.commit()
+    return code
+
+
+def use_code(code, parent_id):
+    """Привязывает родителя к ребёнку. Возвращает id ребёнка или None."""
+    c = conn()
+    r = c.execute("SELECT child_id FROM codes WHERE code=?", (code.strip().upper(),)).fetchone()
+    if not r:
+        return None
+    child_id = r["child_id"]
+    if child_id == parent_id:
+        return None
+    c.execute("INSERT OR IGNORE INTO parents(parent_id, child_id) VALUES(?,?)", (parent_id, child_id))
+    c.execute("DELETE FROM codes WHERE code=?", (code.strip().upper(),))
+    c.commit()
+    return child_id
+
+
+def parent_links():
+    return [(r["parent_id"], r["child_id"]) for r in
+            conn().execute("SELECT parent_id, child_id FROM parents").fetchall()]
+
+
+def children_of(parent_id):
+    return [r["child_id"] for r in conn().execute(
+        "SELECT child_id FROM parents WHERE parent_id=?", (parent_id,)).fetchall()]
+
+
+# ---------- разбор задания с фотографии ----------
+
+def photo_start(uid, task):
+    c = conn()
+    c.execute("INSERT INTO photo(id,user_id,task,step,history,started) VALUES(?,?,?,0,'[]',?) "
+              "ON CONFLICT(id) DO UPDATE SET task=excluded.task, step=0, history='[]', started=excluded.started",
+              (uid, uid, task, datetime.now().isoformat()))
+    c.commit()
+
+
+def photo_get(uid):
+    r = conn().execute("SELECT * FROM photo WHERE id=?", (uid,)).fetchone()
+    if not r:
+        return None
+    d = dict(r)
+    d["history"] = json.loads(d["history"])
+    return d
+
+
+def photo_step(uid, history):
+    c = conn()
+    c.execute("UPDATE photo SET step=step+1, history=? WHERE id=?",
+              (json.dumps(history, ensure_ascii=False), uid))
+    c.commit()
+
+
+def photo_close(uid):
+    c = conn(); c.execute("DELETE FROM photo WHERE id=?", (uid,)); c.commit()

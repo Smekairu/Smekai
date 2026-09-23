@@ -16,7 +16,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup,
                            Message, ReplyKeyboardMarkup, KeyboardButton)
 
-import db, tasks
+import ai, db, report, tasks
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("myslik")
@@ -31,6 +31,10 @@ PAID_LIMIT = int(os.environ.get("PAID_LIMIT", "30"))
 bot = Bot(TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher()
 
+def esc(t):
+    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 PRAISE = ["Верно!", "Точно!", "Да, именно так.", "Отлично, правильно."]
 SOFT = ["Пока не то.", "Почти, но нет.", "Не сходится."]
 
@@ -43,7 +47,8 @@ class Reg(StatesGroup):
 def menu():
     return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [KeyboardButton(text="📚 Задание"), KeyboardButton(text="📊 Мой прогресс")],
-        [KeyboardButton(text="⭐ Подписка"), KeyboardButton(text="❓ Как это работает")],
+        [KeyboardButton(text="⭐ Подписка"), KeyboardButton(text="👨‍👩‍👧 Родителю")],
+        [KeyboardButton(text="❓ Как это работает")],
     ])
 
 
@@ -97,7 +102,8 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
     await state.clear()
     await c.message.edit_text(f"Записал: {grade} класс.")
     await c.message.answer(
-        "Три задания в день бесплатно. Нажимай «Задание», и начнём.",
+        "Три задания в день бесплатно. Нажимай «Задание», и начнём.\n"
+        "С подпиской можно присылать фотографию задания из учебника.",
         reply_markup=menu())
     await c.answer()
 
@@ -173,6 +179,8 @@ async def check_answer(m: Message):
     user = db.get_user(m.from_user.id)
     if not user:
         return
+    if db.photo_get(user["id"]):
+        await ai_turn(m, user, m.text.strip()); return
     cur = db.get_current(user["id"])
     if not cur:
         return
@@ -196,6 +204,132 @@ async def check_answer(m: Message):
             add = "Возьми подсказку, она ниже."
         await m.answer(f"{random.choice(SOFT)} {add}",
                        reply_markup=hint_kb(cur["hint_used"] < len(cur["hints"])))
+
+
+# ---------------- разбор задания с фотографии ----------------
+
+@dp.message(F.photo)
+async def photo(m: Message):
+    user = db.get_user(m.from_user.id)
+    if not user:
+        await m.answer("Напиши /start, чтобы познакомиться."); return
+    if not db.is_paid(user["id"]):
+        await m.answer("Разбор заданий по фотографии входит в подписку.", reply_markup=pay_kb()); return
+    if not ai.available():
+        await m.answer("Разбор по фото пока отключён. Напиши задание текстом, я помогу."); return
+
+    await bot.send_chat_action(m.chat.id, "typing")
+    f = await bot.get_file(m.photo[-1].file_id)
+    buf = await bot.download_file(f.file_path)
+    text = ai.ocr(buf.read())
+    if not text:
+        await m.answer("Не смог разобрать текст. Сфотографируй ещё раз, ближе и ровнее, "
+                       "или просто напиши задание словами.")
+        return
+    db.photo_start(user["id"], text)
+    short = text if len(text) < 400 else text[:400] + "…"
+    await m.answer(f"<b>Вижу задание</b>\n{esc(short)}\n\nДавай разберёмся.")
+    await ai_turn(m, user)
+
+
+async def ai_turn(m: Message, user, answer=None):
+    cur = db.photo_get(user["id"])
+    if not cur:
+        return
+    hist = cur["history"]
+    if answer:
+        hist.append(["user", answer])
+    await bot.send_chat_action(m.chat.id, "typing")
+    reply = ai.ask(user["grade"], cur["task"], hist, cur["step"] + 1)
+    if not reply:
+        await m.answer("Связь с помощником пропала. Попробуй ещё раз через минуту.")
+        return
+    hist.append(["assistant", reply])
+    db.photo_step(user["id"], hist)
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Показать решение", callback_data="ai_solve"),
+        InlineKeyboardButton(text="Закончить", callback_data="ai_done")]])
+    await m.answer(reply, reply_markup=kb)
+
+
+@dp.callback_query(F.data == "ai_solve")
+async def ai_solve(c: CallbackQuery):
+    user = db.get_user(c.from_user.id)
+    cur = db.photo_get(user["id"]) if user else None
+    if not cur:
+        await c.answer("Сначала пришли фотографию задания", show_alert=True); return
+    await c.answer()
+    await bot.send_chat_action(c.message.chat.id, "typing")
+    reply = ai.ask(user["grade"], cur["task"], cur["history"], 5)
+    db.photo_close(user["id"])
+    await c.message.answer(reply or "Не получилось собрать разбор, попробуй ещё раз.")
+
+
+@dp.callback_query(F.data == "ai_done")
+async def ai_done(c: CallbackQuery):
+    user = db.get_user(c.from_user.id)
+    if user:
+        db.photo_close(user["id"])
+    await c.answer("Хорошо")
+    await c.message.answer("Закончили. Присылай следующее задание, когда будешь готов.")
+
+
+# ---------------- родитель ----------------
+
+@dp.message(F.text == "👨‍👩‍👧 Родителю")
+async def parent_menu(m: Message):
+    kids = db.children_of(m.from_user.id)
+    if kids:
+        lines = ["<b>Ваши дети в Смекае</b>", ""]
+        for kid in kids:
+            ch = db.get_user(kid)
+            if not ch:
+                continue
+            r = db.week_report(kid)
+            lines.append(f"{ch['name']}, {ch['grade']} класс: за неделю решено {r['solved']} из {r['tasks']}, "
+                         f"занимался дней {r['days']}")
+        lines += ["", "Полный отчёт приходит в воскресенье вечером."]
+        await m.answer("\n".join(lines))
+        return
+    user = db.get_user(m.from_user.id)
+    code = db.make_code(user["id"]) if user else None
+    await m.answer(
+        "<b>Как подключить отчёты</b>\n\n"
+        "Отчёт получает тот, кто привяжет ребёнка к себе.\n\n"
+        "1. Откройте этого бота с телефона ребёнка и нажмите «Родителю», там будет код.\n"
+        "2. Пришлите мне этот код со своего телефона: просто отправьте его сообщением.\n\n"
+        + (f"Ваш код для родителя: <b>{code}</b>" if code else ""))
+
+
+CODE_RE = re.compile(r"^[A-Z0-9]{6}$")
+
+
+@dp.message(F.text.func(lambda t: bool(t) and CODE_RE.match(t.strip().upper())))
+async def link_code(m: Message):
+    child_id = db.use_code(m.text, m.from_user.id)
+    if not child_id:
+        await m.answer("Такого кода нет или он уже использован. Попросите ребёнка открыть «Родителю» ещё раз.")
+        return
+    ch = db.get_user(child_id)
+    await m.answer(f"Готово. Теперь вы получаете отчёты про {ch['name']}, {ch['grade']} класс.\n\n"
+                   "Первый отчёт придёт в воскресенье вечером.")
+    try:
+        await bot.send_message(child_id, "Родитель подключил отчёты о твоих занятиях. "
+                                         "Он будет видеть, сколько заданий решено и где было трудно.")
+    except Exception:
+        pass
+
+
+@dp.message(Command("report"))
+async def report_now(m: Message):
+    """Показать отчёт прямо сейчас, не дожидаясь воскресенья."""
+    kids = db.children_of(m.from_user.id)
+    if not kids:
+        await m.answer("Сначала привяжите ребёнка: кнопка «Родителю»."); return
+    for kid in kids:
+        ch = db.get_user(kid)
+        if ch:
+            await m.answer(report.build(ch))
 
 
 # ---------------- подписка и прогресс ----------------
@@ -258,6 +392,13 @@ async def grant(m: Message):
         log.warning("не удалось отправить приглашение: %s", e)
 
 
+@dp.message(F.text)
+async def free_text(m: Message):
+    user = db.get_user(m.from_user.id)
+    if user and db.photo_get(user["id"]):
+        await ai_turn(m, user, m.text.strip())
+
+
 async def make_invite():
     if not CLOSED_CHANNEL:
         return PAY_URL
@@ -268,7 +409,7 @@ async def make_invite():
 
 async def main():
     db.init()
-    log.info("Мыслик запущен")
+    log.info("Мыслик запущен, модель: %s", ai.PROVIDER if ai.available() else "не подключена")
     await dp.start_polling(bot)
 
 
