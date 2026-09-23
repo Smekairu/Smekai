@@ -56,6 +56,12 @@ def main():
             cid = u.get("chat_id") or ((u.get("message") or {}).get("recipient") or {}).get("chat_id")
             print("  событие:", u.get("update_type"), "chat_id =", cid)
             if cid: ids.append(cid)
+        canal = [i for i in ids if i < 0]
+        if canal:
+            print("Похоже, канал это chat_id =", canal[-1])
+            print("Положите это число в MAX_CHAT_ID. Отрицательные id принадлежат каналам и группам,")
+            print("положительные это личные диалоги с людьми.")
+            return
         if not ids:
             print("Событий нет.")
     print("Итог: бот ещё не добавлен в канал. Сначала подписчиком, затем администратором")
