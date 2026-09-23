@@ -7,7 +7,7 @@
 - `assets/`: логотипы и аватары Мыслика.
 - `posts/`: посты. Один файл = один пост.
 - `state/published.json`: список уже отправленных постов, ведётся автоматически.
-- `scripts/publish.py` и `.github/workflows/publish.yml`: автопубликация, запускается каждые 3 часа.
+- `scripts/publish.py` и `.github/workflows/publish.yml`: автопубликация, запускается пять раз в день: 09:00, 12:00, 15:00, 18:00, 21:00 по Москве.
 
 ## Как добавить пост
 1. Откройте папку `posts` → Add file → Create new file.
