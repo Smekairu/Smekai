@@ -34,6 +34,8 @@ jobs:
           sudo update-ca-certificates
           echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
           rm -f root.cer sub.cer root.pem sub.pem
+      - name: Собрать задания на ближайшие дни
+        run: python scripts/build_posts.py --days 3
       - name: Отправить посты, у которых подошло время
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
@@ -41,12 +43,13 @@ jobs:
           TG_CHANNEL_CLOSED: ${{ vars.TG_CHANNEL_CLOSED || secrets.TG_CHANNEL_CLOSED }}
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
           MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
+          MAX_CHAT_ID_CLOSED: ${{ vars.MAX_CHAT_ID_CLOSED || secrets.MAX_CHAT_ID_CLOSED }}
           QUIZ_URL: ${{ vars.QUIZ_URL }}
         run: python scripts/publish.py
       - name: Сохранить отметки об отправке
         run: |
           git config user.name "smekai-bot"
           git config user.email "smekai-bot@users.noreply.github.com"
-          git add state/published.json
+          git add state/published.json state/used.json posts
           git diff --cached --quiet || git commit -m "Отмечены опубликованные посты"
           git push

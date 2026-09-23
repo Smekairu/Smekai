@@ -88,12 +88,22 @@ def send_telegram(p):
     ok = bool(r.get("ok")); print("Telegram:", "отправлено" if ok else r)
     return (r.get("result") or {}).get("message_id") if ok else None
 
+def max_chat(p):
+    """Открытый канал MAX по умолчанию, закрытый если в посте указано channel: closed."""
+    if str(p.get("channel", "")).strip().lower() in ("closed", "закрытый"):
+        return os.environ.get("MAX_CHAT_ID_CLOSED") or ""
+    return os.environ.get("MAX_CHAT_ID") or ""
+
+def plain(text):
+    """MAX не понимает скрытый текст Telegram, поэтому раскрываем его."""
+    return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", "")
+
 def send_max(p):
-    token, chat = os.environ.get("MAX_BOT_TOKEN"), os.environ.get("MAX_CHAT_ID")
+    token, chat = os.environ.get("MAX_BOT_TOKEN"), max_chat(p)
     if not token or not chat:
         print("MAX: бот ещё не подключён, пропускаю"); return False
     base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
-    body = {"text": p["text"], "format": "html"}
+    body = {"text": plain(p["text"]), "format": "html"}
     if p.get("button") and p.get("link"):
         body["attachments"] = [{"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}]
     try:
