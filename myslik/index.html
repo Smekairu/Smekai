@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мыслик — настроения и голос</title>
+<meta name="description" content="Как выглядит и говорит Мыслик: настроения, облачко с фразами, выбор голоса.">
+<link rel="icon" href="../assets/favicon.png">
+<script src="../assets/myslik.js"></script>
+<style>
+:root{--ink:#1B1F3B;--ink-2:#3A4166;--ink-3:#6B738F;--sun:#FFC933;--line:#E4E7F2;--bg-2:#F6F7FB;--blue:#3E7BFA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff}
+body.render{background:transparent}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);z-index:5}
+.nav{display:flex;align-items:center;height:62px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;text-decoration:none;color:var(--ink)}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--sun);display:grid;place-items:center;font-style:normal;font-weight:900;color:#5C4300;font-size:17px}
+.nav a.back{margin-left:auto;color:var(--ink-2);text-decoration:none;font-size:15px}
+h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.02em;margin:34px 0 6px}
+h2{font-size:21px;font-weight:800;margin:32px 0 12px}
+p{color:var(--ink-2)}
+.lab{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start;margin-top:22px}
+@media(max-width:760px){.lab{grid-template-columns:1fr}}
+.stagebox{background:radial-gradient(circle at 50% 38%,#FFD661,#FFC933);border-radius:26px;padding:30px 20px 24px;display:grid;place-items:center;position:sticky;top:80px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button,.btn{font:inherit;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+button.main{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.sun{background:var(--sun);border-color:var(--sun);color:#3D2E00}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+input[type=text],select{font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;min-width:0}
+input[type=text]{flex:1 1 260px}
+select{flex:1 1 220px}
+.card{background:var(--bg-2);border-radius:16px;padding:16px 18px;margin-top:14px}
+.small{font-size:14px;color:var(--ink-3)}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg-2)}
+.tag{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;color:var(--ink-2)}
+footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size:14px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="../"><i>С</i>Смекай</a><a class="back" href="../">На главную</a></div></header>
+
+<main class="wrap">
+<h1>Мыслик: настроения и голос</h1>
+<p>Тут можно потрогать персонажа: сменить настроение, заставить сказать фразу, выбрать голос. Двигайте мышью рядом с ним, он следит глазами.</p>
+
+<div class="lab">
+  <div class="stagebox">
+    <myslik-face id="m" mood="idle" size="280"></myslik-face>
+  </div>
+  <div>
+    <h2 style="margin-top:0">Настроения</h2>
+    <div class="btns" id="moods"></div>
+    <h2>Готовые реакции</h2>
+    <p class="small">То, что бот и викторина показывают сами: приветствие, верный ответ, ошибка, размышление.</p>
+    <div class="btns" id="reacts" style="margin-top:8px"></div>
+
+    <h2>Сказать фразу</h2>
+    <div class="row">
+      <input type="text" id="txt" value="Привет! Я Мыслик. Давай разберём задачу вместе." maxlength="160">
+      <button class="main" id="say">Написать</button>
+      <button class="sun" id="speak">Озвучить</button>
+    </div>
+
+    <h2>Голос</h2>
+    <div class="row">
+      <select id="profile">
+        <option value="boy">Мыслик для мальчика</option>
+        <option value="girl">Мыслик для девочки</option>
+        <option value="parent">Мыслик для родителя</option>
+      </select>
+      <select id="voice"></select>
+    </div>
+    <div class="row">
+      <label class="small">Высота <input type="range" id="pitch" min="0.6" max="1.6" step="0.05" value="1.25"></label>
+      <label class="small">Скорость <input type="range" id="rate" min="0.7" max="1.3" step="0.02" value="1"></label>
+      <button id="test">Проверить голос</button>
+    </div>
+    <div class="card small" id="voicenote">
+      Список голосов зависит от устройства: на Windows это голоса Microsoft, на Android голоса Google, на iPhone голоса Apple. Ниже описано, как сделать голос одинаковым у всех.
+    </div>
+  </div>
+</div>
+
+<h2>Как сделать голос по-настоящему живым</h2>
+<p>Голос браузера бесплатный и работает сразу, но на разных телефонах звучит по-разному. Для продукта нужен один узнаваемый голос, который приходит с сервера готовым аудиофайлом. Для России подходят три варианта.</p>
+<table>
+<tr><th>Сервис</th><th>Голоса</th><th>Плюсы</th><th>Минусы</th><th>Кому подходит</th></tr>
+<tr><td><b>Yandex SpeechKit</b></td><td>Более 15 русских голосов, у части есть оттенки речи: дружелюбный, строгий, шёпот</td><td>Самое естественное русское произношение, ударения ставятся знаком +, паузы задаются в тексте, данные в России</td><td>Платно, около 1 300 ₽ за миллион знаков в премиум-качестве</td><td>Основной вариант для бота</td></tr>
+<tr><td><b>SaluteSpeech, Сбер</b></td><td>Шесть голосов, мужские и женские, 24 кГц</td><td>Хорошее качество, тот же кабинет, что у GigaChat</td><td>Меньше голосов, слабее управление интонацией</td><td>Запасной вариант, если уже работаем с GigaChat</td></tr>
+<tr><td><b>Silero TTS</b></td><td>Пять русских голосов, открытая модель</td><td>Бесплатно, работает на нашем сервере без интернета, никаких лимитов</td><td>Чуть более плоская интонация, нужен сервер помощнее</td><td>Когда голоса станет много и счёт от Яндекса вырастет</td></tr>
+</table>
+
+<h2>Три голоса Мыслика</h2>
+<p>Один персонаж, три манеры. Ребёнок выбирает при знакомстве, родитель слышит третью в отчётах.</p>
+<table>
+<tr><th>Для кого</th><th>Голос Яндекса</th><th>Манера</th><th>Пример фразы</th></tr>
+<tr><td>Мальчику</td><td>anton, оттенок good, или zahar</td><td>Молодой, бодрый, чуть быстрее обычного. Друг постарше, не учитель</td><td>«Так, стоп. Половину от двенадцати мы нашли, дальше сам!»</td></tr>
+<tr><td>Девочке</td><td>masha, оттенок friendly, или dasha</td><td>Тёплый, живой, с улыбкой в голосе. Подбадривает, не сюсюкает</td><td>«Смотри, ты почти у цели. Треть берём от остатка, помнишь?»</td></tr>
+<tr><td>Родителю</td><td>alexander, оттенок neutral, или julia</td><td>Спокойный, взрослый, без игры. Коротко и по делу</td><td>«За неделю решено пятнадцать заданий из двадцати. Трудности с задачами на части.»</td></tr>
+</table>
+<p class="small" style="margin-top:8px">Названия голосов проверить в консоли Яндекса перед подключением, состав меняется. Все три звучат как живые дикторы, детских голосов у сервисов нет, поэтому детскость даём манерой и текстом, а не писклявостью.</p>
+
+<h2>Что делает речь живой, кроме голоса</h2>
+<table>
+<tr><th>Приём</th><th>Как делаем</th></tr>
+<tr><td>Ударения</td><td>В сложных словах ставим знак плюс перед ударной гласной: Мы+слик, звон+ит, катал+ог. Иначе синтезатор ошибается</td></tr>
+<tr><td>Паузы</td><td>Между мыслью и вопросом пауза в полсекунды. У Яндекса это метка sil&lt;[500]&gt; прямо в тексте</td></tr>
+<tr><td>Короткие фразы</td><td>Одна мысль в одном предложении. Длинные конструкции синтез читает монотонно</td></tr>
+<tr><td>Эмоция от контекста</td><td>Верный ответ читается оттенком good, ошибка спокойным neutral, никогда строгим</td></tr>
+<tr><td>Рот и облачко</td><td>Пока звучит аудио, у Мыслика двигается рот и печатается текст. Ребёнок видит и слышит одно и то же</td></tr>
+<tr><td>Голосовые в Telegram</td><td>Бот отправляет ответ голосовым сообщением, как будто пишет друг, а не приложение</td></tr>
+</table>
+</main>
+
+<footer class="wrap">© 2026 Смекай · <a href="../" style="color:#2F63D6">На главную</a></footer>
+
+<script>
+const m = document.getElementById('m');
+const q = new URLSearchParams(location.search);
+
+// режим для записи стикеров: ?render=yay&size=512
+if (q.get('render')) {
+  document.body.className = 'render';
+  document.body.innerHTML = '';
+  const el = document.createElement('myslik-face');
+  el.setAttribute('size', q.get('size') || '512');
+  el.setAttribute('mood', q.get('render'));
+  document.body.append(el);
+  if (q.get('say')) el.say(q.get('say'), { ms: 9000 });
+  if (q.get('talk')) el.setAttribute('talking', '');
+} else {
+  const RU = { idle: 'Покой', think: 'Думает', yay: 'Радуется', party: 'Празднует', sad: 'Огорчился', angry: 'Сердится',
+               surprised: 'Удивился', sleepy: 'Устал', wave: 'Машет', love: 'Обожает', shy: 'Смущён' };
+  const moods = document.getElementById('moods');
+  for (const k of Myslik.MOODS) {
+    const b = document.createElement('button'); b.textContent = RU[k]; b.onclick = () => m.mood(k); moods.append(b);
+  }
+  const RR = { hello: 'Привет', correct: 'Верно', wrong: 'Ошибка', thinking: 'Думаю', streak: 'Серия', surprise: 'Ого', tired: 'Перерыв', love: 'Молодец', bye: 'Пока' };
+  const reacts = document.getElementById('reacts');
+  for (const k in RR) {
+    const b = document.createElement('button'); b.textContent = RR[k];
+    b.onclick = () => m.react(k, { voice: document.getElementById('voiceOn')?.checked, profile: currentProfile() });
+    reacts.append(b);
+  }
+  const txt = document.getElementById('txt');
+  document.getElementById('say').onclick = () => m.say(txt.value);
+  document.getElementById('speak').onclick = () => m.speak(txt.value, currentProfile());
+  document.getElementById('test').onclick = () => m.speak('Привет! Я Мыслик. Давай разберём задачу вместе. Что известно?', currentProfile());
+
+  const sel = document.getElementById('voice'), prof = document.getElementById('profile');
+  const pitch = document.getElementById('pitch'), rate = document.getElementById('rate');
+  function fillVoices() {
+    const vs = Myslik.voices(); sel.innerHTML = '';
+    if (!vs.length) { sel.innerHTML = '<option>Русских голосов в этом браузере нет</option>'; return; }
+    const auto = document.createElement('option'); auto.value = ''; auto.textContent = 'Автоматически'; sel.append(auto);
+    for (const v of vs) { const o = document.createElement('option'); o.value = v.voiceURI; o.textContent = v.name; sel.append(o); }
+  }
+  function currentProfile() {
+    const base = Myslik.profiles[prof.value];
+    return { ...base, pitch: +pitch.value, rate: +rate.value, voiceURI: sel.value || undefined };
+  }
+  prof.onchange = () => { const P = Myslik.profiles[prof.value]; pitch.value = P.pitch; rate.value = P.rate; sel.value = ''; };
+  fillVoices(); document.addEventListener('myslik-voices', fillVoices); setTimeout(fillVoices, 600);
+
+  m.react('hello');
+  m.addEventListener('click', () => { const ks = Object.keys(RR); m.react(ks[Math.floor(Math.random() * ks.length)]); });
+}
+</script>
+</body>
+</html>

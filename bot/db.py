@@ -34,11 +34,55 @@ def init():
     CREATE TABLE IF NOT EXISTS photo(
       id INTEGER PRIMARY KEY, user_id INTEGER, task TEXT, step INTEGER DEFAULT 0,
       history TEXT DEFAULT '[]', started TEXT);
+    CREATE TABLE IF NOT EXISTS files(key TEXT PRIMARY KEY, file_id TEXT);
     CREATE TABLE IF NOT EXISTS payments(
       id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, amount REAL,
       days INTEGER, source TEXT, ts TEXT DEFAULT CURRENT_TIMESTAMP);
     """)
     c.commit()
+    # новые колонки для старых баз
+    cols = [r["name"] for r in c.execute("PRAGMA table_info(users)").fetchall()]
+    if "voice" not in cols:
+        c.execute("ALTER TABLE users ADD COLUMN voice TEXT DEFAULT 'boy'")
+    if "streak" not in cols:
+        c.execute("ALTER TABLE users ADD COLUMN streak INTEGER DEFAULT 0")
+    if "source" not in cols:
+        c.execute("ALTER TABLE users ADD COLUMN source TEXT")
+    c.commit()
+
+
+def file_id_get(key):
+    r = conn().execute("SELECT file_id FROM files WHERE key=?", (key,)).fetchone()
+    return r["file_id"] if r else None
+
+
+def file_id_set(key, fid):
+    c = conn(); c.execute("INSERT OR REPLACE INTO files(key,file_id) VALUES(?,?)", (key, fid)); c.commit()
+
+
+def file_id_del(key):
+    c = conn(); c.execute("DELETE FROM files WHERE key=?", (key,)); c.commit()
+
+
+def set_source(uid, source):
+    c = conn()
+    c.execute("INSERT OR IGNORE INTO users(id,name,grade) VALUES(?,?,?)", (uid, "", 0))
+    c.execute("UPDATE users SET source=COALESCE(source,?) WHERE id=?", (source[:40], uid))
+    c.commit()
+
+
+def set_voice(uid, profile):
+    c = conn(); c.execute("UPDATE users SET voice=? WHERE id=?", (profile, uid)); c.commit()
+
+
+def bump_streak(uid, ok):
+    c = conn()
+    if ok:
+        c.execute("UPDATE users SET streak=COALESCE(streak,0)+1 WHERE id=?", (uid,))
+    else:
+        c.execute("UPDATE users SET streak=0 WHERE id=?", (uid,))
+    c.commit()
+    return conn().execute("SELECT streak FROM users WHERE id=?", (uid,)).fetchone()["streak"]
 
 
 def get_user(uid):

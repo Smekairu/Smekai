@@ -7,6 +7,7 @@
   button: Пройти викторину      текст кнопки (необязательно)
   link: quiz                    ссылка кнопки: quiz, boosty или полный адрес
   image: assets/myslik-navy.png картинка (необязательно)
+  animation: assets/anim/myslik-wave.mp4  анимация Мыслика (необязательно, для MAX берётся .mp4)
 Ниже: текст поста. Разметка Telegram HTML: <b>жирный</b>, <i>курсив</i>, <a href="...">ссылка</a>.
 """
 import json, os, re, sys, urllib.request, urllib.parse, uuid
@@ -76,7 +77,12 @@ def send_telegram(p):
     markup = None
     if p.get("button") and p.get("link"):
         markup = json.dumps({"inline_keyboard": [[{"text": p["button"], "url": p["link"]}]]})
-    if p.get("image"):
+    if p.get("animation"):
+        data = {"chat_id": chat, "caption": p["text"], "parse_mode": "HTML"}
+        if markup: data["reply_markup"] = markup
+        anim = ROOT / p["animation"]
+        r = http(base + "/sendAnimation", data, files={"animation": (anim.name, anim.read_bytes())})
+    elif p.get("image"):
         data = {"chat_id": chat, "caption": p["text"], "parse_mode": "HTML"}
         if markup: data["reply_markup"] = markup
         img = ROOT / p["image"]
@@ -115,13 +121,47 @@ def pending_write(items):
     PENDING.parent.mkdir(exist_ok=True)
     PENDING.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
 
-def max_send_text(chat, text, markup=None):
+def max_upload(kind, path):
+    """Загружает файл в MAX. kind: image или video. Возвращает вложение для сообщения или None."""
+    token = os.environ.get("MAX_BOT_TOKEN")
+    base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
+    try:
+        up = http(f"{base}/uploads?type={kind}", {}, headers={"Authorization": token})
+        url = up.get("url")
+        if not url:
+            print("MAX: не дали адрес загрузки:", up); return None
+        res = http(url, {}, files={"data": (Path(path).name, Path(path).read_bytes())})
+        if kind == "image":
+            photos = res.get("photos") or {}
+            tok = next((v.get("token") for v in photos.values() if isinstance(v, dict)), None) or res.get("token")
+        else:
+            tok = res.get("token") or up.get("token")
+        if not tok:
+            print("MAX: загрузка без токена:", res); return None
+        return {"type": kind, "payload": {"token": tok}}
+    except Exception as e:
+        detail = e.read().decode() if hasattr(e, "read") else str(e)
+        print("MAX: загрузка не удалась:", detail[:200]); return None
+
+
+def max_send_text(chat, text, markup=None, media=None):
     token = os.environ.get("MAX_BOT_TOKEN")
     base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
     body = {"text": text, "format": "html"}
-    if markup:
-        body["attachments"] = [markup]
-    http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+    att = []
+    if media: att.append(media)
+    if markup: att.append(markup)
+    if att: body["attachments"] = att
+    import time
+    for attempt in range(4):
+        try:
+            http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+            return
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode()
+            if "not.ready" in detail and attempt < 3:
+                time.sleep(2); continue      # видео ещё обрабатывается
+            raise urllib.error.HTTPError(e.url, e.code, detail, e.hdrs, None)
 
 def send_max_pending():
     """Отправляет ответы, у которых прошёл час после задания."""
@@ -147,8 +187,17 @@ def send_max(p):
     markup = None
     if p.get("button") and p.get("link"):
         markup = {"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}
+    media = None
+    if p.get("animation"):
+        mp4 = ROOT / p["animation"]
+        if mp4.suffix.lower() == ".gif":
+            mp4 = mp4.with_suffix(".mp4")
+        if mp4.exists():
+            media = max_upload("video", mp4)
+    elif p.get("image"):
+        media = max_upload("image", ROOT / p["image"])
     try:
-        max_send_text(chat, body, markup)
+        max_send_text(chat, body, markup, media)
     except Exception as e:
         detail = e.read().decode() if hasattr(e, "read") else str(e)
         print("MAX: ошибка:", detail); return False

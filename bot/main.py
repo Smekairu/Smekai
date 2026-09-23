@@ -16,7 +16,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup,
                            Message, ReplyKeyboardMarkup, KeyboardButton)
 
-import ai, db, report, tasks
+import ai, db, report, stickers, tasks, voice
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("myslik")
@@ -70,6 +70,9 @@ def hint_kb(has_more):
 
 @dp.message(CommandStart())
 async def start(m: Message, state: FSMContext):
+    parts = (m.text or "").split(maxsplit=1)
+    if len(parts) > 1 and parts[1].strip():
+        db.set_source(m.from_user.id, parts[1].strip())   # откуда пришёл: site, chat5a, boosty
     u = db.get_user(m.from_user.id)
     if u and u["grade"]:
         await m.answer(f"С возвращением, {u['name']}. Что делаем?", reply_markup=menu())
@@ -101,11 +104,38 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
     db.save_user(c.from_user.id, data.get("name") or c.from_user.first_name, grade)
     await state.clear()
     await c.message.edit_text(f"Записал: {grade} класс.")
+    await c.answer()
+    await stickers.send_mood(bot, c.message.chat.id, "wave")
+    await c.message.answer("Каким голосом мне с тобой говорить?", reply_markup=voice_kb())
+
+
+def voice_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Как с мальчиком", callback_data="voice:boy"),
+         InlineKeyboardButton(text="Как с девочкой", callback_data="voice:girl")],
+        [InlineKeyboardButton(text="Спокойно, по-взрослому", callback_data="voice:parent"),
+         InlineKeyboardButton(text="Без голоса", callback_data="voice:off")],
+    ])
+
+
+@dp.callback_query(F.data.startswith("voice:"))
+async def set_voice(c: CallbackQuery):
+    profile = c.data.split(":")[1]
+    db.set_voice(c.from_user.id, profile)
+    names = {"boy": "бодрый, как с другом", "girl": "тёплый, с улыбкой", "parent": "спокойный, по делу", "off": "выключен"}
+    await c.message.edit_text(f"Голос: {names.get(profile, profile)}.")
+    await c.answer()
+    if profile != "off" and not voice.available():
+        await c.message.answer("Голосовые сообщения включатся, когда на сервере появится ключ Яндекса. Пока отвечаю текстом.")
     await c.message.answer(
         "Три задания в день бесплатно. Нажимай «Задание», и начнём.\n"
         "С подпиской можно присылать фотографию задания из учебника.",
         reply_markup=menu())
-    await c.answer()
+
+
+@dp.message(Command("voice"))
+async def voice_cmd(m: Message):
+    await m.answer("Каким голосом мне говорить?", reply_markup=voice_kb())
 
 
 # ---------------- задания ----------------
@@ -113,6 +143,7 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
 async def give_task(m: Message, user):
     left = db.attempts_left(user["id"], FREE_LIMIT, PAID_LIMIT)
     if left <= 0:
+        await stickers.send_mood(bot, m.chat.id, "sleepy")
         await m.answer(
             "На сегодня бесплатные задания кончились.\n\n"
             "С подпиской их 30 в день, плюс разбор домашки и отчёт родителю.",
@@ -152,9 +183,12 @@ async def hint(c: CallbackQuery):
     if i >= len(hints):
         await c.answer("Подсказки кончились, попробуй решить", show_alert=True); return
     db.bump_hint(user["id"])
+    if i == 0:
+        await stickers.send_mood(bot, c.message.chat.id, "think")
     await c.message.answer(f"<b>Подсказка {i + 1}</b>\n{hints[i]}",
                            reply_markup=hint_kb(i + 1 < len(hints)))
     await c.answer()
+    await voice.send_voice(bot, c.message.chat.id, hints[i], user["voice"])
 
 
 @dp.callback_query(F.data == "solution")
@@ -189,13 +223,21 @@ async def check_answer(m: Message):
     if ok:
         db.close_current(user["id"], solved=True)
         stat = db.stats(user["id"])
-        await m.answer(
-            f"{random.choice(PRAISE)} {'Без подсказок, отлично.' if cur['hint_used'] == 0 else ''}\n"
-            f"Решено сегодня: {stat['today']}.",
-            reply_markup=hint_kb(False))
+        streak = db.bump_streak(user["id"], True)
+        praise = random.choice(PRAISE) + (" Без подсказок, отлично." if cur["hint_used"] == 0 else "")
+        if streak and streak % 3 == 0:
+            await stickers.send_mood(bot, m.chat.id, "party")
+            praise += f" Уже {streak} подряд!"
+        else:
+            await stickers.send_mood(bot, m.chat.id, "yay")
+        await m.answer(f"{praise}\nРешено сегодня: {stat['today']}.", reply_markup=hint_kb(False))
+        await voice.send_voice(bot, m.chat.id, praise, user["voice"])
     else:
         db.bump_try(user["id"])
+        db.bump_streak(user["id"], False)
         tries = cur["tries"] + 1
+        if tries == 2:
+            await stickers.send_mood(bot, m.chat.id, "sad")
         if tries == 1:
             add = "Проверь, что нашёл именно то, о чём спрашивают."
         elif tries == 2:
@@ -218,6 +260,7 @@ async def photo(m: Message):
     if not ai.available():
         await m.answer("Разбор по фото пока отключён. Напиши задание текстом, я помогу."); return
 
+    await stickers.send_mood(bot, m.chat.id, "think")
     await bot.send_chat_action(m.chat.id, "typing")
     f = await bot.get_file(m.photo[-1].file_id)
     buf = await bot.download_file(f.file_path)
@@ -250,6 +293,7 @@ async def ai_turn(m: Message, user, answer=None):
         InlineKeyboardButton(text="Показать решение", callback_data="ai_solve"),
         InlineKeyboardButton(text="Закончить", callback_data="ai_done")]])
     await m.answer(reply, reply_markup=kb)
+    await voice.send_voice(bot, m.chat.id, reply, user["voice"])
 
 
 @dp.callback_query(F.data == "ai_solve")
@@ -386,6 +430,7 @@ async def grant(m: Message):
     db.grant(uid, days)
     await m.answer(f"Подписка для {uid} продлена на {days} дней.")
     try:
+        await stickers.send_mood(bot, uid, "love")
         link = await make_invite()
         await bot.send_message(uid, "Подписка активна. Вот ссылка в закрытый канал:\n" + link)
     except Exception as e:

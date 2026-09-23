@@ -1,9 +1,8 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Викторина Смекай</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/fonts.css">
+<script src="../assets/myslik.js"></script>
 <style>
 :root{
   --ground:#EEF1F8; --card:#FFFFFF; --card-2:#F5F7FC; --line:#DCE1EE;
@@ -431,40 +430,7 @@ function beep(ok){ if(!S.sound) return; try{ AC=AC||new (window.AudioContext||wi
   g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.start(t); o.stop(t+.32);}catch(e){} }
 
 /* ---------- Мыслик ---------- */
-function mys(m,size){ return `<div class="mys ${m||''} ${size||''}" id="mys"><svg viewBox="-6 -8 112 122" aria-hidden="true">
-<ellipse cx="50" cy="108" rx="24" ry="3.5" fill="var(--line)"/>
-<g class="m-body">
-<g class="m-sparks" fill="var(--sun)"><path d="M6 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M92 40l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/><path d="M88 8l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g>
-<g class="m-rays" stroke="var(--sun)" stroke-width="2.6" stroke-linecap="round"><line x1="50" y1="-6" x2="50" y2="-1"/><line x1="36" y1="0" x2="39.5" y2="3.5"/><line x1="64" y1="0" x2="60.5" y2="3.5"/><line x1="31" y1="12" x2="36" y2="12"/><line x1="69" y1="12" x2="64" y2="12"/></g>
-<circle class="m-glow" cx="50" cy="12" r="15"/>
-<line x1="50" y1="31" x2="50" y2="20" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-<circle class="m-bulb" cx="50" cy="12" r="8"/>
-<circle cx="47" cy="9" r="2.5" fill="#fff" opacity=".8"/>
-<rect x="45.5" y="19" width="9" height="4" rx="1.5" fill="var(--ink-3)"/>
-<g class="m-arm l"><path d="M20 70 Q8 74 10 84" stroke="#2F63D6" stroke-width="7" fill="none" stroke-linecap="round"/></g>
-<g class="m-arm r"><path d="M80 70 Q92 74 90 84" stroke="#2F63D6" stroke-width="7" fill="none" stroke-linecap="round"/></g>
-<path d="M18 67 C18 41 32 29 50 29 C68 29 82 41 82 67 C82 89 68 103 50 103 C32 103 18 89 18 67Z" fill="#3E7BFA"/>
-<path d="M30 77 C30 65 38 59 50 59 C62 59 70 65 70 77 C70 91 62 98 50 98 C38 98 30 91 30 77Z" fill="#fff" opacity=".92"/>
-<circle cx="30" cy="70" r="4.5" fill="#FF8FA3" opacity=".6"/><circle cx="70" cy="70" r="4.5" fill="#FF8FA3" opacity=".6"/>
-<!-- обычное лицо -->
-<g class="f f-idle"><g class="m-lid"><ellipse cx="39" cy="55" rx="7" ry="8" fill="#fff"/><ellipse cx="61" cy="55" rx="7" ry="8" fill="#fff"/>
-<g class="m-pup"><circle cx="40" cy="56" r="4" fill="#1B1F3B"/><circle cx="62" cy="56" r="4" fill="#1B1F3B"/><circle cx="41.5" cy="54" r="1.4" fill="#fff"/><circle cx="63.5" cy="54" r="1.4" fill="#fff"/></g></g>
-<path d="M42 73 Q50 80 58 73" stroke="#1B1F3B" stroke-width="3" fill="none" stroke-linecap="round"/></g>
-<!-- думает -->
-<g class="f f-think"><ellipse cx="39" cy="55" rx="7" ry="8" fill="#fff"/><ellipse cx="61" cy="55" rx="7" ry="8" fill="#fff"/>
-<circle cx="42" cy="52" r="4" fill="#1B1F3B"/><circle cx="64" cy="52" r="4" fill="#1B1F3B"/>
-<path d="M32 44 L45 42" stroke="#1B1F3B" stroke-width="2.6" stroke-linecap="round"/><path d="M55 41 L68 45" stroke="#1B1F3B" stroke-width="2.6" stroke-linecap="round"/>
-<path d="M44 75 Q50 73 57 76" stroke="#1B1F3B" stroke-width="3" fill="none" stroke-linecap="round"/></g>
-<!-- радуется -->
-<g class="f f-yay"><path d="M32 57 Q39 48 46 57" stroke="#1B1F3B" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M54 57 Q61 48 68 57" stroke="#1B1F3B" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-<path d="M40 70 Q50 70 60 70 Q59 84 50 85 Q41 84 40 70Z" fill="#1B1F3B"/><path d="M44 79 Q50 75 56 79 Q54 84 50 84 Q46 84 44 79Z" fill="#FF6B81"/></g>
-<!-- огорчился -->
-<g class="f f-oops"><ellipse cx="39" cy="56" rx="7" ry="8" fill="#fff"/><ellipse cx="61" cy="56" rx="7" ry="8" fill="#fff"/>
-<circle cx="39" cy="59" r="4" fill="#1B1F3B"/><circle cx="61" cy="59" r="4" fill="#1B1F3B"/>
-<path d="M31 47 L45 43" stroke="#1B1F3B" stroke-width="2.6" stroke-linecap="round"/><path d="M55 43 L69 47" stroke="#1B1F3B" stroke-width="2.6" stroke-linecap="round"/>
-<ellipse cx="50" cy="77" rx="4.5" ry="5" fill="#1B1F3B"/>
-<path d="M72 46 Q75 52 72 55 Q69 52 72 46Z" fill="#7FB7FF"/></g>
-</g></svg></div>`; }
+function mys(m,size){ return `<myslik-face class="mys ${m||''} ${size||''}" id="mys"></myslik-face>`; }
 function mood(m){ document.querySelectorAll('.mys').forEach(el=>{ el.classList.remove('idle','think','yay','oops','party'); void el.offsetWidth; if(m) el.classList.add(m); }); }
 
 /* ---------- каркас ---------- */

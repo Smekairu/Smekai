@@ -10,6 +10,7 @@
 <meta property="og:image" content="assets/logo-myslik-yellow.png">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/favicon.png">
+<script src="assets/myslik.js" defer></script>
 <style>
 :root{
   --ink:#1B1F3B; --ink-2:#3A4166; --ink-3:#6B738F;
@@ -68,12 +69,8 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdro
 .hero-note{margin-top:16px;font-size:14px;color:var(--ink-3)}
 .mys-box{background:radial-gradient(circle at 50% 38%,#FFD661,#FFC933);border-radius:26px;
   padding:26px;box-shadow:var(--shadow);display:grid;place-items:center}
-.mys{width:100%;max-width:300px}
-.mys svg{width:100%;height:auto;overflow:visible}
-.m-eye{animation:blink 5.5s infinite}
-@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
-.m-glow{fill:#FFE9A3;opacity:.55;animation:pulse 3.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.35;r:14}50%{opacity:.7;r:16}}
+.mys{width:100%;max-width:300px;aspect-ratio:1;cursor:pointer}
+.mys-box{overflow:visible}
 
 /* карточки */
 .cards{display:grid;gap:18px}
@@ -136,12 +133,15 @@ footer a{color:var(--ink-2);text-decoration:none;font-size:15px;display:block;ma
 footer a:hover{color:var(--ink)}
 .req{font-size:13px;color:var(--ink-3);margin-top:22px;line-height:1.7}
 </style>
+<!-- Яндекс Метрика: получите номер счётчика на metrika.yandex.ru и вставьте вместо XXXXXXXX, затем уберите комментарий
+<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(XXXXXXXX,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true});</script>
+-->
 </head>
 <body>
 
 <header>
   <div class="wrap nav">
-    <a class="brand" href="/"><i>С</i>Смекай</a>
+    <a class="brand" href="./"><i>С</i>Смекай</a>
     <nav class="nav-links">
       <a class="link" href="#how">Как работает</a>
       <a class="link" href="#diff">Отличие</a>
@@ -149,7 +149,7 @@ footer a:hover{color:var(--ink)}
       <a class="link" href="#faq">Вопросы</a>
     </nav>
     <span class="sp"></span>
-    <a class="btn btn-main btn-sm" href="https://t.me/smekai_ru_bot">Попробовать</a>
+    <a class="btn btn-main btn-sm" href="https://t.me/smekai_ru_bot?start=site">Попробовать</a>
   </div>
 </header>
 
@@ -160,31 +160,13 @@ footer a:hover{color:var(--ink)}
       <h1>Ребёнок думает сам.<br>Родитель спокоен.</h1>
       <p class="lead">Мыслик разбирает домашние задания вместе с ребёнком. Он не выдаёт готовый ответ, а ведёт к нему вопросами и подсказками. Вам раз в неделю приходит отчёт: что сделано и где было трудно.</p>
       <div class="btns">
-        <a class="btn btn-main" href="https://t.me/smekai_ru_bot">Начать бесплатно</a>
+        <a class="btn btn-main" href="https://t.me/smekai_ru_bot?start=site">Начать бесплатно</a>
         <a class="btn btn-ghost" href="viktorina/">Пройти викторину</a>
       </div>
       <p class="hero-note">Три задания в день бесплатно, без карты и без установки приложений.</p>
     </div>
     <div class="mys-box">
-      <div class="mys">
-        <svg viewBox="-6 -8 112 122" aria-label="Мыслик">
-          <g fill="#FFE9A3"><path d="M6 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M92 40l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/><path d="M88 8l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g>
-          <g stroke="#FFE9A3" stroke-width="2.6" stroke-linecap="round"><line x1="50" y1="-6" x2="50" y2="-1"/><line x1="36" y1="0" x2="39.5" y2="3.5"/><line x1="64" y1="0" x2="60.5" y2="3.5"/><line x1="31" y1="12" x2="36" y2="12"/><line x1="69" y1="12" x2="64" y2="12"/></g>
-          <circle class="m-glow" cx="50" cy="12" r="15"/>
-          <line x1="50" y1="31" x2="50" y2="20" stroke="#1B1F3B" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="50" cy="12" r="8" fill="#FFE9A3"/><circle cx="47" cy="9" r="2.5" fill="#fff" opacity=".85"/>
-          <rect x="45.5" y="19" width="9" height="4" rx="1.5" fill="#8891AE"/>
-          <path d="M20 70 Q8 74 10 84" stroke="#2F63D6" stroke-width="7" fill="none" stroke-linecap="round"/>
-          <path d="M80 70 Q92 74 90 84" stroke="#2F63D6" stroke-width="7" fill="none" stroke-linecap="round"/>
-          <path d="M18 67 C18 41 32 29 50 29 C68 29 82 41 82 67 C82 89 68 103 50 103 C32 103 18 89 18 67Z" fill="#3E7BFA"/>
-          <path d="M30 77 C30 65 38 59 50 59 C62 59 70 65 70 77 C70 91 62 98 50 98 C38 98 30 91 30 77Z" fill="#fff" opacity=".93"/>
-          <circle cx="30" cy="70" r="4.5" fill="#FF8FA3" opacity=".6"/><circle cx="70" cy="70" r="4.5" fill="#FF8FA3" opacity=".6"/>
-          <g class="m-eye" style="transform-origin:39px 55px"><path d="M32 57 Q39 48 46 57" stroke="#1B1F3B" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>
-          <g class="m-eye" style="transform-origin:61px 55px"><path d="M54 57 Q61 48 68 57" stroke="#1B1F3B" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>
-          <path d="M40 70 Q50 70 60 70 Q59 84 50 85 Q41 84 40 70Z" fill="#1B1F3B"/>
-          <path d="M44 79 Q50 75 56 79 Q54 84 50 84 Q46 84 44 79Z" fill="#FF6B81"/>
-        </svg>
-      </div>
+      <myslik-face id="hero-mys" class="mys" mood="idle" aria-label="Мыслик"></myslik-face>
     </div>
   </div>
 </section>
@@ -272,7 +254,7 @@ footer a:hover{color:var(--ink)}
           <li>Открытый канал с заданиями</li>
           <li>Викторина для всей семьи</li>
         </ul>
-        <a class="btn btn-ghost" href="https://t.me/smekai_ru_bot">Начать</a>
+        <a class="btn btn-ghost" href="https://t.me/smekai_ru_bot?start=site">Начать</a>
       </div>
       <div class="plan best">
         <span class="badge">Основной тариф</span>
@@ -285,7 +267,7 @@ footer a:hover{color:var(--ink)}
           <li>Закрытый канал с заданиями по классу</li>
           <li>Отчёт родителю раз в неделю</li>
         </ul>
-        <a class="btn btn-main" href="https://t.me/smekai_ru_bot">Подключить</a>
+        <a class="btn btn-main" href="https://t.me/smekai_ru_bot?start=site">Подключить</a>
       </div>
       <div class="plan">
         <h3>Семья</h3>
@@ -297,10 +279,10 @@ footer a:hover{color:var(--ink)}
           <li>Отдельный отчёт по каждому</li>
           <li>Ответы в первую очередь</li>
         </ul>
-        <a class="btn btn-ghost" href="https://t.me/smekai_ru_bot">Подключить</a>
+        <a class="btn btn-ghost" href="https://t.me/smekai_ru_bot?start=site">Подключить</a>
       </div>
     </div>
-    <p class="center small muted" style="margin-top:22px">Есть ещё тариф «Задания» за 390 ₽ в месяц: закрытый канал с ежедневными заданиями и разборами, без личного помощника.</p>
+    <p class="center small muted" style="margin-top:22px">Есть ещё тариф «Задания» за 390 ₽ в месяц: закрытый канал с ежедневными заданиями и разборами, без личного помощника.<br>Оплата картами российских банков, в том числе МИР, и через СБП.</p>
   </div>
 </section>
 
@@ -345,6 +327,9 @@ footer a:hover{color:var(--ink)}
     <details><summary>Как отменить подписку?</summary>
       <p>В один клик там же, где оформляли. Деньги за неиспользованные дни возвращаются по заявлению, условия в оферте.</p></details>
 
+    <details><summary>Он говорит голосом?</summary>
+      <p>Да. При знакомстве ребёнок выбирает манеру: бодрую, как с другом, тёплую или спокойную взрослую. Ответы приходят и текстом, и голосовым сообщением, а сам Мыслик радуется, думает и огорчается стикерами. Посмотреть и послушать можно на <a href="myslik/">странице Мыслика</a>.</p></details>
+
     <details><summary>Кто это делает?</summary>
       <p>Проект начался с того, что я сделал помощника для собственных детей: их у меня пятеро, и вечерние уроки в нашей семье были отдельным видом спорта. Сейчас им пользуются другие семьи.</p></details>
   </div>
@@ -356,7 +341,7 @@ footer a:hover{color:var(--ink)}
       <h2>Попробуйте сегодня вечером</h2>
       <p>Три задания в день бесплатно. Карта не нужна, регистрация занимает полминуты: имя и класс.</p>
       <div class="btns" style="justify-content:center">
-        <a class="btn btn-sun" href="https://t.me/smekai_ru_bot">Открыть Мыслика</a>
+        <a class="btn btn-sun" href="https://t.me/smekai_ru_bot?start=site">Открыть Мыслика</a>
         <a class="btn btn-ghost" href="viktorina/">Сначала викторина</a>
       </div>
     </div>
@@ -367,7 +352,7 @@ footer a:hover{color:var(--ink)}
   <div class="wrap">
     <div class="foot">
       <div style="max-width:300px">
-        <a class="brand" href="/" style="margin-bottom:10px"><i>С</i>Смекай</a>
+        <a class="brand" href="./" style="margin-bottom:10px"><i>С</i>Смекай</a>
         <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
       </div>
       <div>
@@ -375,6 +360,7 @@ footer a:hover{color:var(--ink)}
         <a href="#how">Как работает</a>
         <a href="#price">Цены</a>
         <a href="viktorina/">Викторина</a>
+        <a href="myslik/">Мыслик</a>
       </div>
       <div>
         <p class="small" style="font-weight:700;margin-bottom:10px">Каналы</p>
@@ -386,7 +372,7 @@ footer a:hover{color:var(--ink)}
         <p class="small" style="font-weight:700;margin-bottom:10px">Документы</p>
         <a href="oferta.html">Публичная оферта</a>
         <a href="policy.html">Обработка данных</a>
-        <a href="https://t.me/smekai_ru_bot">Поддержка</a>
+        <a href="https://t.me/smekai_ru_bot?start=site">Поддержка</a>
       </div>
     </div>
     <p class="req">
@@ -397,5 +383,17 @@ footer a:hover{color:var(--ink)}
   </div>
 </footer>
 
+<script>
+window.addEventListener('load', () => {
+  const m = document.getElementById('hero-mys'); if (!m || !window.Myslik) return;
+  const lines = ['Привет! Я Мыслик.', 'Готовый ответ не дам.', 'Зато доведу до него сам.', 'Нажми на меня!'];
+  let i = 0;
+  setTimeout(() => m.react('hello', { text: lines[0] }), 600);
+  const next = () => { i = (i + 1) % lines.length; m.say(lines[i]); };
+  setTimeout(next, 4200); setTimeout(next, 7600); setTimeout(next, 11000);
+  const kinds = ['correct', 'thinking', 'surprise', 'love', 'streak', 'wrong', 'tired'];
+  m.addEventListener('click', () => m.react(kinds[Math.floor(Math.random() * kinds.length)]));
+});
+</script>
 </body>
 </html>
