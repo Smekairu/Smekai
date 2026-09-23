@@ -94,24 +94,72 @@ def max_chat(p):
         return os.environ.get("MAX_CHAT_ID_CLOSED") or ""
     return os.environ.get("MAX_CHAT_ID") or ""
 
-def plain(text):
-    """MAX не понимает скрытый текст Telegram, поэтому раскрываем его."""
-    return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", "")
+SPOILER = re.compile(r"\s*Ответы:\s*<tg-spoiler>(.*?)</tg-spoiler>\s*", re.S)
+PENDING = ROOT / "state" / "max_pending.json"
+ANSWER_DELAY_MIN = 60
+
+def split_answers(text):
+    """Отделяет ответы от задания. В MAX нет скрытого текста, поэтому ответы уходят позже."""
+    m = SPOILER.search(text)
+    if not m:
+        return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", ""), ""
+    body = SPOILER.sub("\n", text).strip()
+    return body, m.group(1).strip()
+
+def pending_read():
+    if PENDING.exists():
+        return json.loads(PENDING.read_text(encoding="utf-8"))
+    return []
+
+def pending_write(items):
+    PENDING.parent.mkdir(exist_ok=True)
+    PENDING.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+
+def max_send_text(chat, text, markup=None):
+    token = os.environ.get("MAX_BOT_TOKEN")
+    base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
+    body = {"text": text, "format": "html"}
+    if markup:
+        body["attachments"] = [markup]
+    http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+
+def send_max_pending():
+    """Отправляет ответы, у которых прошёл час после задания."""
+    items, left, now = pending_read(), [], datetime.now(MSK)
+    for it in items:
+        due = datetime.fromisoformat(it["due"])
+        if due > now:
+            left.append(it); continue
+        try:
+            max_send_text(it["chat"], "<b>Ответы к заданиям</b>\n\n" + it["text"])
+            print("MAX: отправлены ответы к", it.get("post"))
+        except Exception as e:
+            detail = e.read().decode() if hasattr(e, "read") else str(e)
+            print("MAX: ответы не ушли:", detail); left.append(it)
+    if items:
+        pending_write(left)
 
 def send_max(p):
     token, chat = os.environ.get("MAX_BOT_TOKEN"), max_chat(p)
     if not token or not chat:
         print("MAX: бот ещё не подключён, пропускаю"); return False
-    base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
-    body = {"text": plain(p["text"]), "format": "html"}
+    body, answers = split_answers(p["text"])
+    markup = None
     if p.get("button") and p.get("link"):
-        body["attachments"] = [{"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}]
+        markup = {"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}
     try:
-        http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+        max_send_text(chat, body, markup)
     except Exception as e:
         detail = e.read().decode() if hasattr(e, "read") else str(e)
         print("MAX: ошибка:", detail); return False
-    print("MAX: отправлено"); return True
+    print("MAX: отправлено")
+    if answers:
+        items = pending_read()
+        items.append({"chat": str(chat), "text": answers, "post": p.get("name", ""),
+                      "due": (datetime.now(MSK) + timedelta(minutes=ANSWER_DELAY_MIN)).isoformat()})
+        pending_write(items)
+        print(f"MAX: ответы уйдут через {ANSWER_DELAY_MIN} минут")
+    return True
 
 def check_telegram():
     """Проверка: токен рабочий, бот администратор канала и может публиковать."""
@@ -129,6 +177,7 @@ def check_telegram():
     return ok
 
 def main():
+    send_max_pending()
     if not check_telegram():
         print("Проверка не пройдена, публикация остановлена"); sys.exit(1)
     state = json.loads(STATE.read_text(encoding="utf-8"))
@@ -151,7 +200,9 @@ def main():
                 if mid:
                     sent = True
                     msgs[path.name] = mid
-            if "max" in p["channels"]: sent = send_max(p) or sent
+            if "max" in p["channels"]:
+                p["name"] = path.name
+                sent = send_max(p) or sent
         except Exception as e:
             print("Ошибка отправки:", e); errors += 1; continue
         if sent:
