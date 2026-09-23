@@ -3,7 +3,7 @@
 Сайт с викториной и автопубликация постов в Telegram и MAX.
 
 ## Что где лежит
-- `index.html`: викторина. Адрес после включения Pages: https://yarnick86.github.io/Smekai/
+- `index.html`: викторина. Адрес после включения Pages: https://smekairu.github.io/Smekai/
 - `assets/`: логотипы и аватары Мыслика.
 - `posts/`: посты. Один файл = один пост.
 - `state/published.json`: список уже отправленных постов, ведётся автоматически.
