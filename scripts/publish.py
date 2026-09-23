@@ -84,11 +84,15 @@ def send_max(p):
     token, chat = os.environ.get("MAX_BOT_TOKEN"), os.environ.get("MAX_CHAT_ID")
     if not token or not chat:
         print("MAX: бот ещё не подключён, пропускаю"); return False
-    base = os.environ.get("MAX_API_BASE", "https://platform-api.max.ru")
+    base = os.environ.get("MAX_API_BASE", "https://platform-api2.max.ru")
     body = {"text": p["text"], "format": "html"}
     if p.get("button") and p.get("link"):
         body["attachments"] = [{"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}]
-    r = http(f"{base}/messages?chat_id={urllib.parse.quote(chat)}", body, headers={"Authorization": token})
+    try:
+        http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+    except Exception as e:
+        detail = e.read().decode() if hasattr(e, "read") else str(e)
+        print("MAX: ошибка:", detail); return False
     print("MAX: отправлено"); return True
 
 def check_telegram():
