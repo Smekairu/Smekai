@@ -1,0 +1,16 @@
+name: Узнать канал Telegram
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  ids:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python scripts/tg_chat_id.py
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
