@@ -31,8 +31,8 @@ h2{font-size:21px;margin:32px 0 12px}
 
 <main class="wrap">
 <h1 style="margin-top:34px">Мыслик и Лев: настроения и голос</h1>
-<p>Тут можно потрогать персонажей: сменить настроение, заставить сказать фразу, выбрать голос. Нажимайте на лампу, глаза, рот, руки и живот, реакции разные. Двигайте мышью рядом, он следит глазами.</p>
-<div class="btns" style="margin-top:14px"><button class="btn btn-main btn-sm" id="who-m">Мыслик</button><button class="btn btn-ghost btn-sm" id="who-l">Лев</button></div>
+<p>Тут можно потрогать персонажа: сменить класс и посмотреть, как он растёт, сменить настроение, заставить сказать фразу, выбрать голос. Нажимайте на лампу, глаза, рот, руки и живот, реакции разные. Двигайте мышью рядом, он следит глазами.</p>
+<div class="row" style="margin-top:14px"><label class="small" style="flex:1 1 300px">Класс: <b id="agev">5</b> <input type="range" id="ager" min="1" max="11" step="0.1" value="5" style="width:100%"></label><button class="btn btn-ghost btn-sm" id="growb">Вырастить до 11</button></div>
 
 <div class="lab">
   <div class="stagebox" id="stagebox">
@@ -129,14 +129,16 @@ if (q.get('render')) {
   const el = document.createElement('myslik-face');
   el.setAttribute('size', q.get('size') || '512');
   if (q.get('who')) el.setAttribute('who', q.get('who'));
+  if (q.get('age')) el.setAttribute('age', q.get('age'));
   el.setAttribute('mood', q.get('render'));
   document.body.append(el);
   if (q.get('say')) el.say(q.get('say'), { ms: 9000 });
   if (q.get('talk')) el.setAttribute('talking', '');
 } else {
-  const box = document.getElementById('stagebox');
-  document.getElementById('who-m').onclick = () => { m.removeAttribute('who'); box.classList.remove('lev'); document.getElementById('who-m').className='btn btn-main btn-sm'; document.getElementById('who-l').className='btn btn-ghost btn-sm'; m.react('hello'); };
-  document.getElementById('who-l').onclick = () => { m.setAttribute('who', 'lev'); box.classList.add('lev'); document.getElementById('who-l').className='btn btn-main btn-sm'; document.getElementById('who-m').className='btn btn-ghost btn-sm'; m.react('hello'); };
+  const box = document.getElementById('stagebox'), ager = document.getElementById('ager'), agev = document.getElementById('agev');
+  const setAge = a => { m.setAttribute('age', a); agev.textContent = Math.round(a); box.classList.toggle('lev', a >= 9); };
+  ager.addEventListener('input', () => setAge(+ager.value));
+  let raf; document.getElementById('growb').onclick = () => { const f = () => { ager.value = m.age; agev.textContent = Math.round(m.age); box.classList.toggle('lev', m.age >= 9); raf = requestAnimationFrame(f); }; f(); m.grow(11, 6000); setTimeout(() => cancelAnimationFrame(raf), 7500); };
   const RU = { idle: 'Покой', think: 'Думает', yay: 'Радуется', party: 'Празднует', sad: 'Огорчился', angry: 'Сердится',
                surprised: 'Удивился', sleepy: 'Устал', wave: 'Машет', love: 'Обожает', shy: 'Смущён' };
   const moods = document.getElementById('moods');

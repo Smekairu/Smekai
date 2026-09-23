@@ -1,10 +1,11 @@
 """Создаёт наборы стикеров и эмодзи Смекай в Telegram через Bot API.
 
 Что создаётся (владелец набора: ADMIN_ID, то есть вы):
-  smekai_myslik_by_<бот>        обычные стикеры, 11 настроений Мыслика (WEBP 512)
-  smekai_lev_by_<бот>           обычные стикеры Льва
+  smekai_junior_by_<бот>        стикеры младшего Мыслика, 1–3 класс (WEBP 512)
+  smekai_myslik_by_<бот>        стикеры Мыслика, 4–8 класс
+  smekai_lev_by_<бот>           стикеры Льва, 9–11 класс
   smekai_anim_by_<бот>          видеостикеры, 10 анимаций Мыслика (WEBM)
-  smekai_emoji_by_<бот>         набор эмодзи, 22 штуки (100x100)
+  smekai_emoji_by_<бот>         набор эмодзи, 33 штуки (100x100)
 
 Запуск на сервере или с компьютера, где есть Python:
   set -a; . ./.env; set +a
@@ -94,11 +95,13 @@ def create_set(name, title, items, sticker_type="regular"):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["myslik", "lev", "anim", "emoji"])
+    ap.add_argument("--only", choices=["junior", "myslik", "lev", "anim", "emoji"])
     ap.add_argument("--delete", action="store_true")
     a = ap.parse_args()
     bot = bot_name()
     sets = {
+        "junior": (f"smekai_junior_by_{bot}", "Мыслик младший · Смекай",
+                   [(PACK / "sticker" / f"junior-{m}.webp", e) for m, e in EMOJI.items()], "regular"),
         "myslik": (f"smekai_myslik_by_{bot}", "Мыслик · Смекай",
                    [(PACK / "sticker" / f"myslik-{m}.webp", e) for m, e in EMOJI.items()], "regular"),
         "lev": (f"smekai_lev_by_{bot}", "Лев · Смекай",
@@ -106,7 +109,7 @@ def main():
         "anim": (f"smekai_anim_by_{bot}", "Мыслик живой · Смекай",
                  [(ANIM / f"myslik-{m}.webm", e) for m, e in EMOJI.items() if m != "shy"], "regular"),
         "emoji": (f"smekai_emoji_by_{bot}", "Эмодзи Смекай",
-                  [(PACK / "emoji" / f"{who}-{m}.webp", e) for who in ("myslik", "lev") for m, e in EMOJI.items()], "custom_emoji"),
+                  [(PACK / "emoji" / f"{who}-{m}.webp", e) for who in ("junior", "myslik", "lev") for m, e in EMOJI.items()], "custom_emoji"),
     }
     for key, (name, title, items, kind) in sets.items():
         if a.only and a.only != key:

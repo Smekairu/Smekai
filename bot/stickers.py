@@ -27,10 +27,10 @@ def path(mood, ext, prefix="myslik"):
 
 
 async def send_mood(bot: Bot, chat_id: int, mood: str, who: str = "myslik"):
-    """Присылает стикер с нужным настроением. Для старшеклассников Лев. Тихо пропускает, если файлов нет."""
+    """Присылает стикер с нужным настроением. who: junior (1–3 класс), myslik (4–8), lev (9–11). Тихо пропускает, если файлов нет."""
     if mood not in MOODS:
         return
-    prefix = "lev" if who == "lev" else "myslik"
+    prefix = who if who in ("junior", "lev") else "myslik"
     key = f"tg:{prefix}:{mood}"
     cached = db.file_id_get(key)
     try:

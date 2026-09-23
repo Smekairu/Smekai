@@ -20,11 +20,12 @@ import ai, db, report, stickers, tasks, voice
 
 
 def who(user):
-    """Старшеклассникам отвечает Лев: другие стикеры и голос."""
+    """Персонаж по классу: 1–3 младший Мыслик, 4–8 Мыслик, 9–11 Лев. Другие стикеры и голос."""
     try:
-        return "lev" if user and (user["grade"] or 0) >= 9 else "myslik"
+        g = (user["grade"] or 0) if user else 0
     except (KeyError, IndexError, TypeError):
-        return "myslik"
+        g = 0
+    return "lev" if g >= 9 else "junior" if 0 < g <= 3 else "myslik"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("myslik")
@@ -113,7 +114,7 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
     await state.clear()
     await c.message.edit_text(f"Записал: {grade} класс.")
     await c.answer()
-    await stickers.send_mood(bot, c.message.chat.id, "wave", "lev" if grade >= 9 else "myslik")
+    await stickers.send_mood(bot, c.message.chat.id, "wave", "lev" if grade >= 9 else "junior" if grade <= 3 else "myslik")
     await c.message.answer("Каким голосом мне с тобой говорить?", reply_markup=voice_kb())
 
 

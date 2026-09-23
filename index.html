@@ -29,6 +29,7 @@
 .growth .who.lev{background:var(--ink);color:#fff;border-color:var(--ink)}
 .growth .who.lev p{color:#C9CEE4}
 .growth myslik-face{width:170px;height:170px}
+.growth .who.lev myslik-face{width:200px;height:200px}
 .growth .arrow{font-size:34px;color:var(--ink-3);text-align:center}
 .where{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media(max-width:820px){.where{grid-template-columns:1fr}}
@@ -143,9 +144,21 @@
     <h2 class="center">Растёт вместе с ребёнком</h2>
     <p class="center lead muted" style="margin-bottom:30px">В младших и средних классах помогает Мыслик. В старших его сменяет Лев: спокойнее, строже, ближе к экзаменам.</p>
     <div class="growth">
-      <div class="who"><myslik-face mood="idle" id="g-mys"></myslik-face><h3>Мыслик</h3><p class="small">1–8 класс. Подсказывает, подбадривает, радуется вместе.</p></div>
+      <div class="who"><myslik-face age="1" mood="idle" id="g-1"></myslik-face><h3>1 класс</h3><p class="small">Круглый, глазастый, радуется каждой решённой задаче.</p></div>
       <div class="arrow">→</div>
-      <div class="who lev"><myslik-face who="lev" mood="idle" id="g-lev"></myslik-face><h3>Лев</h3><p class="small">9–11 класс. Разбирает по делу, готовит к ОГЭ и ЕГЭ.</p></div>
+      <div class="who"><myslik-face age="8" mood="idle" id="g-8"></myslik-face><h3>8 класс</h3><p class="small">Вытянулся, говорит короче, лампа светит теплее.</p></div>
+    </div>
+    <div class="growth" style="margin-top:18px;grid-template-columns:1fr auto 1fr">
+      <div></div>
+      <div class="arrow" style="transform:none">↓</div>
+      <div></div>
+    </div>
+    <div class="growth" style="grid-template-columns:1fr">
+      <div class="who lev" style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;text-align:left">
+        <myslik-face id="g-grow" age="1" mood="idle"></myslik-face>
+        <div><h3>С 9 класса Лев</h3><p class="small">Тот же характер, но грива вместо лампы и разговор по делу. Нажмите, чтобы увидеть, как первоклассник вырастает во Льва.</p>
+        <button class="btn btn-sun btn-sm" id="grow-btn" style="margin-top:12px">Вырастить</button></div>
+      </div>
     </div>
     <p class="center" style="margin-top:22px"><a class="btn btn-ghost" href="lev.html">Познакомиться с обоими</a></p>
   </div>
@@ -230,9 +243,10 @@ window.addEventListener('load', () => {
   setTimeout(() => m.react('hello', { text: lines[0] }), 600);
   const next = () => { i = (i + 1) % lines.length; if (!m.hasAttribute('talking')) m.say(lines[i]); };
   setTimeout(next, 4200); setTimeout(next, 7600); setTimeout(next, 11000);
-  const g1 = document.getElementById('g-mys'), g2 = document.getElementById('g-lev');
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { g1.react('hello'); setTimeout(() => g2.react('hello'), 700); io.disconnect(); } }), { threshold: .5 });
+  const g1 = document.getElementById('g-1'), g8 = document.getElementById('g-8'), gg = document.getElementById('g-grow');
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { g1.react('hello'); setTimeout(() => g8.react('hello'), 700); io.disconnect(); } }), { threshold: .5 });
   io.observe(g1);
+  document.getElementById('grow-btn').onclick = () => { if (gg.age >= 11) { gg.setAttribute('age', 1); gg.react('hello'); return; } gg.grow(11, 6000); };
 });
 </script>
 </body>

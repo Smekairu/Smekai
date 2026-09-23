@@ -28,8 +28,8 @@
 .tl-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-3)}
 .slider{margin-top:34px;background:var(--bg-2);border-radius:22px;padding:24px;text-align:center}
 .slider input{width:min(520px,100%);margin:14px 0}
-.slider .stage{display:flex;justify-content:center;gap:0;align-items:flex-end;height:200px;position:relative}
-.slider myslik-face{width:190px;height:190px;position:absolute;transition:opacity .35s,transform .35s}
+.slider .stage{display:flex;justify-content:center;align-items:flex-end;height:220px}
+.slider myslik-face{width:210px;height:210px}
 .tone{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
 @media(max-width:700px){.tone{grid-template-columns:1fr}}
 .tone .chat{height:100%}
@@ -49,23 +49,24 @@
 
 <div class="duo">
   <div class="who m">
-    <myslik-face id="mys" mood="idle"></myslik-face>
+    <myslik-face id="mys" age="4" mood="idle"></myslik-face>
     <div><h2 style="margin-bottom:6px">Мыслик</h2><p>1–8 класс</p>
-      <ul><li>Лампочка загорается, когда есть идея</li><li>Подсказывает вопросами, не спешит</li><li>Радуется вместе, огорчается вместе</li><li>Голос бодрый или тёплый, на выбор</li></ul></div>
+      <ul><li>Растёт вместе с ребёнком: в первом классе круглый и с большими глазами, к восьмому вытягивается</li><li>Лампочка загорается, когда есть идея</li><li>Подсказывает вопросами, не спешит</li><li>Радуется вместе, огорчается вместе</li><li>Голос бодрый или тёплый, на выбор</li></ul></div>
   </div>
   <div class="who l">
-    <myslik-face id="lev" who="lev" mood="idle"></myslik-face>
+    <myslik-face id="lev" age="10" mood="idle"></myslik-face>
     <div><h2 style="margin-bottom:6px;color:#fff">Лев</h2><p>9–11 класс</p>
       <ul><li>Грива светится там, где у Мыслика лампа</li><li>Говорит короче и по делу</li><li>Разбирает в формате ОГЭ и ЕГЭ</li><li>Голос спокойный, взрослый</li></ul></div>
   </div>
 </div>
 
 <div class="slider">
-  <h3>Как один превращается в другого</h3>
-  <p class="small muted">Потяните ползунок. Лампа Мыслика становится гривой Льва, а сам характер остаётся.</p>
-  <div class="stage"><myslik-face id="s-m" mood="idle"></myslik-face><myslik-face id="s-l" who="lev" mood="idle" style="opacity:0"></myslik-face></div>
-  <input type="range" id="age" min="1" max="11" value="5" aria-label="Класс">
-  <div id="age-label" class="small">5 класс · Мыслик</div>
+  <h3>Как он растёт</h3>
+  <p class="small muted">Потяните ползунок или нажмите «Вырастить». С первого по восьмой класс Мыслик взрослеет: вытягивается, глаза становятся строже, лампа меньше, а свет вокруг неё теплеет. В девятом лампа вспыхивает и становится гривой Льва.</p>
+  <div class="stage"><myslik-face id="s-m" age="1" mood="idle"></myslik-face></div>
+  <input type="range" id="age" min="1" max="11" step="0.1" value="1" aria-label="Класс">
+  <div id="age-label" class="small">1 класс · Мыслик</div>
+  <div class="btns" style="justify-content:center;margin-top:12px"><button class="btn btn-main btn-sm" id="grow">Вырастить</button><button class="btn btn-ghost btn-sm" id="reset">Снова в первый класс</button></div>
 </div>
 
 <h2 style="margin-top:40px">Один и тот же разбор, два тона</h2>
@@ -93,15 +94,13 @@
 window.addEventListener('load', () => {
   const m = document.getElementById('mys'), l = document.getElementById('lev');
   setTimeout(() => m.react('hello'), 500); setTimeout(() => l.react('hello'), 1300);
-  const sm = document.getElementById('s-m'), sl = document.getElementById('s-l'), age = document.getElementById('age'), lab = document.getElementById('age-label');
-  const upd = () => {
-    const v = +age.value, lev = v >= 9;
-    sm.style.opacity = lev ? 0 : 1; sl.style.opacity = lev ? 1 : 0;
-    sm.style.transform = lev ? 'scale(.8)' : 'scale(1)'; sl.style.transform = lev ? 'scale(1)' : 'scale(.8)';
-    lab.textContent = `${v} класс · ${lev ? 'Лев' : 'Мыслик'}`;
-    (lev ? sl : sm).react(v === 9 ? 'hello' : 'correct', { bubble: v === 9 || v === 1 });
-  };
-  age.addEventListener('input', upd);
+  const sm = document.getElementById('s-m'), age = document.getElementById('age'), lab = document.getElementById('age-label');
+  const label = a => { const g = Math.round(a); lab.textContent = `${g} класс · ${a >= 9 ? 'Лев' : 'Мыслик'}`; };
+  age.addEventListener('input', () => { sm.setAttribute('age', age.value); label(+age.value); });
+  sm.addEventListener('myslik-grown', e => { age.value = e.detail.age; label(e.detail.age); });
+  let raf; const follow = () => { age.value = sm.age; label(sm.age); raf = requestAnimationFrame(follow); };
+  document.getElementById('grow').onclick = () => { cancelAnimationFrame(raf); follow(); sm.grow(11, 6000); setTimeout(() => cancelAnimationFrame(raf), 7500); };
+  document.getElementById('reset').onclick = () => { cancelAnimationFrame(raf); sm.setAttribute('age', 1); age.value = 1; label(1); sm.react('hello'); };
 });
 </script>
 </body>

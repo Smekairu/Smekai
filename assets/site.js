@@ -138,7 +138,7 @@
   function floater() {
     if (document.body.dataset.float === 'off' || !window.customElements.get('myslik-face')) return;
     const m = document.createElement('myslik-face'); m.setAttribute('float', ''); m.setAttribute('mood', 'idle');
-    if (document.body.dataset.who) m.setAttribute('who', document.body.dataset.who);
+    m.setAttribute('age', document.body.dataset.age || '5');
     document.body.append(m);
     let seen = 0; try { seen = +localStorage.getItem('smk_float_seen') || 0; } catch (e) {}
     setTimeout(() => m.react('hello', { text: seen ? undefined : 'Привет! Меня можно таскать по экрану.' }), 900);
@@ -154,6 +154,7 @@
 
   /* ---------- сборка ---------- */
   document.addEventListener('DOMContentLoaded', () => {
+    if (document.body.classList.contains('render')) return;   // режим записи стикеров
     const h = document.getElementById('site-header'); if (h) h.outerHTML = header(document.body.dataset.page || '');
     const f = document.getElementById('site-footer'); if (f) f.outerHTML = footer();
     const bg = document.getElementById('burger'); if (bg) bg.onclick = () => document.getElementById('navlinks').classList.toggle('open');

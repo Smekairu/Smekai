@@ -132,7 +132,7 @@ function setup() {
     <div class="grades" id="gr">${[1,2,3,4,5,6,7,8,9,10,11].map(g => `<button data-g="${g}"${S.grade === g ? ' class="on"' : ''}>${g}</button>`).join('')}</div>
     <button class="btn btn-main" id="go">Начать</button></div>`;
   $('#gr').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#gr').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); S.grade = +b.dataset.g; };
-  $('#go').onclick = () => { if (!S.grade) { talk('Выбери класс.', 'thinking'); return; } S.name = $('#nm').value.trim(); save(); lev = S.grade >= 9; if (lev) m.setAttribute('who', 'lev'); else m.removeAttribute('who'); pills(); task(); };
+  $('#go').onclick = () => { if (!S.grade) { talk('Выбери класс.', 'thinking'); return; } S.name = $('#nm').value.trim(); save(); lev = S.grade >= 9; m.setAttribute('age', S.grade); pills(); task(); };
   m.react('hello', { text: 'Привет! Как тебя зовут и в каком ты классе?' });
 }
 function task() {
@@ -192,7 +192,7 @@ $('#voice-btn').onclick = e => {
 m.addEventListener('myslik-tap', e => { /* реакция уже показана, тут можно считать клики */ });
 
 load(); pills();
-if (S.grade) { lev = S.grade >= 9; if (lev) m.setAttribute('who', 'lev'); task(); } else setup();
+if (S.grade) { lev = S.grade >= 9; m.setAttribute('age', S.grade); task(); } else setup();
 </script>
 </body>
 </html>
