@@ -18,7 +18,7 @@ POSTS = ROOT / "posts"
 STATE = ROOT / "state" / "published.json"
 MSK = timezone(timedelta(hours=3))
 LINKS = {
-    "quiz": os.environ.get("QUIZ_URL") or "https://smekairu.github.io/Smekai/",
+    "quiz": "https://smekairu.github.io/Smekai/",
     "boosty": "https://boosty.to/smekai",
     "telegram": "https://t.me/smekai_ru",
 }
@@ -77,7 +77,8 @@ def send_telegram(p):
         data = {"chat_id": chat, "text": p["text"], "parse_mode": "HTML", "disable_web_page_preview": False}
         if markup: data["reply_markup"] = json.loads(markup)
         r = http(base + "/sendMessage", data)
-    ok = bool(r.get("ok")); print("Telegram:", "отправлено" if ok else r); return ok
+    ok = bool(r.get("ok")); print("Telegram:", "отправлено" if ok else r)
+    return (r.get("result") or {}).get("message_id") if ok else None
 
 def send_max(p):
     token, chat = os.environ.get("MAX_BOT_TOKEN"), os.environ.get("MAX_CHAT_ID")
@@ -110,6 +111,7 @@ def main():
         print("Проверка не пройдена, публикация остановлена"); sys.exit(1)
     state = json.loads(STATE.read_text(encoding="utf-8"))
     done = set(state.get("published", []))
+    msgs = dict(state.get("messages", {}))
     now = datetime.now(MSK)
     errors = 0
     for path in sorted(POSTS.glob("*.md")):
@@ -122,13 +124,17 @@ def main():
         print(f"Публикую {path.name}")
         sent = False
         try:
-            if "telegram" in p["channels"]: sent = send_telegram(p) or sent
+            if "telegram" in p["channels"]:
+                mid = send_telegram(p)
+                if mid:
+                    sent = True
+                    msgs[path.name] = mid
             if "max" in p["channels"]: sent = send_max(p) or sent
         except Exception as e:
             print("Ошибка отправки:", e); errors += 1; continue
         if sent:
             done.add(path.name)
-    STATE.write_text(json.dumps({"published": sorted(done)}, ensure_ascii=False, indent=2), encoding="utf-8")
+    STATE.write_text(json.dumps({"published": sorted(done), "messages": msgs}, ensure_ascii=False, indent=2), encoding="utf-8")
     sys.exit(1 if errors else 0)
 
 if __name__ == "__main__":

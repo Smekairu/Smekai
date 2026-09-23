@@ -1,0 +1,32 @@
+name: Исправить ссылку в посте
+
+on:
+  workflow_dispatch:
+    inputs:
+      message_id:
+        description: "Номер поста из ссылки t.me/smekai_ru/N"
+        required: true
+      button:
+        description: "Текст кнопки"
+        required: false
+        default: "Пройти викторину"
+      url:
+        description: "Новая ссылка"
+        required: false
+        default: "https://smekairu.github.io/Smekai/"
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python scripts/fix_link.py
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHANNEL: ${{ secrets.TG_CHANNEL }}
+          MSG_ID: ${{ inputs.message_id }}
+          BTN_TEXT: ${{ inputs.button }}
+          BTN_URL: ${{ inputs.url }}
