@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://smekairu.github.io/Smekai/sitemap.xml

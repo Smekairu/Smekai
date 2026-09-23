@@ -18,7 +18,7 @@ POSTS = ROOT / "posts"
 STATE = ROOT / "state" / "published.json"
 MSK = timezone(timedelta(hours=3))
 LINKS = {
-    "quiz": "https://smekairu.github.io/Smekai/",
+    "quiz": "https://smekairu.github.io/Smekai/viktorina/",
     "boosty": "https://boosty.to/smekai",
     "telegram": "https://t.me/smekai_ru",
 }
