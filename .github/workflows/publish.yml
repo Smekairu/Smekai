@@ -20,12 +20,26 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - name: Сертификаты НУЦ Минцифры (нужны для MAX)
+        continue-on-error: true
+        run: |
+          set -e
+          curl -fsSL -o root.cer https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
+          curl -fsSL -o sub.cer  https://gu-st.ru/content/Other/doc/russian_trusted_sub_ca.cer
+          for f in root sub; do
+            openssl x509 -in $f.cer -out $f.pem 2>/dev/null || openssl x509 -inform DER -in $f.cer -out $f.pem
+          done
+          sudo cp root.pem /usr/local/share/ca-certificates/russian_trusted_root_ca.crt
+          sudo cp sub.pem  /usr/local/share/ca-certificates/russian_trusted_sub_ca.crt
+          sudo update-ca-certificates
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          rm -f root.cer sub.cer root.pem sub.pem
       - name: Отправить посты, у которых подошло время
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHANNEL: ${{ vars.TG_CHANNEL }}
+          TG_CHANNEL: ${{ vars.TG_CHANNEL || secrets.TG_CHANNEL }}
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
-          MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID }}
+          MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
           QUIZ_URL: ${{ vars.QUIZ_URL }}
         run: python scripts/publish.py
       - name: Сохранить отметки об отправке
