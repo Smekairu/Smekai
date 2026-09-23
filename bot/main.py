@@ -18,6 +18,14 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton, InlineKeyboardMa
 
 import ai, db, report, stickers, tasks, voice
 
+
+def who(user):
+    """Старшеклассникам отвечает Лев: другие стикеры и голос."""
+    try:
+        return "lev" if user and (user["grade"] or 0) >= 9 else "myslik"
+    except (KeyError, IndexError, TypeError):
+        return "myslik"
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("myslik")
 
@@ -105,7 +113,7 @@ async def reg_grade(c: CallbackQuery, state: FSMContext):
     await state.clear()
     await c.message.edit_text(f"Записал: {grade} класс.")
     await c.answer()
-    await stickers.send_mood(bot, c.message.chat.id, "wave")
+    await stickers.send_mood(bot, c.message.chat.id, "wave", "lev" if grade >= 9 else "myslik")
     await c.message.answer("Каким голосом мне с тобой говорить?", reply_markup=voice_kb())
 
 
@@ -121,8 +129,11 @@ def voice_kb():
 @dp.callback_query(F.data.startswith("voice:"))
 async def set_voice(c: CallbackQuery):
     profile = c.data.split(":")[1]
+    u = db.get_user(c.from_user.id)
+    if profile in ("boy", "girl") and who(u) == "lev":
+        profile = "lev"      # у старшеклассников говорит Лев
     db.set_voice(c.from_user.id, profile)
-    names = {"boy": "бодрый, как с другом", "girl": "тёплый, с улыбкой", "parent": "спокойный, по делу", "off": "выключен"}
+    names = {"boy": "бодрый, как с другом", "girl": "тёплый, с улыбкой", "parent": "спокойный, по делу", "lev": "Лев, спокойный", "off": "выключен"}
     await c.message.edit_text(f"Голос: {names.get(profile, profile)}.")
     await c.answer()
     if profile != "off" and not voice.available():
@@ -138,12 +149,31 @@ async def voice_cmd(m: Message):
     await m.answer("Каким голосом мне говорить?", reply_markup=voice_kb())
 
 
+@dp.message(Command("voicetest"))
+async def voice_test(m: Message):
+    """Присылает одну фразу всеми голосами Яндекса, чтобы выбрать. Только для администратора."""
+    if m.from_user.id != ADMIN_ID:
+        return
+    if not voice.available():
+        await m.answer("Ключ Яндекса не настроен, слушать пока нечего."); return
+    parts = m.text.split(maxsplit=1)
+    phrase = parts[1] if len(parts) > 1 else "Привет, я Мыслик. Половину от двенадцати мы нашли, дальше сам. Что известно и что надо найти?"
+    from aiogram.types import BufferedInputFile
+    for name, sex, note in voice.CATALOG:
+        audio = voice.synth(phrase, voice_name=name)
+        if not audio:
+            await m.answer(f"{name}: не получилось"); continue
+        await bot.send_voice(m.chat.id, BufferedInputFile(audio, filename=f"{name}.ogg"),
+                             caption=f"{name} · {sex} · {note}")
+    await m.answer("Понравившиеся имена впишите в .env: VOICE_BOY, VOICE_GIRL, VOICE_PARENT, VOICE_LEV.")
+
+
 # ---------------- задания ----------------
 
 async def give_task(m: Message, user):
     left = db.attempts_left(user["id"], FREE_LIMIT, PAID_LIMIT)
     if left <= 0:
-        await stickers.send_mood(bot, m.chat.id, "sleepy")
+        await stickers.send_mood(bot, m.chat.id, "sleepy", who(user))
         await m.answer(
             "На сегодня бесплатные задания кончились.\n\n"
             "С подпиской их 30 в день, плюс разбор домашки и отчёт родителю.",
@@ -184,7 +214,7 @@ async def hint(c: CallbackQuery):
         await c.answer("Подсказки кончились, попробуй решить", show_alert=True); return
     db.bump_hint(user["id"])
     if i == 0:
-        await stickers.send_mood(bot, c.message.chat.id, "think")
+        await stickers.send_mood(bot, c.message.chat.id, "think", who(user))
     await c.message.answer(f"<b>Подсказка {i + 1}</b>\n{hints[i]}",
                            reply_markup=hint_kb(i + 1 < len(hints)))
     await c.answer()
@@ -226,10 +256,10 @@ async def check_answer(m: Message):
         streak = db.bump_streak(user["id"], True)
         praise = random.choice(PRAISE) + (" Без подсказок, отлично." if cur["hint_used"] == 0 else "")
         if streak and streak % 3 == 0:
-            await stickers.send_mood(bot, m.chat.id, "party")
+            await stickers.send_mood(bot, m.chat.id, "party", who(user))
             praise += f" Уже {streak} подряд!"
         else:
-            await stickers.send_mood(bot, m.chat.id, "yay")
+            await stickers.send_mood(bot, m.chat.id, "yay", who(user))
         await m.answer(f"{praise}\nРешено сегодня: {stat['today']}.", reply_markup=hint_kb(False))
         await voice.send_voice(bot, m.chat.id, praise, user["voice"])
     else:
@@ -237,7 +267,7 @@ async def check_answer(m: Message):
         db.bump_streak(user["id"], False)
         tries = cur["tries"] + 1
         if tries == 2:
-            await stickers.send_mood(bot, m.chat.id, "sad")
+            await stickers.send_mood(bot, m.chat.id, "sad", who(user))
         if tries == 1:
             add = "Проверь, что нашёл именно то, о чём спрашивают."
         elif tries == 2:
@@ -260,7 +290,7 @@ async def photo(m: Message):
     if not ai.available():
         await m.answer("Разбор по фото пока отключён. Напиши задание текстом, я помогу."); return
 
-    await stickers.send_mood(bot, m.chat.id, "think")
+    await stickers.send_mood(bot, m.chat.id, "think", who(user))
     await bot.send_chat_action(m.chat.id, "typing")
     f = await bot.get_file(m.photo[-1].file_id)
     buf = await bot.download_file(f.file_path)
@@ -430,7 +460,7 @@ async def grant(m: Message):
     db.grant(uid, days)
     await m.answer(f"Подписка для {uid} продлена на {days} дней.")
     try:
-        await stickers.send_mood(bot, uid, "love")
+        await stickers.send_mood(bot, uid, "love", who(db.get_user(uid)))
         link = await make_invite()
         await bot.send_message(uid, "Подписка активна. Вот ссылка в закрытый канал:\n" + link)
     except Exception as e:

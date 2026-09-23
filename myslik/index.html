@@ -3,54 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Мыслик — настроения и голос</title>
-<meta name="description" content="Как выглядит и говорит Мыслик: настроения, облачко с фразами, выбор голоса.">
+<title>Мыслик и Лев: настроения и голос — Смекай</title>
+<meta name="description" content="Как выглядят и говорят персонажи Смекай: настроения, облачко с фразами, выбор голоса, образцы.">
 <link rel="icon" href="../assets/favicon.png">
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../assets/myslik.js"></script>
+<script src="../assets/site.js" defer></script>
 <style>
-:root{--ink:#1B1F3B;--ink-2:#3A4166;--ink-3:#6B738F;--sun:#FFC933;--line:#E4E7F2;--bg-2:#F6F7FB;--blue:#3E7BFA}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff}
 body.render{background:transparent}
-.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
-header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);z-index:5}
-.nav{display:flex;align-items:center;height:62px;gap:16px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;text-decoration:none;color:var(--ink)}
-.brand i{width:30px;height:30px;border-radius:9px;background:var(--sun);display:grid;place-items:center;font-style:normal;font-weight:900;color:#5C4300;font-size:17px}
-.nav a.back{margin-left:auto;color:var(--ink-2);text-decoration:none;font-size:15px}
-h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.02em;margin:34px 0 6px}
-h2{font-size:21px;font-weight:800;margin:32px 0 12px}
-p{color:var(--ink-2)}
+body.render #site-header,body.render #site-footer{display:none}
 .lab{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start;margin-top:22px}
 @media(max-width:760px){.lab{grid-template-columns:1fr}}
-.stagebox{background:radial-gradient(circle at 50% 38%,#FFD661,#FFC933);border-radius:26px;padding:30px 20px 24px;display:grid;place-items:center;position:sticky;top:80px}
-.btns{display:flex;flex-wrap:wrap;gap:8px}
-button,.btn{font:inherit;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;cursor:pointer}
-button:hover{border-color:var(--ink)}
-button.main{background:var(--ink);color:#fff;border-color:var(--ink)}
-button.sun{background:var(--sun);border-color:var(--sun);color:#3D2E00}
+.stagebox{background:radial-gradient(circle at 50% 38%,#FFD661,#FFC933);border-radius:26px;padding:30px 20px 24px;display:grid;place-items:center;position:sticky;top:80px;transition:background .4s}
+.stagebox.lev{background:radial-gradient(circle at 50% 38%,#2A3160,#1B1F3B)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 input[type=text],select{font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;min-width:0}
-input[type=text]{flex:1 1 260px}
-select{flex:1 1 220px}
-.card{background:var(--bg-2);border-radius:16px;padding:16px 18px;margin-top:14px}
-.small{font-size:14px;color:var(--ink-3)}
-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px}
-th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-th{background:var(--bg-2)}
-.tag{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;color:var(--ink-2)}
-footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size:14px;color:var(--ink-3)}
+input[type=text]{flex:1 1 260px} select{flex:1 1 220px}
+.card.note{margin-top:14px}
+h2{font-size:21px;margin:32px 0 12px}
+.vtable td audio{width:100%;max-width:260px}
 </style>
 </head>
-<body>
-<header><div class="wrap nav"><a class="brand" href="../"><i>С</i>Смекай</a><a class="back" href="../">На главную</a></div></header>
+<body data-page="myslik" data-root="../" data-src="site" data-float="off" data-metrika="">
+<div id="site-header"></div>
+
 
 <main class="wrap">
-<h1>Мыслик: настроения и голос</h1>
-<p>Тут можно потрогать персонажа: сменить настроение, заставить сказать фразу, выбрать голос. Двигайте мышью рядом с ним, он следит глазами.</p>
+<h1 style="margin-top:34px">Мыслик и Лев: настроения и голос</h1>
+<p>Тут можно потрогать персонажей: сменить настроение, заставить сказать фразу, выбрать голос. Нажимайте на лампу, глаза, рот, руки и живот, реакции разные. Двигайте мышью рядом, он следит глазами.</p>
+<div class="btns" style="margin-top:14px"><button class="btn btn-main btn-sm" id="who-m">Мыслик</button><button class="btn btn-ghost btn-sm" id="who-l">Лев</button></div>
 
 <div class="lab">
-  <div class="stagebox">
+  <div class="stagebox" id="stagebox">
     <myslik-face id="m" mood="idle" size="280"></myslik-face>
   </div>
   <div>
@@ -73,6 +58,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size
         <option value="boy">Мыслик для мальчика</option>
         <option value="girl">Мыслик для девочки</option>
         <option value="parent">Мыслик для родителя</option>
+        <option value="lev">Лев</option>
       </select>
       <select id="voice"></select>
     </div>
@@ -87,6 +73,16 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size
   </div>
 </div>
 
+<h2>Послушать образцы</h2>
+<p>Голос браузера выше зависит от устройства. Ниже одинаковые для всех образцы: один записан здесь открытой моделью, остальные это ссылки на демонстрации сервисов, где голоса можно прослушать без регистрации.</p>
+<table class="vtable">
+<tr><th>Что это</th><th>Как звучит</th><th>Где ещё послушать</th></tr>
+<tr><td>Открытая модель Piper, голос Ирина. Так звучит бесплатный вариант на своём сервере</td><td><audio controls preload="none" src="../assets/voice/sample-irina.mp3"></audio></td><td>Модель работает без интернета, голосов по-русски у неё немного</td></tr>
+<tr><td>Yandex SpeechKit: anton, masha, alexander и ещё больше десяти</td><td>Кнопка «Прослушать» на странице сервиса, любой текст</td><td><a href="https://yandex.cloud/ru/services/speechkit" target="_blank" rel="noopener">yandex.cloud, раздел SpeechKit</a></td></tr>
+<tr><td>SaluteSpeech, Сбер: шесть голосов</td><td>Демонстрация на сайте</td><td><a href="https://developers.sber.ru/portal/products/smartspeech" target="_blank" rel="noopener">developers.sber.ru, SaluteSpeech</a></td></tr>
+</table>
+<p class="small muted" style="margin-top:8px">Когда на сервере появится ключ Яндекса, бот по команде /voicetest пришлёт голосовые сообщения всеми голосами с одной и той же фразой, и выбрать можно будет прямо в Telegram.</p>
+
 <h2>Как сделать голос по-настоящему живым</h2>
 <p>Голос браузера бесплатный и работает сразу, но на разных телефонах звучит по-разному. Для продукта нужен один узнаваемый голос, который приходит с сервера готовым аудиофайлом. Для России подходят три варианта.</p>
 <table>
@@ -96,13 +92,14 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size
 <tr><td><b>Silero TTS</b></td><td>Пять русских голосов, открытая модель</td><td>Бесплатно, работает на нашем сервере без интернета, никаких лимитов</td><td>Чуть более плоская интонация, нужен сервер помощнее</td><td>Когда голоса станет много и счёт от Яндекса вырастет</td></tr>
 </table>
 
-<h2>Три голоса Мыслика</h2>
-<p>Один персонаж, три манеры. Ребёнок выбирает при знакомстве, родитель слышит третью в отчётах.</p>
+<h2>Четыре голоса</h2>
+<p>Три манеры у Мыслика и один голос у Льва. Ребёнок выбирает при знакомстве, родитель слышит взрослую манеру в отчётах.</p>
 <table>
 <tr><th>Для кого</th><th>Голос Яндекса</th><th>Манера</th><th>Пример фразы</th></tr>
 <tr><td>Мальчику</td><td>anton, оттенок good, или zahar</td><td>Молодой, бодрый, чуть быстрее обычного. Друг постарше, не учитель</td><td>«Так, стоп. Половину от двенадцати мы нашли, дальше сам!»</td></tr>
 <tr><td>Девочке</td><td>masha, оттенок friendly, или dasha</td><td>Тёплый, живой, с улыбкой в голосе. Подбадривает, не сюсюкает</td><td>«Смотри, ты почти у цели. Треть берём от остатка, помнишь?»</td></tr>
 <tr><td>Родителю</td><td>alexander, оттенок neutral, или julia</td><td>Спокойный, взрослый, без игры. Коротко и по делу</td><td>«За неделю решено пятнадцать заданий из двадцати. Трудности с задачами на части.»</td></tr>
+<tr><td>Лев, старшеклассникам</td><td>ermil или filipp, оттенок neutral</td><td>Низкий, ровный, уверенный. Не давит, но и не развлекает</td><td>«Перенеси свободный член вправо. Что справа?»</td></tr>
 </table>
 <p class="small" style="margin-top:8px">Названия голосов проверить в консоли Яндекса перед подключением, состав меняется. Все три звучат как живые дикторы, детских голосов у сервисов нет, поэтому детскость даём манерой и текстом, а не писклявостью.</p>
 
@@ -118,7 +115,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:50px;font-size
 </table>
 </main>
 
-<footer class="wrap">© 2026 Смекай · <a href="../" style="color:#2F63D6">На главную</a></footer>
+<div id="site-footer"></div>
 
 <script>
 const m = document.getElementById('m');
@@ -128,13 +125,18 @@ const q = new URLSearchParams(location.search);
 if (q.get('render')) {
   document.body.className = 'render';
   document.body.innerHTML = '';
+  document.body.dataset.float = 'off';
   const el = document.createElement('myslik-face');
   el.setAttribute('size', q.get('size') || '512');
+  if (q.get('who')) el.setAttribute('who', q.get('who'));
   el.setAttribute('mood', q.get('render'));
   document.body.append(el);
   if (q.get('say')) el.say(q.get('say'), { ms: 9000 });
   if (q.get('talk')) el.setAttribute('talking', '');
 } else {
+  const box = document.getElementById('stagebox');
+  document.getElementById('who-m').onclick = () => { m.removeAttribute('who'); box.classList.remove('lev'); document.getElementById('who-m').className='btn btn-main btn-sm'; document.getElementById('who-l').className='btn btn-ghost btn-sm'; m.react('hello'); };
+  document.getElementById('who-l').onclick = () => { m.setAttribute('who', 'lev'); box.classList.add('lev'); document.getElementById('who-l').className='btn btn-main btn-sm'; document.getElementById('who-m').className='btn btn-ghost btn-sm'; m.react('hello'); };
   const RU = { idle: 'Покой', think: 'Думает', yay: 'Радуется', party: 'Празднует', sad: 'Огорчился', angry: 'Сердится',
                surprised: 'Удивился', sleepy: 'Устал', wave: 'Машет', love: 'Обожает', shy: 'Смущён' };
   const moods = document.getElementById('moods');
@@ -168,8 +170,7 @@ if (q.get('render')) {
   prof.onchange = () => { const P = Myslik.profiles[prof.value]; pitch.value = P.pitch; rate.value = P.rate; sel.value = ''; };
   fillVoices(); document.addEventListener('myslik-voices', fillVoices); setTimeout(fillVoices, 600);
 
-  m.react('hello');
-  m.addEventListener('click', () => { const ks = Object.keys(RR); m.react(ks[Math.floor(Math.random() * ks.length)]); });
+  setTimeout(() => m.react('hello'), 400);
 }
 </script>
 </body>

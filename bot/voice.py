@@ -24,8 +24,18 @@ VOICES = {
     "boy": os.environ.get("VOICE_BOY", "anton"),
     "girl": os.environ.get("VOICE_GIRL", "masha"),
     "parent": os.environ.get("VOICE_PARENT", "alexander"),
+    "lev": os.environ.get("VOICE_LEV", "ermil"),
 }
-SPEED = {"boy": "1.05", "girl": "1.0", "parent": "0.95"}
+SPEED = {"boy": "1.05", "girl": "1.0", "parent": "0.95", "lev": "0.95"}
+
+# все голоса Яндекса для команды /voicetest: имя, пол, коротко о манере
+CATALOG = [
+    ("anton", "м", "молодой, бодрый"), ("zahar", "м", "молодой, ровный"), ("ermil", "м", "низкий, спокойный"),
+    ("filipp", "м", "взрослый, уверенный"), ("alexander", "м", "диктор, нейтральный"), ("madirus", "м", "мягкий"),
+    ("masha", "ж", "тёплый, живой"), ("dasha", "ж", "молодой, лёгкий"), ("julia", "ж", "взрослый, спокойный"),
+    ("lera", "ж", "молодой, звонкий"), ("alena", "ж", "нейтральный"), ("jane", "ж", "ровный, деловой"),
+    ("omazh", "ж", "низкий"), ("marina", "ж", "мягкий, взрослый"),
+]
 EMOTION = os.environ.get("VOICE_EMOTION", "")
 CTX = ssl.create_default_context()
 
@@ -54,11 +64,14 @@ def prep(text):
     return re.sub(r"\s+", " ", t).strip()
 
 
-def synth(text, profile="boy"):
-    """Возвращает OGG Opus байты или None."""
-    if not available() or profile not in VOICES:
+def synth(text, profile="boy", voice_name=None):
+    """Возвращает OGG Opus байты или None. voice_name задаёт голос напрямую, минуя профиль."""
+    if not available():
         return None
-    data = {"text": prep(text)[:4900], "lang": "ru-RU", "voice": VOICES[profile],
+    name = voice_name or VOICES.get(profile)
+    if not name:
+        return None
+    data = {"text": prep(text)[:4900], "lang": "ru-RU", "voice": name,
             "speed": SPEED.get(profile, "1.0"), "format": "oggopus", "folderId": YA_FOLDER}
     if EMOTION:
         data["emotion"] = EMOTION

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мыслик и Лев — Смекай</title>
+<meta name="description" content="Два помощника Смекай: Мыслик для 1–8 класса и Лев для 9–11. Как они связаны и чем отличаются.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/myslik.js"></script>
+<script src="assets/site.js" defer></script>
+<style>
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
+@media(max-width:820px){.duo{grid-template-columns:1fr}}
+.who{border-radius:26px;padding:28px;display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center}
+@media(max-width:520px){.who{grid-template-columns:1fr;text-align:center}}
+.who.m{background:radial-gradient(circle at 50% 30%,#FFD661,#FFC933)}
+.who.l{background:radial-gradient(circle at 50% 30%,#2A3160,#1B1F3B);color:#fff}
+.who.l p,.who.l li{color:#C9CEE4}
+.who myslik-face{width:180px;height:180px;margin:0 auto}
+.who ul{list-style:none;margin-top:10px}
+.who li{font-size:15px;margin-bottom:6px;padding-left:18px;position:relative}
+.who li::before{content:"·";position:absolute;left:4px;font-weight:700}
+.timeline{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin:26px 0 8px}
+.timeline span{height:10px;border-radius:5px;background:var(--blue)}
+.timeline span.l{background:var(--sun)}
+.tl-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-3)}
+.slider{margin-top:34px;background:var(--bg-2);border-radius:22px;padding:24px;text-align:center}
+.slider input{width:min(520px,100%);margin:14px 0}
+.slider .stage{display:flex;justify-content:center;gap:0;align-items:flex-end;height:200px;position:relative}
+.slider myslik-face{width:190px;height:190px;position:absolute;transition:opacity .35s,transform .35s}
+.tone{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+@media(max-width:700px){.tone{grid-template-columns:1fr}}
+.tone .chat{height:100%}
+</style>
+</head>
+<body data-page="lev.html" data-root="./" data-src="site" data-metrika="">
+<div id="site-header"></div>
+
+<section class="doc"><div class="wrap">
+<h1>Мыслик и Лев</h1>
+<p class="lead">Помощник растёт вместе с ребёнком. В начальной и средней школе рядом Мыслик: он подбадривает и радуется вместе. В старших классах его сменяет Лев: тот же характер, но спокойнее, строже и ближе к экзаменам.</p>
+
+<div class="timeline">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="l"></span><span class="l"></span><span class="l"></span>
+</div>
+<div class="tl-labels"><span>1 класс</span><span>Мыслик, 1–8</span><span>Лев, 9–11</span><span>11 класс</span></div>
+
+<div class="duo">
+  <div class="who m">
+    <myslik-face id="mys" mood="idle"></myslik-face>
+    <div><h2 style="margin-bottom:6px">Мыслик</h2><p>1–8 класс</p>
+      <ul><li>Лампочка загорается, когда есть идея</li><li>Подсказывает вопросами, не спешит</li><li>Радуется вместе, огорчается вместе</li><li>Голос бодрый или тёплый, на выбор</li></ul></div>
+  </div>
+  <div class="who l">
+    <myslik-face id="lev" who="lev" mood="idle"></myslik-face>
+    <div><h2 style="margin-bottom:6px;color:#fff">Лев</h2><p>9–11 класс</p>
+      <ul><li>Грива светится там, где у Мыслика лампа</li><li>Говорит короче и по делу</li><li>Разбирает в формате ОГЭ и ЕГЭ</li><li>Голос спокойный, взрослый</li></ul></div>
+  </div>
+</div>
+
+<div class="slider">
+  <h3>Как один превращается в другого</h3>
+  <p class="small muted">Потяните ползунок. Лампа Мыслика становится гривой Льва, а сам характер остаётся.</p>
+  <div class="stage"><myslik-face id="s-m" mood="idle"></myslik-face><myslik-face id="s-l" who="lev" mood="idle" style="opacity:0"></myslik-face></div>
+  <input type="range" id="age" min="1" max="11" value="5" aria-label="Класс">
+  <div id="age-label" class="small">5 класс · Мыслик</div>
+</div>
+
+<h2 style="margin-top:40px">Один и тот же разбор, два тона</h2>
+<p>Задание одно, подход один: вопрос, подсказки, разбор после попыток. Меняется только манера.</p>
+<div class="tone">
+  <div class="chat">
+    <div class="msg kid">Не понимаю, как решать 2x + 6 = 18</div>
+    <div class="msg bot">Давай так: что мешает иксу остаться одному? Что лишнее слева?</div>
+    <div class="msg kid">Плюс шесть</div>
+    <div class="msg bot">Точно. Как от него избавиться, чтобы равенство не сломалось?</div>
+  </div>
+  <div class="chat" style="background:#EEF0F7">
+    <div class="msg kid">2x + 6 = 18, дальше?</div>
+    <div class="msg bot">Перенеси свободный член вправо. Что получится справа?</div>
+    <div class="msg kid">12</div>
+    <div class="msg bot">Верно. Теперь коэффициент. Не забывай проверку подстановкой, на экзамене это спасает.</div>
+  </div>
+</div>
+
+<p style="margin-top:30px" class="btns"><a class="btn btn-main" href="#" data-modal="start">Попробовать с Мысликом</a><a class="btn btn-ghost" href="myslik/">Настроения и голос</a></p>
+</div></section>
+
+<div id="site-footer"></div>
+<script>
+window.addEventListener('load', () => {
+  const m = document.getElementById('mys'), l = document.getElementById('lev');
+  setTimeout(() => m.react('hello'), 500); setTimeout(() => l.react('hello'), 1300);
+  const sm = document.getElementById('s-m'), sl = document.getElementById('s-l'), age = document.getElementById('age'), lab = document.getElementById('age-label');
+  const upd = () => {
+    const v = +age.value, lev = v >= 9;
+    sm.style.opacity = lev ? 0 : 1; sl.style.opacity = lev ? 1 : 0;
+    sm.style.transform = lev ? 'scale(.8)' : 'scale(1)'; sl.style.transform = lev ? 'scale(1)' : 'scale(.8)';
+    lab.textContent = `${v} класс · ${lev ? 'Лев' : 'Мыслик'}`;
+    (lev ? sl : sm).react(v === 9 ? 'hello' : 'correct', { bubble: v === 9 || v === 1 });
+  };
+  age.addEventListener('input', upd);
+});
+</script>
+</body>
+</html>

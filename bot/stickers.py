@@ -21,16 +21,17 @@ ANIM = Path(os.environ.get("ANIM_DIR") or Path(__file__).resolve().parent.parent
 MOODS = ("wave", "yay", "party", "think", "sad", "angry", "surprised", "sleepy", "love", "idle")
 
 
-def path(mood, ext):
-    p = ANIM / f"myslik-{mood}.{ext}"
+def path(mood, ext, prefix="myslik"):
+    p = ANIM / f"{prefix}-{mood}.{ext}"
     return p if p.exists() else None
 
 
-async def send_mood(bot: Bot, chat_id: int, mood: str):
-    """Присылает стикер с нужным настроением. Тихо пропускает, если файлов нет."""
+async def send_mood(bot: Bot, chat_id: int, mood: str, who: str = "myslik"):
+    """Присылает стикер с нужным настроением. Для старшеклассников Лев. Тихо пропускает, если файлов нет."""
     if mood not in MOODS:
         return
-    key = f"tg:{mood}"
+    prefix = "lev" if who == "lev" else "myslik"
+    key = f"tg:{prefix}:{mood}"
     cached = db.file_id_get(key)
     try:
         if cached:
@@ -40,12 +41,12 @@ async def send_mood(bot: Bot, chat_id: int, mood: str):
             else:
                 await bot.send_animation(chat_id, fid)
             return
-        webm = path(mood, "webm")
+        webm = path(mood, "webm", prefix)
         if webm:
             msg = await bot.send_sticker(chat_id, FSInputFile(webm))
             db.file_id_set(key, "sticker|" + msg.sticker.file_id)
             return
-        mp4 = path(mood, "mp4")
+        mp4 = path(mood, "mp4", prefix)
         if mp4:
             msg = await bot.send_animation(chat_id, FSInputFile(mp4))
             db.file_id_set(key, "animation|" + msg.animation.file_id)

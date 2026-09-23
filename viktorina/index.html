@@ -3,6 +3,7 @@
 <title>Викторина Смекай</title>
 <link rel="stylesheet" href="../assets/fonts.css">
 <script src="../assets/myslik.js"></script>
+<script src="../assets/site.js" defer></script>
 <style>
 :root{
   --ground:#EEF1F8; --card:#FFFFFF; --card-2:#F5F7FC; --line:#DCE1EE;
@@ -194,7 +195,7 @@ a.btn{text-decoration:none}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-</head><body>
+</head><body data-root="../" data-src="quiz" data-float="off" data-metrika="">
 
 <div class="wrap" id="app"></div>
 
@@ -203,7 +204,7 @@ a.btn{text-decoration:none}
 /* ================= НАСТРОЙКИ: поменять на свои ссылки ================= */
 const LINKS={
   site:'../',                                 // главная страница сайта
-  bot:'https://t.me/smekai_ru_bot',           // бот Мыслик
+  bot:'https://t.me/smekai_ru_bot?start=quiz',           // бот Мыслик
   boosty:'https://boosty.to/smekai',          // страница «Смекай» на Boosty
   channel:'https://t.me/smekai_ru',
   max:'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo', // канал в MAX              // открытый Telegram-канал «Смекай»
