@@ -100,7 +100,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 :host(.surprised) .wow{opacity:1;animation:wow .5s ease}
 :host(.surprised) .glow{animation:none;opacity:.5;transform:scale(1.2)}
 :host(.sleepy) .rig{animation:sway 7.5s ease-in-out infinite}
-:host(.sleepy) .lid{transform:scaleY(.62)}
+:host(.sleepy) .eyes .eye,:host(.sleepy) .eyes .pupils{opacity:0!important}
 :host(.sleepy) .brow.l,:host(.sleepy) .brow.r{transform:translate(0,1.8px)}
 :host(.sleepy) .zzz{opacity:1}:host(.sleepy) .z{animation:zz 2.6s ease-out infinite}:host(.sleepy) .z.b{animation-delay:.9s}:host(.sleepy) .z.c{animation-delay:1.8s}
 :host(.sleepy) .bulb{fill:url(#gBulbOff)}:host(.sleepy) .glow{animation:none;opacity:0}:host(.sleepy) .fil{opacity:.1}
@@ -306,7 +306,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
     const eye = (cx) => `
       <g class="eye"><ellipse cx="${f1(cx)}" cy="${f1(ey)}" rx="${f1(p.eyeRx)}" ry="${f1(p.eyeRy)}" fill="url(#gSclera)"/>
         <path d="M${f1(cx - p.eyeRx)} ${f1(ey)} A${f1(p.eyeRx)} ${f1(p.eyeRy)} 0 0 1 ${f1(cx + p.eyeRx)} ${f1(ey)}" fill="#1B1F3B" opacity=".08"/>
-        <ellipse class="lid" cx="${f1(cx)}" cy="${f1(ey - p.eyeRy)}" rx="${f1(p.eyeRx + .6)}" ry="${f1(p.eyeRy * 2 + .8)}" fill="url(#gBody)"/></g>`;
+        <ellipse class="lid" cx="${f1(cx)}" cy="${f1(ey)}" rx="${f1(p.eyeRx + .7)}" ry="${f1(p.eyeRy + .7)}" fill="url(#gBody)"/></g>`;
     const armL = `M${f1(50 - rx + 13)} ${f1(p.armY)} Q${f1(50 - rx - 2)} ${f1(p.armY + 4)} ${f1(50 - rx - 2 + 1)} ${f1(p.armY + 14 * p.armLen)}`;
     const armR = `M${f1(50 + rx - 13)} ${f1(p.armY)} Q${f1(50 + rx + 2)} ${f1(p.armY + 4)} ${f1(50 + rx + 2 - 1)} ${f1(p.armY + 14 * p.armLen)}`;
     return `
@@ -328,6 +328,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
       <circle cx="${f1(ex1 + 2.2)}" cy="${f1(ey - 1)}" r="${f1(p.pupilR * .32)}" fill="#fff"/><circle cx="${f1(ex2 + 2.2)}" cy="${f1(ey - 1)}" r="${f1(p.pupilR * .32)}" fill="#fff"/>
       <circle cx="${f1(ex1 - .6)}" cy="${f1(ey + 2.2)}" r=".6" fill="#fff" opacity=".7"/><circle cx="${f1(ex2 - .6)}" cy="${f1(ey + 2.2)}" r=".6" fill="#fff" opacity=".7"/>
     </g>
+    <g class="shut m" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M${f1(ex1 - p.eyeRx)} ${f1(ey)} Q${f1(ex1)} ${f1(ey + p.eyeRy * .75)} ${f1(ex1 + p.eyeRx)} ${f1(ey)}"/><path d="M${f1(ex2 - p.eyeRx)} ${f1(ey)} Q${f1(ex2)} ${f1(ey + p.eyeRy * .75)} ${f1(ex2 + p.eyeRx)} ${f1(ey)}"/><path d="M${f1(ex1 - p.eyeRx * .55)} ${f1(ey + p.eyeRy * .26)} l-1.5 2M${f1(ex1)} ${f1(ey + p.eyeRy * .375)} l0 2.3M${f1(ex1 + p.eyeRx * .55)} ${f1(ey + p.eyeRy * .26)} l1.5 2M${f1(ex2 - p.eyeRx * .55)} ${f1(ey + p.eyeRy * .26)} l-1.5 2M${f1(ex2)} ${f1(ey + p.eyeRy * .375)} l0 2.3M${f1(ex2 + p.eyeRx * .55)} ${f1(ey + p.eyeRy * .26)} l1.5 2" stroke-width="1.3"/></g>
     <g class="happy m" stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round"><path d="M${f1(ex1 - 6)} ${f1(ey + 2)} Q${f1(ex1)} ${f1(ey - 5)} ${f1(ex1 + 6)} ${f1(ey + 2)}"/><path d="M${f1(ex2 - 6)} ${f1(ey + 2)} Q${f1(ex2)} ${f1(ey - 5)} ${f1(ex2 + 6)} ${f1(ey + 2)}"/></g>
     <g class="tears" fill="#7FB7FF"><path class="tear a" d="M${f1(ex1 - 4.5)} ${f1(ey + 7)} q2.2 3.6 0 5.4 q-2.2 -1.8 0 -5.4z"/><path class="tear b" d="M${f1(ex2 + 4.5)} ${f1(ey + 7)} q2.2 3.6 0 5.4 q-2.2 -1.8 0 -5.4z"/></g>
   </g>
@@ -359,6 +360,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
   const MOUTH = { idle: 'smile', think: 'flat', yay: 'grin', party: 'grin', sad: 'frown', angry: 'grit', surprised: 'o', sleepy: 'half', wave: 'smile', love: 'grin', shy: 'smile' };
   const MOUTH_LEV = { ...MOUTH, idle: 'smirk', yay: 'half', wave: 'smirk', love: 'half' };
   const HAPPY_EYES = new Set(['yay', 'party', 'love']);
+  const SHUT_EYES = new Set(['sleepy']);
   const TALK = ['open', 'half', 'smile', 'open', 'o', 'half'];
 
   const REACT = {
@@ -485,7 +487,8 @@ svg{width:100%;height:100%;overflow:visible;display:block}
       this._setMouth((this.lev ? MOUTH_LEV : MOUTH)[m]);
       const eyes = this._stage.querySelector('.eyes'); if (!eyes) return;
       eyes.querySelector('.happy').classList.toggle('on', HAPPY_EYES.has(m));
-      eyes.querySelectorAll('.eye, .pupils').forEach(e => e.style.opacity = HAPPY_EYES.has(m) ? 0 : 1);
+      eyes.querySelector('.shut').classList.toggle('on', SHUT_EYES.has(m));
+      eyes.querySelectorAll('.eye, .pupils').forEach(e => e.style.opacity = HAPPY_EYES.has(m) || SHUT_EYES.has(m) ? 0 : 1);
       this._stage.querySelector('.brows').style.opacity = HAPPY_EYES.has(m) ? 0 : 1;
     }
     _setMouth(kind) { this._stage.querySelectorAll('.mouth .m').forEach(e => e.classList.toggle('on', e.classList.contains(kind))); }
