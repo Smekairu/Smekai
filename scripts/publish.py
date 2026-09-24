@@ -7,7 +7,7 @@
   button: Пройти викторину      текст кнопки (необязательно)
   link: quiz                    ссылка кнопки: quiz, boosty или полный адрес
   image: assets/posts/2026-09-25-1830.jpg  картинка (необязательно)
-  channel: closed               закрытый канал Telegram; в MAX такие посты идут в открытый канал бесплатно
+  channel: closed               закрытый канал: в Telegram TG_CHANNEL_CLOSED, в MAX MAX_CHAT_ID_CLOSED
   animation: assets/anim/myslik-wave.mp4  анимация Мыслика (необязательно, для MAX берётся .mp4)
 Ниже: текст поста. Разметка Telegram HTML: <b>жирный</b>, <i>курсив</i>, <a href="...">ссылка</a>.
 """
@@ -106,12 +106,13 @@ def send_telegram(p):
     return (r.get("result") or {}).get("message_id") if ok else None
 
 def max_chat(p):
-    """Открытый канал MAX по умолчанию. Задания из закрытого канала в MAX для детей бесплатны,
-    поэтому идут в открытый канал, если отдельный закрытый не задан или MAX_TASKS_FREE=1."""
+    """Открытый канал MAX по умолчанию, закрытый для постов с channel: closed.
+    Если закрытого канала в MAX нет, такие посты в MAX не уходят.
+    MAX_TASKS_FREE=1 отправит их в открытый канал для всех (по умолчанию выключено)."""
     if str(p.get("channel", "")).strip().lower() in ("closed", "закрытый"):
-        free = os.environ.get("MAX_TASKS_FREE", "1") == "1"
-        if not free and os.environ.get("MAX_CHAT_ID_CLOSED"):
-            return os.environ["MAX_CHAT_ID_CLOSED"]
+        if os.environ.get("MAX_TASKS_FREE", "0") == "1":
+            return os.environ.get("MAX_CHAT_ID") or ""
+        return os.environ.get("MAX_CHAT_ID_CLOSED") or ""
     return os.environ.get("MAX_CHAT_ID") or ""
 
 SPOILER = re.compile(r"\s*Ответы?:\s*<tg-spoiler>(.*?)</tg-spoiler>\s*", re.S)
@@ -196,8 +197,10 @@ def send_max_pending():
 
 def send_max(p):
     token, chat = os.environ.get("MAX_BOT_TOKEN"), max_chat(p)
-    if not token or not chat:
-        print("MAX: бот ещё не подключён, пропускаю"); return False
+    if not token:
+        print("MAX: нет MAX_BOT_TOKEN, пропускаю"); return False
+    if not chat:
+        print("MAX: канал для этого поста не задан, пропускаю"); return False
     body, answers = split_answers(p["text"])
     markup = None
     if p.get("button") and p.get("link"):

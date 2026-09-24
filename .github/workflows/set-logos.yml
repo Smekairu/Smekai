@@ -1,19 +1,10 @@
-name: Публикация постов
+name: Обновить логотипы
 
 on:
-  schedule:
-    - cron: "3,23,43 6-18 * * *"   # три раза в час с 09:03 до 21:43 по Москве: GitHub часть запусков пропускает
-  workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
-
-permissions:
-  contents: write
-
-concurrency:
-  group: publish
-  cancel-in-progress: false
+  workflow_dispatch: {}
 
 jobs:
-  publish:
+  logos:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
@@ -34,9 +25,8 @@ jobs:
           sudo update-ca-certificates
           echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
           rm -f root.cer sub.cer root.pem sub.pem
-      - name: Собрать задания на ближайшие дни
-        run: python scripts/build_posts.py --days 3
-      - name: Отправить посты, у которых подошло время
+      - name: Аватарки каналов
+        run: python scripts/set_logos.py
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHANNEL: ${{ vars.TG_CHANNEL || secrets.TG_CHANNEL }}
@@ -44,20 +34,3 @@ jobs:
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
           MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
           MAX_CHAT_ID_CLOSED: ${{ vars.MAX_CHAT_ID_CLOSED || secrets.MAX_CHAT_ID_CLOSED }}
-          MAX_TASKS_FREE: ${{ vars.MAX_TASKS_FREE || '0' }}
-          QUIZ_URL: ${{ vars.QUIZ_URL }}
-        run: python scripts/publish.py
-      - name: Сохранить отметки об отправке
-        if: always()
-        run: |
-          git config user.name "smekai-bot"
-          git config user.email "smekai-bot@users.noreply.github.com"
-          git add -A state posts
-          git diff --cached --quiet && exit 0
-          git commit -m "Отмечены опубликованные посты"
-          for i in 1 2 3 4 5; do
-            git push && exit 0
-            git pull --rebase -X theirs origin main || git rebase --abort
-            sleep 3
-          done
-          exit 1

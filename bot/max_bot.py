@@ -2,8 +2,8 @@
 
 Запуск: python max_bot.py
 Нужны переменные: MAX_BOT_TOKEN, MAX_ADMIN_ID (ваш user_id в MAX, бот покажет его по /id).
-Необязательные: MAX_CHANNEL_INVITE (ссылка в закрытый канал MAX), MAX_FREE_TASKS (1 по умолчанию:
-задания в MAX бесплатны для детей, 30 в день), остальные как у Telegram-бота.
+Необязательные: MAX_CHANNEL_INVITE (ссылка в закрытый канал MAX), остальные как у Telegram-бота.
+Бесплатный доступ для своих: /free и /unfree у администратора, список /users.
 
 База общая с Telegram и сайтом. Людей из MAX база хранит со знаком минус (ids.py),
 поэтому код родителя работает между платформами: ребёнок в MAX, родитель в Telegram.
@@ -491,6 +491,39 @@ async def support_text(uid, text):
     await say(uid, text=ans, keyboard=support_kb(buttons) if buttons else menu_kb())
 
 
+async def admin_users(uid):
+    if uid != ids.from_max(ADMIN_MAX):
+        return
+    free = db.free_ids()
+    lines = ["<b>Последние пользователи</b> (номер · платформа · имя · класс)", ""]
+    for u in db.recent_users(20):
+        mark = " · бесплатно" if u["id"] in free else ""
+        lines.append(f"{u['id']} · {ids.platform(u['id'])} · {esc(u['name'] or '')} · {u['grade']}{mark}")
+    lines += ["", "Бесплатный доступ навсегда: /free номер заметка", "Убрать: /unfree номер"]
+    await say(uid, text="\n".join(lines))
+
+
+async def admin_free(uid, text, add=True):
+    """/free номер [заметка] и /unfree номер. Номер как в /users: у людей из MAX со знаком минус."""
+    if uid != ids.from_max(ADMIN_MAX):
+        return
+    parts = text.split(maxsplit=2)
+    if len(parts) < 2 or not parts[1].lstrip("-").isdigit():
+        lst = db.free_list()
+        body = "\n".join(f"{x['uid']} {esc(x['note'] or '')}" for x in lst) or "пока никого"
+        await say(uid, text=f"<b>Бесплатный доступ</b>\n{body}\n\nДобавить: /free номер заметка (номер из /users)"); return
+    target = int(parts[1])
+    if not add:
+        db.free_del(target)
+        await say(uid, text="Убрал из бесплатного доступа."); return
+    db.free_add(target, parts[2] if len(parts) > 2 else "")
+    await say(uid, text=f"Готово: {target} занимается бесплатно.")
+    msg = "Для тебя все задания Смекая бесплатны. Нажимай «Задание»!"
+    if ids.platform(target) == "max" and INVITE:
+        msg += f"\n\nЗакрытый канал с заданиями в MAX:\n{INVITE}"
+    db.outbox_put(target, msg)
+
+
 async def admin_reply(uid, text):
     if uid != ids.from_max(ADMIN_MAX):
         return
@@ -614,6 +647,12 @@ async def on_message(upd):
             await grant(uid, text)
         elif cmd == "reply":
             await admin_reply(uid, text)
+        elif cmd == "users":
+            await admin_users(uid)
+        elif cmd == "free":
+            await admin_free(uid, text)
+        elif cmd == "unfree":
+            await admin_free(uid, text, add=False)
         elif cmd == "id":
             await say(uid, text=f"Ваш user_id в MAX: <b>{mid}</b>")
         else:

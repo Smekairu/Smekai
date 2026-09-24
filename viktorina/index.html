@@ -44,6 +44,7 @@ h1{font-size:clamp(1.7rem,6vw,2.3rem);font-weight:800;line-height:1.05}
 h2{font-size:1.25rem;font-weight:700;line-height:1.2}
 .bar{display:flex;align-items:center;gap:10px}
 .logo{font-family:var(--display);font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.kab{font-weight:700;font-size:.9rem;text-decoration:none;color:inherit;border:1.5px solid rgba(127,127,127,.35);border-radius:999px;padding:6px 12px}
 .logo i{width:26px;height:26px;border-radius:8px;background:var(--sun);display:grid;place-items:center;font-style:normal;font-size:.9rem;color:var(--sun-ink)}
 .sp{flex:1}
 .ib{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:1.05rem}
@@ -436,7 +437,8 @@ function mood(m){ document.querySelectorAll('.mys').forEach(el=>{ el.classList.r
 
 /* ---------- каркас ---------- */
 function topbar(){
-  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><i>С</i>Смекай</a><div class="sp"></div>
+  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><img src="../assets/brand/mark.png" alt="" style="width:30px;height:30px;border-radius:9px;display:block">Смекай</a><div class="sp"></div>
+    <a class="kab" href="../kabinet/">Личный кабинет</a>
     <button class="ib" id="snd" aria-label="Звук">${S.sound?'🔊':'🔇'}</button>
     ${S.screen!=='start'?'<button class="ib" id="home" aria-label="В начало">⌂</button>':''}</div>`);
   b.querySelector('#snd').onclick=()=>{S.sound=!S.sound;store.set('smk_sound',S.sound);render();};
@@ -725,7 +727,7 @@ function offer(text,channelOnly){
     ${channelOnly?'':`<ul><li>Разбор домашки по шагам, без готовых ответов</li><li>Тесты-игры по учебникам вашего класса</li><li>Отчёт родителю: что получилось, где трудно</li></ul>`}
     <div class="row"></div></div>`);
   const r=o.querySelector('.row');
-  if(!channelOnly){ const b=$(`<a class="btn sun" href="${LINKS.bot}" target="_blank" rel="noopener">Попробовать Мыслика</a>`); r.appendChild(b); }
+  if(!channelOnly){ const b=$(`<a class="btn sun" href="../kabinet/">Попробовать Мыслика</a>`); r.appendChild(b); }
   const c=$(`<a class="btn ghost" href="${LINKS.channel}" target="_blank" rel="noopener" style="background:transparent;color:inherit;border-color:rgba(255,255,255,.3)">Канал в Telegram</a>`); r.appendChild(c);
   const mx=$(`<a class="btn ghost" href="${LINKS.max}" target="_blank" rel="noopener" style="background:transparent;color:inherit;border-color:rgba(255,255,255,.3)">Канал в MAX</a>`); r.appendChild(mx);
   return o;

@@ -31,12 +31,15 @@ p{color:var(--ink-2)}
 header.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;gap:22px;height:66px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:19px;text-decoration:none;color:var(--ink)}
+.brand img.brand-mark{width:34px;height:34px;border-radius:10px;display:block;flex:none}
+.only-mob-t{display:none}
+@media(max-width:860px){.hide-mob-t{display:none}.only-mob-t{display:inline}}
 .brand i{width:30px;height:30px;border-radius:9px;background:var(--sun);display:grid;place-items:center;font-style:normal;font-weight:800;color:#5C4300;font-size:16px}
 .nav-links{display:flex;gap:20px}
 .nav-links a{color:var(--ink-2);text-decoration:none;font-size:15px;font-weight:500}
 .nav-links a:hover,.nav-links a[aria-current]{color:var(--ink)}
 .nav .sp{margin-left:auto}
-.nav .btn svg{width:18px;height:18px;fill:currentColor}
+.nav .btn svg{width:18px;height:18px;fill:currentColor;flex:none}
 .only-mob{display:none}
 .burger{display:none;flex:none;width:42px;height:42px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-size:20px}
 @media(max-width:860px){

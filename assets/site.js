@@ -75,12 +75,11 @@
   function header(active) {
     const items = [['kak-rabotaet.html', 'Как работает'], ['tarify.html', 'Цены'], ['lev.html', 'Мыслик и Лев'], ['viktorina/', 'Викторина'], ['faq.html', 'Вопросы']];
     return `<header class="top"><div class="wrap nav">
-      <a class="brand" href="${root}"><i>С</i>Смекай</a>
+      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png" alt="">Смекай</a>
       <nav class="nav-links" id="navlinks">${items.map(([h, t]) => `<a href="${root}${h}"${active === h ? ' aria-current="page"' : ''}>${t}</a>`).join('')}
         <a href="${root}kabinet/" class="only-mob"${active === 'kabinet' ? ' aria-current="page"' : ''}>Личный кабинет</a></nav>
       <span class="sp"></span>
-      <a class="btn btn-ghost btn-sm hide-mob" href="${root}kabinet/">${ICONS.home}Кабинет</a>
-      <a class="btn btn-main btn-sm" href="#" data-modal="start">Начать</a>
+      <a class="btn btn-main btn-sm" href="${root}kabinet/">${ICONS.home}<span class="hide-mob-t">Личный кабинет</span><span class="only-mob-t">Кабинет</span></a>
       <button class="burger" id="burger" aria-label="Меню">☰</button>
     </div></header>`;
   }
@@ -89,7 +88,7 @@
   function footer() {
     return `<footer class="site"><div class="wrap">
       <div class="foot">
-        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><i>С</i>Смекай</a>
+        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png" alt="">Смекай</a>
           <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
           <div class="social">
             <a href="${CFG.TG}" target="_blank" rel="noopener" title="Канал в Telegram" aria-label="Telegram">${ICONS.tg}</a>
@@ -115,21 +114,21 @@
       <div class="choice">
         <a href="${root}kabinet/"><span class="ci">${ICONS.home}</span><div><b>Личный кабинет</b><span>Планшет или компьютер, без установки. Занятие, прогресс, тариф</span></div></a>
         <a href="${CFG.BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.tg}</span><div><b>Telegram</b><span>Бот Мыслик: задания, фото домашки, голос, отчёты родителю</span></div></a>
-        <a href="${CFG.MAX_BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>MAX</b><span>Бот Мыслик в MAX. Задания для детей бесплатно</span></div></a>
+        <a href="${CFG.MAX_BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>MAX</b><span>Бот Мыслик в MAX: задания, подсказки, отчёты родителю</span></div></a>
       </div>
       <div class="qr"><img src="${root}assets/qr-bot.png" alt="QR-код бота"><p class="small muted" style="margin-top:6px">Наведите камеру телефона, чтобы открыть бота в Telegram</p></div>`,
     channel: () => `<h2>Канал с заданиями</h2>
       <p class="small muted">Каждый день задания по группам классов, ответы с разбором.</p>
       <div class="choice">
         <a href="${CFG.TG}" target="_blank" rel="noopener"><span class="ci">${ICONS.tg}</span><div><b>Telegram</b><span>@smekai_ru</span></div></a>
-        <a href="${CFG.MAX}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>MAX</b><span>Задания для детей бесплатно, каждое утро</span></div></a>
+        <a href="${CFG.MAX}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>MAX</b><span>Советы, задачи и викторины каждый вечер</span></div></a>
       </div>`,
     plan: (name) => {
       const p = PLANS[name] || PLANS.myslik;
       if (name === 'free') return `<h2>${p.title} <span class="muted" style="font-size:18px;font-weight:500">0 ₽</span></h2><p>Три задания в день в боте или в личном кабинете, открытый канал, викторина. Карта не нужна.</p>
         <div class="choice"><a href="${root}kabinet/"><span class="ci">${ICONS.home}</span><div><b>Личный кабинет</b><span>Планшет или компьютер</span></div></a>
         <a href="${CFG.BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.tg}</span><div><b>Бот в Telegram</b><span>Имя и класс, дальше первое задание</span></div></a>
-        <a href="${CFG.MAX_BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>Бот в MAX</b><span>В MAX задания для детей бесплатны</span></div></a></div>`;
+        <a href="${CFG.MAX_BOT}?start=${src}" target="_blank" rel="noopener"><span class="ci">${ICONS.max}</span><div><b>Бот в MAX</b><span>Имя и класс, дальше первое задание</span></div></a></div>`;
       return `<h2>${p.title} <span class="muted" style="font-size:18px;font-weight:500">${rub(p.price)} в месяц</span></h2><p>${p.about[0].toUpperCase() + p.about.slice(1)}.</p><div id="modal-pay"></div>`;
     },
     support: () => `<div id="modal-support"></div>`,

@@ -279,7 +279,7 @@ async function solution() {
 function over() {
   const helper = ME && ME.user.helper;
   $('#pane').innerHTML = `<div class="limit"><h2>На сегодня хватит</h2><p class="lead" style="margin:8px 0 18px">Задания на сегодня сделаны. Завтра будут новые.</p>
-    ${helper ? '' : `<p class="small muted" style="margin-bottom:18px">С тарифом «Мыслик» заданий 30 в день, плюс разбор домашки по фото и отчёт родителю. В MAX задания для детей бесплатны.</p>`}
+    ${helper ? '' : `<p class="small muted" style="margin-bottom:18px">С тарифом «Мыслик» заданий 30 в день, плюс разбор домашки по фото и отчёт родителю.</p>`}
     <div class="btns" style="justify-content:center">${helper ? '' : '<button class="btn btn-main" id="to-plan">Тарифы и оплата</button>'}<a class="btn btn-ghost" href="../viktorina/">Сыграть в викторину</a></div></div>`;
   const tp = $('#to-plan'); if (tp) tp.onclick = () => go('plan');
   m.react('tired', { text: 'На сегодня всё. Завтра продолжим.' });
@@ -308,7 +308,7 @@ function progress() {
 /* ---------- тариф и оплата ---------- */
 function plan() {
   const line = ME ? ME.plan_line : 'Сейчас тариф «Знакомство»: 3 задания в день бесплатно.';
-  $('#pane').innerHTML = `<h2>Тариф и оплата</h2><p>${esc(line)}</p><p class="small muted">В MAX задания для детей бесплатны. Тариф нужен для разбора домашки по фото, закрытого канала, 30 заданий в день и отчётов родителю.</p><div id="payx"></div>`;
+  $('#pane').innerHTML = `<h2>Тариф и оплата</h2><p>${esc(line)}</p><p class="small muted">Тариф нужен для разбора домашки по фото, закрытого канала, 30 заданий в день и отчётов родителю.</p><div id="payx"></div>`;
   SMK.pay($('#payx'), (ME && ['tasks', 'myslik', 'family'].includes(ME.user.plan)) ? ME.user.plan : 'myslik');
   m.react('love', { text: 'Выбирай тариф.' });
 }

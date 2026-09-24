@@ -25,11 +25,14 @@ PLANS = {
 }
 PRICE = str(PLANS["tasks"]["price"])
 
-# в MAX задания для детей бесплатны: дневной предел как у подписки
-MAX_FREE_TASKS = os.environ.get("MAX_FREE_TASKS", "1") == "1"
+# 1: в MAX задания бесплатны для всех (по умолчанию выключено; бесплатный доступ для своих через /free)
+MAX_FREE_TASKS = os.environ.get("MAX_FREE_TASKS", "0") == "1"
 
 
 def daily_limit(uid, helper):
+    import db
+    if db.is_free(uid):
+        return 100          # свои занимаются сколько хотят
     if helper:
         return PAID_LIMIT
     if MAX_FREE_TASKS and ids.platform(uid) == "max":
@@ -59,9 +62,7 @@ DESCRIPTION = ("Мыслик помогает школьнику 1–11 клас
                "даёт подсказки, разбирает по шагам. Три задания в день бесплатно. "
                "С подпиской: разбор домашки по фото, закрытый канал, отчёт родителю.")
 SHORT_DESCRIPTION = "Помощник по учёбе для 1–11 класса. Подсказки вместо готовых ответов."
-DESCRIPTION_MAX = ("Мыслик помогает школьнику 1–11 класса решать задания самому: задаёт вопросы, "
-                   "даёт подсказки, разбирает по шагам. В MAX задания для детей бесплатны, до 30 в день. "
-                   "По тарифу: разбор домашки по фото и отчёт родителю.")
+DESCRIPTION_MAX = DESCRIPTION
 
 
 def who(user):
@@ -74,6 +75,8 @@ def who(user):
 
 
 def plan_line(plan, until):
+    if plan in PLANS and until and until.startswith("9999"):
+        return "Все задания бесплатно."
     if plan in PLANS and until:
         return f"Тариф «{PLANS[plan]['title']}» до {until}."
     return "Тариф «Знакомство»: 3 задания в день бесплатно."

@@ -63,6 +63,7 @@ def init():
       id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, kind TEXT, text TEXT, contact TEXT,
       created TEXT DEFAULT CURRENT_TIMESTAMP, status TEXT DEFAULT 'new');
     CREATE TABLE IF NOT EXISTS dialog(uid INTEGER PRIMARY KEY, state TEXT, data TEXT);
+    CREATE TABLE IF NOT EXISTS free_users(uid INTEGER PRIMARY KEY, note TEXT, created TEXT DEFAULT CURRENT_TIMESTAMP);
     """)
     c.commit()
     cols = [r["name"] for r in c.execute("PRAGMA table_info(users)").fetchall()]
@@ -150,6 +151,38 @@ def by_recovery(code):
     return r["id"] if r else None
 
 
+# ---------- бесплатный доступ для своих ----------
+# Список ведёт администратор командами /free и /unfree, начальный можно задать в .env: FREE_USERS=123,-456
+
+FOREVER = "9999-12-31"
+
+
+def free_ids():
+    env = {int(x) for x in os.environ.get("FREE_USERS", "").replace(" ", "").split(",") if x.lstrip("-").isdigit()}
+    return env | {r["uid"] for r in conn().execute("SELECT uid FROM free_users").fetchall()}
+
+
+def is_free(uid):
+    return uid in free_ids()
+
+
+def free_add(uid, note=""):
+    _run("INSERT OR REPLACE INTO free_users(uid, note) VALUES(?,?)", (uid, str(note)[:60]))
+
+
+def free_del(uid):
+    _run("DELETE FROM free_users WHERE uid=?", (uid,))
+
+
+def free_list():
+    return [dict(r) for r in conn().execute("SELECT uid, note, created FROM free_users ORDER BY created").fetchall()]
+
+
+def recent_users(limit=15):
+    return [dict(r) for r in conn().execute(
+        "SELECT id, name, grade, created FROM users WHERE grade>0 ORDER BY created DESC LIMIT ?", (limit,)).fetchall()]
+
+
 # ---------- подписка ----------
 
 HELPER_PLANS = ("myslik", "family")
@@ -157,22 +190,30 @@ HELPER_PLANS = ("myslik", "family")
 
 def is_paid(uid):
     """Любой оплаченный тариф: доступ в закрытый канал."""
+    if is_free(uid):
+        return True
     u = get_user(uid)
     return bool(u and u["paid_until"] and u["paid_until"] >= date.today().isoformat())
 
 
 def has_helper(uid):
     """Тариф с личным помощником: больше заданий в день и разбор по фото."""
+    if is_free(uid):
+        return True
     u = get_user(uid)
     return bool(is_paid(uid) and (u["plan"] or "myslik") in HELPER_PLANS)
 
 
 def plan_of(uid):
+    if is_free(uid):
+        return "family"
     u = get_user(uid)
     return (u["plan"] or "myslik") if is_paid(uid) else "free"
 
 
 def paid_until(uid):
+    if is_free(uid):
+        return FOREVER
     u = get_user(uid)
     return u["paid_until"] if u else None
 

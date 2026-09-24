@@ -520,6 +520,55 @@ async def grant(m: Message):
         db.outbox_put(who_id, text)
 
 
+@dp.message(Command("users"))
+async def admin_users(m: Message):
+    """Последние пользователи с номерами: чтобы найти своих и выдать им бесплатный доступ."""
+    if m.from_user.id != ADMIN_ID:
+        return
+    free = db.free_ids()
+    lines = ["<b>Последние пользователи</b> (номер · платформа · имя · класс)", ""]
+    for u in db.recent_users(20):
+        mark = " · бесплатно" if u["id"] in free else ""
+        lines.append(f"<code>{u['id']}</code> · {ids.platform(u['id'])} · {esc(u['name'] or '')} · {u['grade']}{mark}")
+    lines += ["", "Выдать бесплатный доступ навсегда: /free номер заметка", "Убрать: /unfree номер"]
+    await m.answer("\n".join(lines))
+
+
+@dp.message(Command("free"))
+async def admin_free(m: Message):
+    """/free номер [заметка]: все задания бесплатно и без ограничений, доступ в закрытый канал."""
+    if m.from_user.id != ADMIN_ID:
+        return
+    parts = (m.text or "").split(maxsplit=2)
+    if len(parts) < 2 or not parts[1].lstrip("-").isdigit():
+        lst = db.free_list()
+        body = "\n".join(f"<code>{x['uid']}</code> {esc(x['note'] or '')}" for x in lst) or "пока никого"
+        await m.answer(f"<b>Бесплатный доступ</b>\n{body}\n\nДобавить: /free номер заметка (номер из /users)"); return
+    uid = int(parts[1])
+    db.free_add(uid, parts[2] if len(parts) > 2 else "")
+    await m.answer(f"Готово: {uid} занимается бесплатно.")
+    text = "Для тебя все задания Смекая бесплатны. Нажимай «Задание»!"
+    if ids.platform(uid) == "tg" and CLOSED_CHANNEL:
+        try:
+            text += "\n\nСсылка в закрытый канал с заданиями:\n" + await make_invite()
+        except Exception as e:
+            log.warning("приглашение не создано: %s", e)
+    elif ids.platform(uid) == "max" and os.environ.get("MAX_CHANNEL_INVITE"):
+        text += "\n\nЗакрытый канал с заданиями в MAX:\n" + os.environ["MAX_CHANNEL_INVITE"]
+    db.outbox_put(uid, text)
+
+
+@dp.message(Command("unfree"))
+async def admin_unfree(m: Message):
+    if m.from_user.id != ADMIN_ID:
+        return
+    parts = (m.text or "").split()
+    if len(parts) < 2 or not parts[1].lstrip("-").isdigit():
+        await m.answer("Как пользоваться: /unfree номер"); return
+    db.free_del(int(parts[1]))
+    await m.answer("Убрал из бесплатного доступа.")
+
+
 async def make_invite():
     if not CLOSED_CHANNEL:
         return PAY_URL
