@@ -29,7 +29,7 @@ TPL = """<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet"
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{width:1080px;height:1080px;overflow:hidden;background:{bg};color:{ink};font-family:'Golos Text',sans-serif;position:relative}}
 .brand{{position:absolute;left:72px;top:64px;display:flex;align-items:center;gap:16px;font:800 38px 'Unbounded';color:{ink}}}
-.brand img{{width:60px;height:60px;border-radius:17px;box-shadow:0 4px 14px rgba(27,31,59,.18)}}
+.brand i{{width:56px;height:56px;border-radius:16px;background:{logo};display:grid;place-items:center;font-style:normal;color:{logo_ink};font-size:30px}}
 .date{{position:absolute;right:72px;top:78px;font:600 28px 'Golos Text';opacity:.7}}
 .kicker{{position:absolute;left:72px;top:190px;font:700 30px 'Golos Text';color:{accent};letter-spacing:.02em;text-transform:uppercase}}
 .title{{position:absolute;left:72px;top:246px;width:{tw}px;font:800 {ts}px/1.12 'Unbounded';letter-spacing:-.01em}}
@@ -40,7 +40,7 @@ body{{width:1080px;height:1080px;overflow:hidden;background:{bg};color:{ink};fon
 .two .sub{{width:340px}}
 .url{{position:absolute;right:72px;bottom:40px;font:600 22px 'Golos Text';opacity:.55}}
 </style></head><body class="{cls}">
-<div class="brand"><img src="{root}/assets/brand/mark.png" alt="">Смекай</div><div class="date">{date}</div>
+<div class="brand"><i>С</i>Смекай</div><div class="date">{date}</div>
 <div class="kicker">{kicker}</div><div class="title">{title}</div>
 <div class="sub">{sub}</div>{stickers}
 </body></html>"""

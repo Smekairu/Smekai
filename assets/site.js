@@ -75,7 +75,7 @@
   function header(active) {
     const items = [['kak-rabotaet.html', 'Как работает'], ['tarify.html', 'Цены'], ['lev.html', 'Мыслик и Лев'], ['viktorina/', 'Викторина'], ['faq.html', 'Вопросы']];
     return `<header class="top"><div class="wrap nav">
-      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png" alt="">Смекай</a>
+      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Смекай</a>
       <nav class="nav-links" id="navlinks">${items.map(([h, t]) => `<a href="${root}${h}"${active === h ? ' aria-current="page"' : ''}>${t}</a>`).join('')}
         <a href="${root}kabinet/" class="only-mob"${active === 'kabinet' ? ' aria-current="page"' : ''}>Личный кабинет</a></nav>
       <span class="sp"></span>
@@ -88,7 +88,7 @@
   function footer() {
     return `<footer class="site"><div class="wrap">
       <div class="foot">
-        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png" alt="">Смекай</a>
+        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Смекай</a>
           <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
           <div class="social">
             <a href="${CFG.TG}" target="_blank" rel="noopener" title="Канал в Telegram" aria-label="Telegram">${ICONS.tg}</a>
@@ -160,6 +160,21 @@
   document.addEventListener('click', e => {
     const a = e.target.closest('[data-modal]'); if (!a) return;
     e.preventDefault(); openModal(a.dataset.modal, a.dataset.arg);
+  });
+
+  /* ---------- ссылки: логотип ведёт на главную, папки открываются и с диска ---------- */
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank') return;
+    const href = a.getAttribute('href'); if (!href || href[0] === '#' || /^(mailto|tel|javascript):/i.test(href)) return;
+    const u = new URL(href, location.href);
+    if (u.origin !== location.origin) return;
+    const dir = p => p.replace(/index\.html$/, '');
+    if (!u.hash && dir(u.pathname) === dir(location.pathname) && a.matches('.brand, .logo')) {
+      e.preventDefault(); history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo({ top: 0, behavior: 'smooth' }); return;
+    }
+    if (location.protocol === 'file:' && u.pathname.endsWith('/')) { e.preventDefault(); u.pathname += 'index.html'; location.href = u.href; }
   });
 
   /* ---------- оплата ---------- */
