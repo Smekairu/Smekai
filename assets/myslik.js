@@ -79,7 +79,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 :host(.yay) .mane,:host(.party) .mane{animation:maneyay .9s ease-in-out infinite}
 :host(.yay) .mane .glow,:host(.party) .mane .glow,:host(.surprised) .mane .glow{transform:scale(1.08);opacity:.35}
 :host(.party) .rig{animation:bounce 1.1s ease-in-out infinite}
-:host(.party) .arm.l{animation:wave 1.1s ease-in-out infinite}
+:host(.party) .arm.l{animation:waveL 1.1s ease-in-out infinite}
 :host(.party) .arm.r{animation:wave 1.1s ease-in-out infinite reverse}
 :host(.sad) .rig{animation:slump .6s ease forwards}
 :host(.sad) .brow.l{transform:translate(1px,-1px) rotate(12deg)}
@@ -149,6 +149,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 @keyframes squash{0%{transform:scale(1,1)}18%{transform:scale(1.05,.94)}40%{transform:scale(.96,1.05)}65%{transform:scale(1.02,.98)}100%{transform:scale(1,1)}}
 @keyframes bounce{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
 @keyframes wave{0%,100%{transform:rotate(-60deg)}50%{transform:rotate(-118deg)}}
+@keyframes waveL{0%,100%{transform:rotate(60deg)}50%{transform:rotate(118deg)}}
 @keyframes slump{to{transform:translateY(3px) scale(.985)}}
 @keyframes tear{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(20px);opacity:0}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-2.5px) rotate(-1deg)}75%{transform:translateX(2.5px) rotate(1deg)}}

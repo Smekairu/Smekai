@@ -443,7 +443,7 @@ async def link_code(uid, text):
     if not child_id:
         await say(uid, text="Такого кода нет или он уже использован. Попросите ребёнка открыть «Родителю» ещё раз."); return
     ch = db.get_user(child_id)
-    await say(uid, text=f"Готово. Теперь вы получаете отчёты про {esc(ch['name'])}, {ch['grade']} класс.\n\n"
+    await say(uid, text=f"Готово. Теперь вы получаете отчёты о занятиях. Ребёнок: {esc(ch['name']) or 'без имени'}, {ch['grade']} класс.\n\n"
                         "Первый отчёт придёт в воскресенье вечером.", keyboard=menu_kb())
     db.outbox_put(child_id, "Родитель подключил отчёты о твоих занятиях. Он будет видеть, сколько заданий решено и где было трудно.")
 

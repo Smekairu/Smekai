@@ -28,7 +28,7 @@ DAY[3] = ("logic", "🧠 Четверг. Логика")
 
 FOOTER = {
     "math": "Не диктуйте ход решения. Спросите: что известно и что надо найти.",
-    "rus": "Сомневаетесь в гласной — подберите слово, где на неё падает ударение.",
+    "rus": "Сомневаетесь в гласной? Подберите слово, где на неё падает ударение.",
     "nature": "Хороший вопрос после ответа: а как это проверить самим?",
     "logic": "Если ребёнок застрял, дайте подумать минуту молча. Это и есть работа.",
     "quiz": "Считайте очки всей семьёй. Проигрыш взрослого поднимает интерес сильнее похвалы.",
@@ -50,16 +50,21 @@ def build(day, used):
 
     if subject in ("razbor", "family"):
         item = bank.pick_common(subject, used, rnd)
-        body = [f"<b>{esc(title)}</b>", "", f"<b>{esc(item['title'])}</b>", esc(item["text"])]
+        text, answer = item["text"], ""
+        if "Ответ:" in text:                       # ответ семейного задания прячем под спойлер
+            text, answer = (x.strip() for x in text.split("Ответ:", 1))
+        body = [f"<b>{esc(title)}</b>", "", f"<b>{esc(item['title'])}</b>", esc(text)]
+        if answer and subject == "family":
+            body += ["", f"Ответ: <tg-spoiler>{esc(answer)}</tg-spoiler>"]
         if subject == "razbor":
-            extra = {b: bank.pick(b, "math", used, rnd) for b in ("1-2", "5-6", "9-11")}
+            extra = {b: bank.pick(b, "math", used, rnd, gen=True, month=day.month) for b in ("1-2", "5-6", "9-11")}
             body += ["", "<b>Задачи на выходные</b>"]
             body += [f"{BAND_TITLE[b]}: {esc(it['q'])}" for b, it in extra.items() if it]
             answers = " | ".join(f"{BAND_TITLE[b]}: {esc(it['a'])}" for b, it in extra.items() if it)
             body += ["", f"Ответы: <tg-spoiler>{answers}</tg-spoiler>"]
         return subject, "\n".join(body)
 
-    picked = {b: bank.pick(b, subject, used, rnd) for b in bank.BANDS}
+    picked = {b: bank.pick(b, subject, used, rnd, month=day.month) for b in bank.BANDS}
     body = [f"<b>{esc(title)}</b>", ""]
     for b in bank.BANDS:
         it = picked.get(b)
@@ -77,10 +82,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=3, help="на сколько дней вперёд готовить посты")
     ap.add_argument("--time", default="09:00", help="время публикации по Москве")
+    ap.add_argument("--today", help="считать сегодняшней эту дату, ГГГГ-ММ-ДД (для сборки заранее)")
     args = ap.parse_args()
 
     used = bank.used_read()
-    today = datetime.now(MSK).date()
+    today = datetime.strptime(args.today, "%Y-%m-%d").date() if args.today else datetime.now(MSK).date()
     made = 0
     for i in range(args.days):
         day = today + timedelta(days=i)

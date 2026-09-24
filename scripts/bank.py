@@ -36,43 +36,46 @@ def used_write(d):
     USED.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
-def pick(band, subject, used, rnd):
-    """Берёт задание, которое ещё не выходило. Когда список кончился, начинает круг заново."""
-    if subject == "math":
-        items = load(band).get("math") or []
-        if not items:
-            recent = used.setdefault("math_recent", [])
-            for _ in range(30):                 # без повторов среди последних 300 примеров
-                it = gen_math(band, rnd)
-                if it["q"] not in recent:
-                    break
-            recent.append(it["q"])
-            del recent[:-300]
-            return it
-    else:
-        items = load(band).get(subject) or []
-    if not items:
-        return None
-    key = f"{band}|{subject}"
+def next_free(items, key, used):
+    """Первое по порядку задание, которое ещё не выходило. Банк выстроен по ходу школьного года,
+    поэтому задания идут по порядку. Когда список кончился, круг начинается заново."""
     seen = set(used.get(key, []))
     free = [i for i in range(len(items)) if i not in seen]
     if not free:
         seen, free = set(), list(range(len(items)))
-    i = rnd.choice(free)
+    i = free[0]
     used[key] = sorted(seen | {i})
     return items[i]
+
+
+def pick(band, subject, used, rnd, gen=False, month=None):
+    """Берёт задание, которое ещё не выходило.
+    Математика: сначала текстовые задачи из банка по порядку, когда они кончатся, примеры из генератора.
+    gen=True: сразу пример из генератора (для «Задач на выходные» в субботу)."""
+    if subject == "math":
+        items = [] if gen else (load(band).get("math") or [])
+        key = f"{band}|math"
+        if items and len(used.get(key, [])) < len(items):
+            return next_free(items, key, used)
+        recent = used.setdefault("math_recent", [])
+        for _ in range(30):                 # без повторов среди последних 300 примеров
+            it = gen_math(band, rnd, month)
+            if it["q"] not in recent:
+                break
+        recent.append(it["q"])
+        del recent[:-300]
+        return it
+    items = load(band).get(subject) or []
+    if not items:
+        return None
+    return next_free(items, f"{band}|{subject}", used)
 
 
 def pick_common(kind, used, rnd):
     items = load_common().get(kind, [])
-    key = f"common|{kind}"
-    seen = set(used.get(key, []))
-    free = [i for i in range(len(items)) if i not in seen]
-    if not free:
-        seen, free = set(), list(range(len(items)))
-    i = rnd.choice(free)
-    used[key] = sorted(seen | {i})
-    return items[i]
+    if not items:
+        return None
+    return next_free(items, f"common|{kind}", used)
 
 
 # ---------- генератор примеров по математике ----------
@@ -85,18 +88,25 @@ def plural(n, one, few, many):
     return one if n == 1 else few if 2 <= n <= 4 else many
 
 
-def gen_math(band, rnd):
+def gen_math(band, rnd, month=None):
     """Примеры создаются на ходу, поэтому математика в банке не кончается. Ответ всегда считается точно."""
     from fractions import Fraction
     from math import gcd
     if band == "1-2":
-        kind = rnd.choice(["sum", "diff", "mult", "task"])
+        # умножение во 2 классе начинают во второй половине года
+        kinds = ["sum", "diff", "two"] + (["mult", "task"] if month in (2, 3, 4, 5) else [])
+        kind = rnd.choice(kinds)
         if kind == "sum":
             a, b = rnd.randint(21, 58), rnd.randint(13, 39)
             return {"q": f"Посчитай: {a} + {b}", "a": str(a + b)}
         if kind == "diff":
             a, b = rnd.randint(52, 96), rnd.randint(14, 38)
             return {"q": f"Посчитай: {a} − {b}", "a": str(a - b)}
+        if kind == "two":
+            a, b = rnd.randint(25, 60), rnd.randint(12, 30)
+            c = rnd.randint(10, a + b - 10)
+            return {"q": f"В автобусе ехали {a} {plural(a, 'пассажир', 'пассажира', 'пассажиров')}. На остановке вошли ещё {b}, а вышли {c}. "
+                         f"Сколько пассажиров стало в автобусе?", "a": f"{a + b - c}: {a} + {b} − {c} = {a + b - c}"}
         if kind == "mult":
             a, b = rnd.randint(2, 5), rnd.randint(3, 9)
             return {"q": f"Посчитай: {a} · {b}", "a": str(a * b)}
@@ -173,5 +183,5 @@ def gen_math(band, rnd):
         return {"q": f"Решите уравнение: {base}ˣ = {base ** e}", "a": f"x = {e}"}
     w, b = rnd.randint(2, 6), rnd.randint(3, 8)
     f = Fraction(w, w + b)
-    return {"q": f"В коробке {w} {plural(w, 'белый', 'белых', 'белых')} и {b} {plural(b, 'чёрный', 'чёрных', 'чёрных')} шаров. Какова вероятность вытащить белый?",
+    return {"q": f"В коробке {w} {plural(w, 'белый', 'белых', 'белых')} и {b} {plural(b, 'чёрный', 'чёрных', 'чёрных')} {plural(b, 'шар', 'шара', 'шаров')}. Какова вероятность вытащить белый?",
             "a": f"{f.numerator}/{f.denominator}"}
