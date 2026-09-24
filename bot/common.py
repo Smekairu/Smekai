@@ -4,10 +4,37 @@
 """
 import os
 
-PAY_URL = os.environ.get("PAY_URL", "https://boosty.to/smekai")
+import ids
+
+SITE_URL = os.environ.get("SITE_URL", "https://smekairu.github.io/Smekai/")
+PAY_URL = os.environ.get("PAY_URL") or SITE_URL + "oplata.html"
+BOOSTY_URL = os.environ.get("BOOSTY_URL", "https://boosty.to/smekai")
+CABINET_URL = SITE_URL + "kabinet/"
 FREE_LIMIT = int(os.environ.get("FREE_LIMIT", "3"))
 PAID_LIMIT = int(os.environ.get("PAID_LIMIT", "30"))
-PRICE = os.environ.get("PRICE", "390")
+SUB_DAYS = int(os.environ.get("SUB_DAYS", "30"))
+
+# тарифы: одинаковые для сайта, ботов и оплаты
+PLANS = {
+    "tasks": {"title": "Задания", "price": 390, "helper": False,
+              "about": "закрытый канал с ежедневными заданиями и разборами"},
+    "myslik": {"title": "Мыслик", "price": 890, "helper": True,
+               "about": "30 разборов в день, фото домашки, закрытый канал, отчёт родителю"},
+    "family": {"title": "Семья", "price": 1490, "helper": True,
+               "about": "всё из тарифа Мыслик для двух детей"},
+}
+PRICE = str(PLANS["tasks"]["price"])
+
+# в MAX задания для детей бесплатны: дневной предел как у подписки
+MAX_FREE_TASKS = os.environ.get("MAX_FREE_TASKS", "1") == "1"
+
+
+def daily_limit(uid, helper):
+    if helper:
+        return PAID_LIMIT
+    if MAX_FREE_TASKS and ids.platform(uid) == "max":
+        return PAID_LIMIT
+    return FREE_LIMIT
 
 PRAISE = ["Верно!", "Точно!", "Да, именно так.", "Отлично, правильно."]
 SOFT = ["Пока не то.", "Почти, но нет.", "Не сходится."]
@@ -18,10 +45,13 @@ VOICE_NAMES = {"boy": "бодрый, как с другом", "girl": "тёпл�
 COMMANDS = [
     ("start", "Начать или вернуться в меню"),
     ("task", "Новое задание"),
+    ("kabinet", "Личный кабинет"),
     ("progress", "Мой прогресс"),
+    ("pay", "Тарифы и оплата"),
     ("voice", "Выбрать голос"),
     ("parent", "Родителю: код и отчёты"),
     ("report", "Отчёт о ребёнке сейчас"),
+    ("support", "Помощь: оплата, возврат, вопросы"),
     ("help", "Как это работает"),
 ]
 
@@ -29,6 +59,9 @@ DESCRIPTION = ("Мыслик помогает школьнику 1–11 клас
                "даёт подсказки, разбирает по шагам. Три задания в день бесплатно. "
                "С подпиской: разбор домашки по фото, закрытый канал, отчёт родителю.")
 SHORT_DESCRIPTION = "Помощник по учёбе для 1–11 класса. Подсказки вместо готовых ответов."
+DESCRIPTION_MAX = ("Мыслик помогает школьнику 1–11 класса решать задания самому: задаёт вопросы, "
+                   "даёт подсказки, разбирает по шагам. В MAX задания для детей бесплатны, до 30 в день. "
+                   "По тарифу: разбор домашки по фото и отчёт родителю.")
 
 
 def who(user):
@@ -38,6 +71,12 @@ def who(user):
     except (KeyError, IndexError, TypeError):
         g = 0
     return "lev" if g >= 9 else "junior" if 0 < g <= 3 else "myslik"
+
+
+def plan_line(plan, until):
+    if plan in PLANS and until:
+        return f"Тариф «{PLANS[plan]['title']}» до {until}."
+    return "Тариф «Знакомство»: 3 задания в день бесплатно."
 
 
 def name_of(user):
@@ -64,12 +103,19 @@ HOW = ("Я даю задание по твоему классу. Ты отвеч
 LIMIT_OVER = ("На сегодня бесплатные задания кончились.\n\n"
               f"С подпиской их {PAID_LIMIT} в день, плюс разбор домашки и отчёт родителю.")
 
-SUB_TEXT = ("<b>Что даёт подписка</b>\n\n"
-            f"• {PAID_LIMIT} заданий в день вместо {FREE_LIMIT}\n"
-            "• разбор домашки: присылаешь задание, Мыслик ведёт к ответу\n"
-            "• закрытый канал с ежедневными заданиями по классу\n"
-            "• отчёт родителю раз в неделю\n\n"
-            f"{PRICE} рублей в месяц, отменить можно в любой момент.")
+SUB_TEXT = ("<b>Тарифы</b>\n\n"
+            f"• <b>Задания</b>, {PLANS['tasks']['price']} ₽ в месяц: {PLANS['tasks']['about']}\n"
+            f"• <b>Мыслик</b>, {PLANS['myslik']['price']} ₽ в месяц: {PLANS['myslik']['about']}\n"
+            f"• <b>Семья</b>, {PLANS['family']['price']} ₽ в месяц: {PLANS['family']['about']}\n\n"
+            "Оплата на сайте картой, МИР или по QR-коду СБП. Отменить можно в любой момент.")
+
+SUPPORT_HELLO = ("Я Мыслик, помогаю не только с уроками. Спросите про оплату, возврат, доступ "
+                 "или занятия. Можно своими словами.")
+
+CABINET_TEXT = ("<b>Личный кабинет</b>\n\n"
+                "Там занятие с Мысликом на большом экране, прогресс по дням, тариф и настройки. "
+                "С планшета и компьютера заниматься удобнее там. Ссылка для входа одноразовая, "
+                "действует 30 минут.")
 
 PARENT_HOW = ("<b>Как подключить отчёты</b>\n\n"
               "Отчёт получает тот, кто привяжет ребёнка к себе.\n\n"

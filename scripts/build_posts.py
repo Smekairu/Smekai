@@ -87,13 +87,17 @@ def main():
         when = datetime.strptime(f"{day:%Y-%m-%d} {args.time}", "%Y-%m-%d %H:%M").replace(tzinfo=MSK)
         if when < datetime.now(MSK):
             continue
-        if list(POSTS.glob(f"{day:%Y-%m-%d}-*.md")):
-            continue   # на этот день пост уже есть, написанный руками или собранный раньше
+        if list(POSTS.glob(f"{day:%Y-%m-%d}-{args.time.replace(':', '')}-*.md")):
+            continue   # на это время пост уже есть, написанный руками или собранный раньше
         subject, text = build(day, used)
         name = f"{day:%Y-%m-%d}-{args.time.replace(':', '')}-{subject}.md"
         path = POSTS / name
+        img = ""
+        for cand in (f"assets/posts/{day:%Y-%m-%d}-{args.time.replace(':', '')}.jpg", f"assets/posts/subject-{subject}.jpg"):
+            if (ROOT / cand).exists():
+                img = f"image: {cand}\n"; break
         head = (f"---\ntime: {day:%Y-%m-%d} {args.time}\nchannels: telegram, max\n"
-                f"channel: closed\nauto: yes\n---\n")
+                f"channel: closed\n{img}auto: yes\n---\n")
         path.write_text(head + text + "\n", encoding="utf-8")
         print("собран пост:", name)
         made += 1

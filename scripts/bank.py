@@ -41,7 +41,14 @@ def pick(band, subject, used, rnd):
     if subject == "math":
         items = load(band).get("math") or []
         if not items:
-            return gen_math(band, rnd)
+            recent = used.setdefault("math_recent", [])
+            for _ in range(30):                 # без повторов среди последних 300 примеров
+                it = gen_math(band, rnd)
+                if it["q"] not in recent:
+                    break
+            recent.append(it["q"])
+            del recent[:-300]
+            return it
     else:
         items = load(band).get(subject) or []
     if not items:
@@ -70,8 +77,18 @@ def pick_common(kind, used, rnd):
 
 # ---------- генератор примеров по математике ----------
 
+def plural(n, one, few, many):
+    n = abs(n) % 100
+    if 11 <= n <= 14:
+        return many
+    n %= 10
+    return one if n == 1 else few if 2 <= n <= 4 else many
+
+
 def gen_math(band, rnd):
-    """Примеры создаются на ходу, поэтому математика в банке не кончается."""
+    """Примеры создаются на ходу, поэтому математика в банке не кончается. Ответ всегда считается точно."""
+    from fractions import Fraction
+    from math import gcd
     if band == "1-2":
         kind = rnd.choice(["sum", "diff", "mult", "task"])
         if kind == "sum":
@@ -84,7 +101,8 @@ def gen_math(band, rnd):
             a, b = rnd.randint(2, 5), rnd.randint(3, 9)
             return {"q": f"Посчитай: {a} · {b}", "a": str(a * b)}
         r, c = rnd.randint(3, 7), rnd.randint(3, 6)
-        return {"q": f"В коробке {r} рядов по {c} конфет. Сколько всего конфет?", "a": f"{r * c}"}
+        return {"q": f"В коробке {r} {plural(r, 'ряд', 'ряда', 'рядов')} по {c} {plural(c, 'конфете', 'конфеты', 'конфет')}. Сколько всего конфет?",
+                "a": f"{r * c}"}
 
     if band == "3-4":
         kind = rnd.choice(["mult", "div", "order", "task"])
@@ -95,27 +113,29 @@ def gen_math(band, rnd):
             b, q = rnd.randint(3, 9), rnd.randint(12, 40)
             return {"q": f"Посчитай: {b * q} : {b}", "a": str(q)}
         if kind == "order":
-            a, b, c = rnd.randint(40, 90), rnd.randint(3, 9), rnd.randint(4, 12)
+            b, c = rnd.randint(3, 9), rnd.randint(4, 12)
+            a = b * c + rnd.randint(4, 60)
             return {"q": f"Посчитай: {a} − {b} · {c}", "a": f"{a - b * c}, сначала умножение"}
         price, n = rnd.choice([25, 30, 45, 60]), rnd.randint(3, 8)
-        return {"q": f"Тетрадь стоит {price} рублей. Сколько стоят {n} тетрадей?", "a": f"{price * n} рублей"}
+        return {"q": f"Тетрадь стоит {price} рублей. Сколько стоят {n} {plural(n, 'тетрадь', 'тетради', 'тетрадей')}?",
+                "a": f"{price * n} рублей"}
 
     if band == "5-6":
         kind = rnd.choice(["order", "frac", "percent", "speed"])
         if kind == "order":
-            a, b, c = rnd.randint(90, 160), rnd.randint(3, 8), rnd.randint(9, 18)
-            return {"q": f"Вычислите: {a} − {b} · ({c} + {rnd.randint(2, 9)})".replace("  ", " "),
-                    "a": "считайте по действиям: скобки, умножение, вычитание"}
+            b, c, d = rnd.randint(3, 8), rnd.randint(9, 18), rnd.randint(2, 9)
+            a = b * (c + d) + rnd.randint(5, 60)
+            return {"q": f"Вычислите: {a} − {b} · ({c} + {d})", "a": f"{a - b * (c + d)}"}
         if kind == "frac":
             d = rnd.choice([4, 5, 6, 8])
-            n = rnd.randint(1, d - 1)
+            n = rnd.choice([k for k in range(1, d) if gcd(k, d) == 1])
             whole = d * rnd.randint(3, 9)
             return {"q": f"Найдите {n}/{d} от числа {whole}.", "a": str(whole // d * n)}
         if kind == "percent":
             p, whole = rnd.choice([10, 20, 25, 40, 50]), rnd.choice([120, 240, 360, 480, 600])
             return {"q": f"Найдите {p} процентов от {whole}.", "a": str(whole * p // 100)}
         v, t = rnd.choice([12, 15, 18, 20]), rnd.randint(2, 5)
-        return {"q": f"Велосипедист едет со скоростью {v} км/ч. Какой путь он проедет за {t} часа?",
+        return {"q": f"Велосипедист едет со скоростью {v} км/ч. Какой путь он проедет за {t} {plural(t, 'час', 'часа', 'часов')}?",
                 "a": f"{v * t} км"}
 
     if band == "7-8":
@@ -125,31 +145,33 @@ def gen_math(band, rnd):
             return {"q": f"Решите уравнение: {a}x + {b} = {a * x + b}", "a": f"x = {x}"}
         if kind == "formula":
             a, b = rnd.randint(2, 9), rnd.randint(2, 9)
-            return {"q": f"Раскройте скобки: ({a}x + {b})²",
-                    "a": f"{a*a}x² + {2*a*b}x + {b*b}"}
+            return {"q": f"Раскройте скобки: ({a}x + {b})²", "a": f"{a*a}x² + {2*a*b}x + {b*b}"}
         p, whole = rnd.choice([15, 18, 24, 35]), rnd.choice([200, 400, 800, 1200])
         if kind == "percent":
-            return {"q": f"Товар стоил {whole} рублей и подорожал на {p} процентов. Новая цена?",
+            return {"q": f"Товар стоил {whole} рублей и подорожал на {p} {plural(p, 'процент', 'процента', 'процентов')}. Какой стала цена?",
                     "a": f"{whole + whole * p // 100} рублей"}
-        a, b = rnd.choice([(3, 4), (6, 8), (5, 12), (9, 12)])
+        a, b = rnd.choice([(3, 4), (6, 8), (5, 12), (9, 12), (8, 15)])
         return {"q": f"Катеты прямоугольного треугольника {a} и {b}. Найдите гипотенузу.",
-                "a": f"{int((a*a + b*b) ** 0.5)}"}
+                "a": f"{int(round((a*a + b*b) ** 0.5))}"}
 
     # 9-11
     kind = rnd.choice(["quad", "prog", "power", "prob"])
     if kind == "quad":
-        r1, r2 = rnd.randint(-6, 6), rnd.randint(-6, 6)
+        r1 = rnd.randint(-6, 6)
+        r2 = rnd.choice([k for k in range(-6, 7) if k != r1])
         b, c = -(r1 + r2), r1 * r2
-        sb = f"+ {b}" if b >= 0 else f"− {abs(b)}"
-        sc = f"+ {c}" if c >= 0 else f"− {abs(c)}"
-        return {"q": f"Решите уравнение: x² {sb}x {sc} = 0", "a": f"x = {r1} и x = {r2}"}
+        sb = f"+ {b}x " if b > 0 else f"− {abs(b)}x " if b < 0 else ""
+        sc = f"+ {c} " if c > 0 else f"− {abs(c)} " if c < 0 else ""
+        lo, hi = sorted((r1, r2))
+        return {"q": f"Решите уравнение: x² {sb}{sc}= 0", "a": f"x = {lo} и x = {hi}"}
     if kind == "prog":
         a1, d, n = rnd.randint(2, 9), rnd.randint(2, 7), rnd.randint(8, 20)
         return {"q": f"Арифметическая прогрессия: первый член {a1}, разность {d}. Найдите {n}-й член.",
                 "a": str(a1 + d * (n - 1))}
     if kind == "power":
         base, e = rnd.choice([2, 3, 5]), rnd.randint(2, 5)
-        return {"q": f"Решите: {base} в степени x равно {base ** e}", "a": f"x = {e}"}
+        return {"q": f"Решите уравнение: {base}ˣ = {base ** e}", "a": f"x = {e}"}
     w, b = rnd.randint(2, 6), rnd.randint(3, 8)
-    return {"q": f"В урне {w} белых и {b} чёрных шаров. Вероятность достать белый?",
-            "a": f"{w}/{w + b} ≈ {round(w / (w + b), 2)}"}
+    f = Fraction(w, w + b)
+    return {"q": f"В коробке {w} {plural(w, 'белый', 'белых', 'белых')} и {b} {plural(b, 'чёрный', 'чёрных', 'чёрных')} шаров. Какова вероятность вытащить белый?",
+            "a": f"{f.numerator}/{f.denominator}"}

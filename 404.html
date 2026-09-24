@@ -2,6 +2,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Страница не найдена — Смекай</title>
 <link rel="icon" href="/Smekai/assets/favicon.png"><link rel="stylesheet" href="/Smekai/assets/site.css"><script src="/Smekai/assets/myslik.js"></script>
 <style>body{display:grid;place-items:center;min-height:100vh;text-align:center;padding:20px}</style>
-</head><body><div><myslik-face mood="surprised" size="180"></myslik-face><h1 style="margin:10px 0">Такой страницы нет</h1><p style="margin-bottom:22px">Зато есть викторина и помощник по урокам.</p>
-<a class="btn btn-main" href="/Smekai/">На главную</a></div>
-<script>setTimeout(()=>document.querySelector('myslik-face').say('Тут пусто. Пойдём на главную?'),500)</script></body></html>
+</head><body><div><myslik-face mood="surprised" size="180"></myslik-face><h1 style="margin:10px 0">Такой страницы нет</h1><p style="margin-bottom:22px">Зато есть личный кабинет с Мысликом и викторина.</p>
+<div class="btns" style="justify-content:center"><a class="btn btn-main" href="/Smekai/">На главную</a><a class="btn btn-ghost" href="/Smekai/kabinet/">Личный кабинет</a><a class="btn btn-ghost" href="/Smekai/viktorina/">Викторина</a></div></div>
+<script>setTimeout(()=>{const m=document.querySelector('myslik-face'); if (m && m.say) m.say('Тут пусто. Пойдём на главную?')},500)</script></body></html>

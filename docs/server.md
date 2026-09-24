@@ -117,3 +117,44 @@ curl -s http://127.0.0.1:8080/health
 
 В боте: `/start`, взять задание, ответить, получить стикер. Затем `/grant свой_id 30`
 и проверить, что пришла ссылка в закрытый канал.
+
+## 5. Личный кабинет и оплата на сайте
+
+Сайт лежит на GitHub Pages, а данные кабинета и оплата живут на этом сервере. Сайту нужен адрес
+сервера с HTTPS, поэтому понадобится домен или поддомен, например `api.smekai.ru`, направленный на IP сервера.
+
+```bash
+sudo apt install -y nginx certbot python3-certbot-nginx
+sudo tee /etc/nginx/sites-available/smekai-api >/dev/null <<'NGINX'
+server {
+    server_name api.smekai.ru;
+    location / { proxy_pass http://127.0.0.1:8080; proxy_set_header Host $host; proxy_set_header X-Forwarded-For $remote_addr; }
+}
+NGINX
+sudo ln -s /etc/nginx/sites-available/smekai-api /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d api.smekai.ru      # бесплатный сертификат, продлевается сам
+```
+
+Дальше три правки:
+
+1. В `bot/.env`: `API_PUBLIC=https://api.smekai.ru` и `SITE_ORIGINS=https://smekairu.github.io`.
+2. В `assets/site.js` в самом верху: `API: 'https://api.smekai.ru'`. Закоммитить и отправить в GitHub.
+3. `sudo systemctl restart myslik myslik-max myslik-pay`, затем в GitHub запустить «Настроить ботов»:
+   в Telegram появится кнопка «Кабинет», которая открывает кабинет прямо внутри Telegram.
+
+Проверка: `curl https://api.smekai.ru/health` отвечает `{"ok": true, ...}`. На сайте в кабинете
+появляется вход через Telegram, MAX или без мессенджера.
+
+Как это устроено: все три процесса работают с одной базой `bot/myslik.db`. Люди из Telegram хранятся
+под своим id, из MAX со знаком минус, аккаунты сайта от 9 000 000 000 000 000. Сообщения пользователям
+(оплата прошла, ответ поддержки, отчёт родителю) кладутся в общую очередь, и их доставляет бот той платформы,
+где живёт человек. Поэтому код родителя работает между платформами.
+
+Оплата через ЮKassa описана в `docs/oplata.md`. Адрес для уведомлений ЮKassa: `https://api.smekai.ru/pay/yookassa`.
+
+## 6. Поддержка
+
+Мыслик отвечает на частые вопросы сам: тексты в `assets/support.json`, их читают и сайт, и боты.
+Заявки на возврат и вопросы «написать человеку» приходят администратору в Telegram и MAX с номером.
+Ответить: `/reply номер текст`, ответ уйдёт человеку в его мессенджер.

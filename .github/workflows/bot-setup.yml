@@ -30,3 +30,4 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
+          API_PUBLIC: ${{ vars.API_PUBLIC }}

@@ -1,1 +1,6 @@
 __pycache__/
+*.pyc
+state/_card.html
+bot/.env
+bot/*.db
+bot/*.db-*

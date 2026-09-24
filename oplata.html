@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Оплата — Смекай</title>
+<meta name="description" content="Оплата тарифов Смекай: картой российского банка, картой МИР или по QR-коду СБП. Без автосписаний, чек на почту.">
+<link rel="icon" href="./assets/favicon.png">
+<link rel="stylesheet" href="./assets/fonts.css">
+<link rel="stylesheet" href="./assets/site.css">
+<script src="./assets/myslik.js"></script>
+<script src="./assets/site.js" defer></script>
+<style>
+.pay-page{display:grid;grid-template-columns:1.3fr .7fr;gap:26px;align-items:start;margin-top:22px}
+@media(max-width:900px){.pay-page{grid-template-columns:1fr}}
+.pay-box{background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+.pay-side{display:grid;gap:14px}
+.pay-side .card h3{font-size:17px}
+.pay-side ol{margin:6px 0 0 18px;color:var(--ink-2);font-size:15px}
+.pay-side li{margin-bottom:6px}
+</style>
+</head>
+<body data-page="oplata.html" data-root="./" data-src="pay" data-metrika="">
+<div id="site-header"></div>
+
+<section class="doc"><div class="wrap">
+<h1>Оплата</h1>
+<p class="lead">Выберите тариф и способ оплаты. Оплата помесячная, отменить можно в любой момент.</p>
+<div class="pay-page">
+  <div class="pay-box"><div data-pay="myslik"></div></div>
+  <div class="pay-side">
+    <div class="card"><h3>Как это проходит</h3><ol><li>Выбираете тариф и способ оплаты.</li><li>Платите картой или по QR-коду в приложении банка.</li><li>Бот присылает ссылку в закрытый канал, в личном кабинете появляется тариф.</li></ol></div>
+    <div class="card"><h3>Чек и документы</h3><p class="small">Чек приходит на почту сразу после оплаты. Исполнитель: ИП Ярмак Николай Владимирович, ИНН 501807779599, ОГРНИП 325774600563025. <a href="rekvizity.html">Реквизиты</a> и <a href="oferta.html">оферта</a>.</p></div>
+    <div class="card"><h3>Возврат</h3><p class="small">Деньги за неиспользованные дни вернём по заявлению, в течение десяти рабочих дней. Оформить можно у Мыслика в поддержке.</p><p style="margin-top:10px"><a class="btn btn-ghost btn-sm" href="#" data-modal="support">Поддержка</a></p></div>
+    <div class="card"><h3>Бесплатно</h3><p class="small">Три задания в день в личном кабинете и в боте. В MAX задания для детей бесплатны без ограничений по тарифу.</p><p style="margin-top:10px"><a class="btn btn-ghost btn-sm" href="kabinet/">Личный кабинет</a></p></div>
+  </div>
+</div>
+</div></section>
+
+<div id="site-footer"></div>
+</body>
+</html>

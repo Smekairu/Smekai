@@ -16,15 +16,20 @@
  * API:  el.mood('yay')  el.say('Текст')  el.speak('Текст','girl')  el.react('correct')
  *       el.grow(11, 4000)   вырастить до класса за время, с превращением в Льва на границе
  *       el.age              текущий возраст числом
- * События: myslik-tap {zone, kind}, myslik-grown {age}
+ * События: myslik-tap {zone, kind}, myslik-grown {age}, myslik-help (кнопка «?» у атрибута help)
  */
 (function () {
   const CSS = `
 :host{display:inline-block;position:relative;line-height:0;touch-action:none;user-select:none;-webkit-user-select:none;--sun:#FFC933;--ink:#1B1F3B}
 :host([hidden]){display:none}
-:host([float]){position:fixed;z-index:9000;width:104px;height:104px;cursor:grab;filter:drop-shadow(0 10px 18px rgba(27,31,59,.22))}
+:host([float]){position:fixed;z-index:9000;width:150px;height:150px;cursor:grab;filter:drop-shadow(0 10px 18px rgba(27,31,59,.22))}
 :host([float][dragging]){cursor:grabbing;transition:none!important}
-@media(max-width:640px){:host([float]){width:78px;height:78px}}
+@media(max-width:1024px){:host([float]){width:128px;height:128px}}
+@media(max-width:640px){:host([float]){width:106px;height:106px}}
+.help{display:none;position:absolute;right:4%;top:18%;width:30px;height:30px;border-radius:50%;border:2px solid #fff;background:var(--ink);color:#fff;
+  font:800 16px/26px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;text-align:center;cursor:pointer;box-shadow:0 4px 10px rgba(27,31,59,.3);padding:0;z-index:3}
+:host([help]) .help{display:block}
+.help:hover{background:#2A3160}
 .hint{display:none}
 :host([float]) .hint{display:block;position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font:600 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   color:#fff;background:var(--ink);padding:4px 8px;border-radius:999px;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -35,7 +40,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 .body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 4s ease-in-out infinite}
 .shadow{transform-box:fill-box;transform-origin:center;animation:shadow 4s ease-in-out infinite}
 .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0)}
-.eyes.blink .lid{animation:lid .16s ease-in-out}
+.eyes.blink .lid{animation:lid .3s ease-in-out}
 .pupils{transition:transform .28s ease}
 .brow{transform-box:fill-box;transform-origin:center;transition:transform .3s ease,opacity .2s}
 .m{opacity:0;transition:opacity .1s}.m.on{opacity:1}
@@ -111,13 +116,15 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 /* --- облачко --- */
 .bubble{position:absolute;left:74%;bottom:80%;min-width:130px;max-width:min(300px,68vw);background:#fff;color:var(--ink);
   border:1.5px solid rgba(27,31,59,.22);border-radius:16px;padding:10px 14px;font:500 15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  box-shadow:0 10px 28px rgba(27,31,59,.16);opacity:0;transform:translateY(8px) scale(.94);transform-origin:0 100%;
-  transition:opacity .22s,transform .22s;pointer-events:none;z-index:2;white-space:pre-wrap;text-align:left}
+  box-shadow:0 10px 28px rgba(27,31,59,.16);opacity:0;transform:translateY(8px) scale(0);transform-origin:0 100%;
+  transition:opacity .22s,transform .22s cubic-bezier(.3,1.4,.6,1);pointer-events:none;z-index:2;white-space:pre-wrap;text-align:left}
 .bubble::after{content:"";position:absolute;left:14px;bottom:-9px;width:14px;height:14px;background:#fff;
   border-left:1.5px solid rgba(27,31,59,.22);border-bottom:1.5px solid rgba(27,31,59,.22);transform:rotate(-45deg);border-radius:0 0 0 3px}
 .bubble.on{opacity:1;transform:translateY(0) scale(1)}
 .bubble.left{left:auto;right:74%;transform-origin:100% 100%}
 .bubble.left::after{left:auto;right:14px;transform:rotate(-135deg)}
+.bubble.top{bottom:92%;min-width:0;transform-origin:50% 100%}
+.bubble.top::after{left:var(--tail,50%)}
 .bubble.below{bottom:auto;top:96%;transform-origin:0 0}
 .bubble.below::after{bottom:auto;top:-9px;transform:rotate(135deg)}
 .bubble.below.left::after{transform:rotate(45deg)}
@@ -126,7 +133,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 @keyframes sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
 @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.008,1.022)}}
 @keyframes shadow{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
-@keyframes lid{0%,100%{transform:scaleY(0)}50%{transform:scaleY(1)}}
+@keyframes lid{0%{transform:scaleY(0)}32%{transform:scaleY(1)}52%{transform:scaleY(1)}100%{transform:scaleY(0)}}
 @keyframes idleglow{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.3;transform:scale(1.07)}}
 @keyframes thinkglow{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.7;transform:scale(1.22)}}
 @keyframes maneidle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.02) rotate(.6deg)}}
@@ -341,7 +348,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
 
   function svg(age) {
     const p = params(age);
-    return `<svg viewBox="-12 -16 124 136" aria-hidden="true">${defs(p)}
+    return `<svg viewBox="-5 -12 110 130" aria-hidden="true">${defs(p)}
 <ellipse class="shadow" cx="50" cy="${f1(p.bodyBot + 6)}" rx="${f1(p.bodyRx * .78 * p.scale)}" ry="3.6" fill="#1B1F3B" opacity=".14" filter="url(#soft)"/>
 <g class="rig"><g transform="translate(50 ${f1(p.bodyBot + 6)}) scale(${p.scale.toFixed(3)}) translate(-50 ${f1(-(p.bodyBot + 6))})">${p.lev ? maneLev(p) : lampMyslik(p)}${bodySvg(p)}</g></g></svg>`;
   }
@@ -409,6 +416,11 @@ svg{width:100%;height:100%;overflow:visible;display:block}
       this._stage = document.createElement('div'); this._stage.className = 'stage';
       this._bubble = document.createElement('div'); this._bubble.className = 'bubble';
       this._hint = document.createElement('div'); this._hint.className = 'hint'; this._hint.textContent = 'перетащи меня';
+      this._help = document.createElement('button'); this._help.className = 'help'; this._help.type = 'button';
+      this._help.textContent = '?'; this._help.title = 'Помощь'; this._help.setAttribute('aria-label', 'Помощь');
+      this._help.addEventListener('pointerdown', e => e.stopPropagation());
+      this._help.addEventListener('pointerup', e => e.stopPropagation());
+      this._help.addEventListener('click', e => { e.stopPropagation(); this.dispatchEvent(new CustomEvent('myslik-help', { bubbles: true })); });
       root.append(style, this._stage);
       this._current = 'idle'; this._timers = {}; this._age = 5;
       this._build();
@@ -425,7 +437,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
     _build() {
       this._age = this._readAge();
       this._stage.innerHTML = svg(this._age);
-      this._stage.append(this._bubble, this._hint);
+      this._stage.append(this._bubble, this._hint, this._help);
       this._stage.querySelectorAll('.zone').forEach(z => {
         z.addEventListener('pointerup', e => { if (!this._moved) { e.stopPropagation(); this._zone(z.dataset.zone); } });
       });
@@ -481,10 +493,10 @@ svg{width:100%;height:100%;overflow:visible;display:block}
       clearTimeout(this._timers.blink);
       this._timers.blink = setTimeout(() => {
         const eyes = this._stage.querySelector('.eyes');
-        const b = () => { if (!eyes) return; eyes.classList.add('blink'); setTimeout(() => eyes.classList.remove('blink'), 170); };
-        b(); if (Math.random() < .22) setTimeout(b, 260);
+        const b = () => { if (!eyes) return; eyes.classList.remove('blink'); void eyes.getBoundingClientRect(); eyes.classList.add('blink'); setTimeout(() => eyes.classList.remove('blink'), 320); };
+        b(); if (Math.random() < .08) setTimeout(b, 480);
         this._scheduleBlink();
-      }, 2800 + Math.random() * 3400);
+      }, 4200 + Math.random() * 4600);
     }
     _glance() {
       clearTimeout(this._timers.glance);
@@ -556,16 +568,16 @@ svg{width:100%;height:100%;overflow:visible;display:block}
     _setupFloat() {
       const KEY = 'smk_float_pos';
       const place = (x, y) => {
-        const w = this.offsetWidth || 104, h = this.offsetHeight || 104;
+        const w = this.offsetWidth || 150, h = this.offsetHeight || 150;
         x = Math.max(6, Math.min(window.innerWidth - w - 6, x)); y = Math.max(6, Math.min(window.innerHeight - h - 6, y));
         this.style.left = x + 'px'; this.style.top = y + 'px'; this.style.right = 'auto'; this.style.bottom = 'auto';
         this._bubble.classList.toggle('left', x > window.innerWidth * .55); this._bubble.classList.toggle('below', y < 140);
         return [x, y];
       };
       let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
-      const w = this.offsetWidth || 104;
+      const w = this.offsetWidth || 150;
       if (saved && saved.x != null) place(saved.x * window.innerWidth, saved.y * window.innerHeight);
-      else if (window.innerWidth < 640) place(window.innerWidth - w - 10, 84);
+      else if (window.innerWidth < 640) place(window.innerWidth - w - 10, window.innerHeight - w - 24);
       else place(window.innerWidth - w - 18, window.innerHeight - w - 18);
       this._resizeBound = () => place(parseFloat(this.style.left), parseFloat(this.style.top));
       window.addEventListener('resize', this._resizeBound);
@@ -596,6 +608,7 @@ svg{width:100%;height:100%;overflow:visible;display:block}
     say(text, opts = {}) {
       const b = this._bubble; clearTimeout(this._timers.say);
       if (opts.left != null) b.classList.toggle('left', !!opts.left);
+      else this._fitBubble();
       b.innerHTML = ''; b.classList.add('on');
       const cur = document.createElement('span'); cur.className = 'cur';
       const span = document.createElement('span'); b.append(span, cur);
@@ -605,6 +618,20 @@ svg{width:100%;height:100%;overflow:visible;display:block}
         else { cur.remove(); this._timers.say = setTimeout(() => b.classList.remove('on'), opts.ms ?? Math.max(2200, text.length * 70)); }
       };
       tick(); return this;
+    }
+    _fitBubble() {
+      // облачко не вылезает за край экрана: справа, слева или над головой по центру
+      const b = this._bubble, r = this.getBoundingClientRect(), vw = document.documentElement.clientWidth || window.innerWidth;
+      if (!r.width || this.hasAttribute('float')) return;
+      b.classList.remove('top'); b.style.left = ''; b.style.right = ''; b.style.maxWidth = '';
+      const right = vw - (r.left + r.width * .74) - 10, left = r.left + r.width * .26 - 10;
+      if (right >= 190) { b.classList.remove('left'); b.style.maxWidth = Math.min(300, right) + 'px'; return; }
+      if (left >= 190) { b.classList.add('left'); b.style.maxWidth = Math.min(300, left) + 'px'; return; }
+      const w = Math.min(280, vw - 20);
+      const x = Math.max(10 - r.left, Math.min((r.width - w) / 2, vw - 10 - w - r.left));
+      b.classList.remove('left'); b.classList.add('top');
+      b.style.left = x + 'px'; b.style.right = 'auto'; b.style.maxWidth = w + 'px';
+      b.style.setProperty('--tail', Math.max(14, Math.min(w - 28, r.width / 2 - x - 7)) + 'px');
     }
     hush() { clearTimeout(this._timers.say); this._bubble.classList.remove('on'); return this; }
     react(kind, opts = {}) {

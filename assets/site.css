@@ -8,8 +8,9 @@
   --body:'Golos Text',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+button,input,select,textarea{font-family:inherit}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+body{overflow-x:clip;font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
 img,svg{max-width:100%}
 a{color:var(--blue-2)}
 .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
@@ -35,11 +36,15 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);bac
 .nav-links a{color:var(--ink-2);text-decoration:none;font-size:15px;font-weight:500}
 .nav-links a:hover,.nav-links a[aria-current]{color:var(--ink)}
 .nav .sp{margin-left:auto}
-.burger{display:none;width:42px;height:42px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-size:20px}
+.nav .btn svg{width:18px;height:18px;fill:currentColor}
+.only-mob{display:none}
+.burger{display:none;flex:none;width:42px;height:42px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-size:20px}
 @media(max-width:860px){
   .nav-links{display:none;position:absolute;left:0;right:0;top:66px;background:#fff;border-bottom:1px solid var(--line);padding:12px 20px 18px;flex-direction:column;gap:14px}
   .nav-links.open{display:flex}
   .burger{display:block}
+  .only-mob{display:block}
+  .nav .hide-mob{display:none}
 }
 
 /* кнопки */
@@ -80,7 +85,9 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);bac
 .plan.best{border-color:var(--ink);box-shadow:var(--shadow)}
 .plan .badge{position:absolute;top:-13px;left:26px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px}
 .price{font-family:var(--display);font-size:34px;font-weight:700;margin:6px 0 2px}
-.price span{font-family:var(--body);font-size:15px;font-weight:500;color:var(--ink-3)}
+.price span{font-family:var(--body);font-size:15px;font-weight:500;color:var(--ink-3);white-space:nowrap}
+.c4 .price{font-size:30px}
+.c4 .price span{display:block;margin-top:2px}
 .plan ul{list-style:none;margin:16px 0 22px}
 .plan li{padding-left:26px;position:relative;margin-bottom:9px;font-size:15px;color:var(--ink-2)}
 .plan li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:700}
@@ -108,12 +115,14 @@ details p{margin-top:10px}
 footer.site{background:var(--bg-2);padding:40px 0 28px;margin-top:60px;border-top:1px solid var(--line)}
 .foot{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between}
 .foot a{color:var(--ink-2);text-decoration:none;font-size:15px;display:block;margin-bottom:8px}
+.foot a.brand{display:flex;color:var(--ink)}
 .foot a:hover{color:var(--ink)}
 .foot .col-title{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--ink)}
 .social{display:flex;gap:10px;margin-top:8px}
 .social a{width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;margin:0}
 .social a:hover{border-color:var(--ink)}
 .social svg{width:22px;height:22px;fill:var(--ink)}
+.social .brand-ico{width:26px;height:26px;display:block}
 .copy{font-size:13px;color:var(--ink-3);margin-top:22px;line-height:1.7}
 
 /* всплывающие окна */
@@ -127,6 +136,7 @@ footer.site{background:var(--bg-2);padding:40px 0 28px;margin-top:60px;border-to
 .choice a:hover{border-color:var(--ink)}
 .choice .ci{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--bg-2);flex:none}
 .choice .ci svg{width:24px;height:24px;fill:var(--ink)}
+.choice .ci .brand-ico{width:30px;height:30px}
 .choice b{display:block;font-size:16px}
 .choice span{font-size:14px;color:var(--ink-3)}
 .qr{display:grid;place-items:center;margin-top:14px}
@@ -152,3 +162,47 @@ footer.site{background:var(--bg-2);padding:40px 0 28px;margin-top:60px;border-to
 .doc table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
 .doc th,.doc td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
 .doc th{background:var(--bg-2);font-weight:600}
+
+/* окно пошире для поддержки */
+.modal.wide{max-width:640px}
+
+/* оплата */
+.pay{margin-top:14px}
+.pay-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:560px){.pay-plans{grid-template-columns:1fr}}
+.pay-plans button{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.pay-plans button b{display:block;font-size:16px}
+.pay-plans button span{font-size:14px;color:var(--ink-3)}
+.pay-plans button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.pay-sum{font-size:16px;margin:4px 0 6px}
+.pay-mail{display:grid;gap:6px;font-size:14px;color:var(--ink-3);margin:10px 0 4px}
+.pay-mail input{font:inherit;font-size:16px;color:var(--ink);padding:12px 14px;border:1.5px solid var(--line);border-radius:12px}
+.pay-qr{display:grid;place-items:center}
+.pay-qr svg{width:220px;height:220px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.pay-phone{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-top:14px;background:var(--bg-2);border-radius:16px;padding:14px}
+.pay-phone .pay-qr svg{width:150px;height:150px}
+@media(max-width:860px){.pay-phone{display:none}}
+.pay-static{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-top:12px}
+.pay-static img{width:150px;height:150px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.pay-msg{margin-top:12px;font-size:15px}
+.pay-legal{font-size:13px;color:var(--ink-3);margin-top:14px;line-height:1.5}
+
+/* поддержка */
+.sup-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-right:40px}
+.sup-head myslik-face{width:72px;height:72px;flex:none}
+.sup-head b{display:block;font-family:var(--display);font-size:18px}
+.sup-head span{font-size:14px;color:var(--ink-3)}
+.sup-log{display:grid;gap:10px;max-height:46vh;overflow:auto;background:var(--bg-2);border-radius:16px;padding:14px;align-content:start}
+.sup-log .msg{max-width:92%}
+.sup-acts{display:flex;flex-wrap:wrap;gap:8px}
+.sup-form{display:grid;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.sup-form textarea,.sup-form input{font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;resize:vertical}
+.sup-form .btn{justify-self:start}
+.sup-quick{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:7px 13px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.chip:hover{border-color:var(--ink)}
+.sup-in{display:flex;gap:8px}
+.sup-in input{flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px}
+.sup-in input:focus,.sup-form textarea:focus,.sup-form input:focus,.pay-mail input:focus{outline:none;border-color:var(--ink)}
+
+body.modal-open myslik-face[float]{display:none}

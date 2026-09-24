@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Личный кабинет — Смекай</title>
+<meta name="description" content="Личный кабинет Смекай: занятие с Мысликом, прогресс по дням, тариф и оплата, отчёты родителю, настройки голоса.">
+<link rel="icon" href="../assets/favicon.png">
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/myslik.js"></script>
+<script src="../assets/site.js" defer></script>
+<style>
+body{background:var(--bg-2)}
+.cab{max-width:1120px;margin:0 auto;padding:22px 16px 60px}
+.app{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.app{grid-template-columns:1fr}}
+.side{background:radial-gradient(circle at 50% 26%,#FFD661,#FFC933);border-radius:24px;padding:18px 16px;text-align:center;position:sticky;top:80px}
+.side.lev{background:radial-gradient(circle at 50% 26%,#2A3160,#1B1F3B);color:#fff}
+.side myslik-face{width:210px;height:210px}
+.side .who{font-family:var(--display);font-weight:700;font-size:18px;margin-top:2px}
+.side .sub{font-size:14px;color:#5C4300}
+.side.lev .sub{color:#C9CEE4}
+.tabs{display:grid;gap:6px;margin-top:14px;text-align:left}
+.tabs button{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:12px;padding:11px 12px;background:rgba(255,255,255,.55);font:600 15px var(--body);color:var(--ink);cursor:pointer}
+.side.lev .tabs button{background:rgba(255,255,255,.08);color:#fff}
+.tabs button.on{background:#fff;box-shadow:0 4px 14px rgba(27,31,59,.12)}
+.side.lev .tabs button.on{background:#fff;color:var(--ink)}
+.tabs .em{width:22px;text-align:center}
+@media(max-width:860px){
+  .side{position:static;display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;text-align:left;padding:12px}
+  .side myslik-face{width:110px;height:110px}
+  .tabs{grid-column:1/-1;display:flex;overflow-x:auto;gap:6px;margin-top:4px;padding-bottom:4px}
+  .tabs button{flex:none;width:auto;padding:9px 12px;font-size:14px}
+}
+.pane{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;min-height:420px;scroll-margin-top:80px}
+@media(max-width:560px){.pane{padding:18px}}
+.pane h2{font-size:24px}
+.note{background:var(--bg-2);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--ink-2);margin-top:14px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:var(--bg-2);border-radius:999px;padding:7px 13px;font-size:14px;font-weight:600}
+.pill.ok{background:#E3F6EE;color:var(--ok)}
+.q{font-family:var(--display);font-size:clamp(20px,2.6vw,26px);line-height:1.35;margin:6px 0 18px}
+.answer{display:flex;gap:10px;flex-wrap:wrap}
+.answer input{flex:1 1 200px;font:600 22px var(--body);padding:14px 16px;border:2px solid var(--line);border-radius:14px;min-width:0}
+.answer input:focus,.field input:focus{outline:none;border-color:var(--ink)}
+.hints{margin-top:16px;display:grid;gap:8px}
+.hint{background:var(--bg-2);border-radius:12px;padding:10px 14px;font-size:15px}
+.fb{margin-top:14px;font-weight:600;min-height:24px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.steps{margin-top:14px;background:#FFF9E8;border-radius:12px;padding:12px 14px;font-size:15px}
+.grades{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media(max-width:480px){.grades{grid-template-columns:repeat(4,1fr)}}
+.grades button{padding:13px 0;font-size:18px;font-weight:700;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.grades button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.field{display:grid;gap:6px;margin-bottom:16px;font-size:14px;color:var(--ink-3);font-weight:600}
+.field input{font:inherit;font-size:17px;font-weight:500;color:var(--ink);padding:12px 14px;border:2px solid var(--line);border-radius:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--bg-2);border-radius:16px;padding:14px}
+.stat b{display:block;font-family:var(--display);font-size:28px}
+.stat span{font-size:13px;color:var(--ink-3)}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:160px;margin-top:18px;padding:12px;background:var(--bg-2);border-radius:16px}
+.bar{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bar i{width:100%;max-width:38px;border-radius:8px 8px 4px 4px;background:var(--blue);min-height:4px;display:block}
+.bar i.zero{background:var(--line)}
+.bar span{font-size:12px;color:var(--ink-3)}
+.bar em{font-style:normal;font-size:12px;font-weight:700}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px}
+.badge-a{border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:center;font-size:14px}
+.badge-a .e{font-size:28px;display:block}
+.badge-a.off{opacity:.42;filter:grayscale(1)}
+.voices{display:grid;gap:8px}
+.voices label{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.voices label:has(input:checked){border-color:var(--ink)}
+.voices .play{margin-left:auto}
+.kid{border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+.limit{text-align:center;padding:20px 6px}
+.login{max-width:560px;margin:10px auto;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;text-align:center}
+.login myslik-face{width:170px;height:170px}
+.login .choice{text-align:left}
+.login form{display:grid;gap:10px;text-align:left;margin-top:12px}
+kbd{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px}
+.rec{font-family:var(--display);font-size:22px;letter-spacing:.06em;background:#FFF9E8;border-radius:12px;padding:10px 14px;display:inline-block;margin:6px 0}
+</style>
+</head>
+<body data-page="kabinet" data-root="../" data-src="kabinet" data-float="off" data-metrika="">
+<div id="site-header"></div>
+
+<main class="cab">
+  <div id="login" class="login" hidden></div>
+  <div id="app" class="app" hidden>
+    <aside class="side" id="side">
+      <myslik-face id="m" mood="idle" age="5"></myslik-face>
+      <div>
+        <div class="who" id="who">Мыслик</div>
+        <div class="sub" id="sub"></div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button data-t="lesson"><span class="em">📚</span>Занятие</button>
+        <button data-t="progress"><span class="em">📊</span>Прогресс</button>
+        <button data-t="plan"><span class="em">⭐</span>Тариф и оплата</button>
+        <button data-t="parent"><span class="em">👨‍👩‍👧</span>Родителю</button>
+        <button data-t="settings"><span class="em">⚙️</span>Настройки</button>
+        <button data-t="help"><span class="em">🛟</span>Помощь</button>
+      </nav>
+    </aside>
+    <section class="pane" id="pane" aria-live="polite"></section>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script>
+/* ---------- генератор заданий: те же типы, что в боте ---------- */
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+const pl = (n, one, few, many) => { n = Math.abs(n) % 100; if (n >= 11 && n <= 14) return many; n %= 10; return n === 1 ? one : n >= 2 && n <= 4 ? few : many; };
+const T = {
+  1: [
+    () => { const a = R(23, 58), b = R(14, 39); return { q: `Посчитай: ${a} + ${b}`, a: a + b, hints: ['Сложи сначала десятки, потом единицы.', `Десятки: ${Math.floor(a/10)*10} + ${Math.floor(b/10)*10} = ${Math.floor(a/10)*10 + Math.floor(b/10)*10}.`, `Единицы: ${a%10} + ${b%10} = ${a%10 + b%10}. Осталось сложить.`], steps: `${Math.floor(a/10)*10} + ${Math.floor(b/10)*10} = ${Math.floor(a/10)*10 + Math.floor(b/10)*10}, ${a%10} + ${b%10} = ${a%10+b%10}, вместе ${a+b}` }; },
+    () => { const a = R(52, 96), b = R(14, 38); return { q: `Посчитай: ${a} − ${b}`, a: a - b, hints: ['Вычитай по частям: сначала десятки, потом единицы.', `${a} − ${Math.floor(b/10)*10} = ${a - Math.floor(b/10)*10}.`, `Теперь от ${a - Math.floor(b/10)*10} отними ${b%10}.`], steps: `${a} − ${Math.floor(b/10)*10} = ${a - Math.floor(b/10)*10}, затем − ${b%10} = ${a-b}` }; },
+    () => { const a = R(2, 5), b = R(3, 9); return { q: `Посчитай: ${a} · ${b}`, a: a * b, hints: [`Это ${a} раз по ${b}.`, `Сложи ${b} + ${b}, вот уже два раза.`, `Вспомни таблицу умножения на ${a}.`], steps: `${b} сложить ${a} раза, получится ${a*b}` }; },
+    () => { const r = R(3, 7), c = R(3, 6); return { q: `В коробке ${r} ${pl(r, 'ряд', 'ряда', 'рядов')}, в каждом по ${c} ${pl(c, 'конфете', 'конфеты', 'конфет')}. Сколько конфет всего?`, a: r * c, hints: ['Рядов несколько, в каждом поровну. Это умножение.', `Посчитай ${r} раз по ${c}.`, `${r} · ${c}, вспомни таблицу.`], steps: `${r} ${pl(r, 'ряд', 'ряда', 'рядов')} по ${c} ${pl(c, 'конфете', 'конфеты', 'конфет')}, ${r} · ${c} = ${r*c}` }; },
+  ],
+  3: [
+    () => { const a = R(14, 48), b = R(3, 9), t = Math.floor(a/10)*10, o = a%10; return { q: `Посчитай: ${a} · ${b}`, a: a * b, hints: ['Разложи первое число на десятки и единицы.', `${t} · ${b} = ${t*b}.`, `${o} · ${b} = ${o*b}. Сложи оба результата.`], steps: `${t} · ${b} = ${t*b}, ${o} · ${b} = ${o*b}, вместе ${a*b}` }; },
+    () => { const b = R(3, 9), q = R(12, 40); return { q: `Посчитай: ${b*q} : ${b}`, a: q, hints: [`Сколько раз по ${b} помещается в ${b*q}?`, `Прикинь: ${b} · 10 = ${b*10}. Это больше или меньше?`, `Ответ между ${Math.max(1,q-3)} и ${q+3}.`], steps: `${b} · ${q} = ${b*q}, значит ${b*q} : ${b} = ${q}` }; },
+    () => { const b = R(3, 9), c = R(4, 11), a = b * c + R(4, 50); return { q: `Посчитай: ${a} − ${b} · ${c}`, a: a - b*c, hints: ['Сначала умножение, потом вычитание.', `${b} · ${c} = ${b*c}.`, `Теперь ${a} − ${b*c}.`], steps: `${b} · ${c} = ${b*c}, затем ${a} − ${b*c} = ${a-b*c}` }; },
+    () => { const p = pick([25, 30, 45, 60]), n = R(3, 8); return { q: `Тетрадь стоит ${p} рублей. Сколько стоят ${n} ${pl(n, 'тетрадь', 'тетради', 'тетрадей')}?`, a: p * n, hints: ['Цена одной известна, нужно цену нескольких. Это умножение.', `${p} · ${n}.`, `Посчитай ${p} · 10 = ${p*10} и убери лишнее.`], steps: `${p} · ${n} = ${p*n} рублей` }; },
+  ],
+  5: [
+    () => { const b = R(3, 8), c = R(9, 18), d = R(2, 9), a = b * (c + d) + R(5, 60); return { q: `Вычисли: ${a} − ${b} · (${c} + ${d})`, a: a - b*(c+d), hints: ['Порядок действий: скобки, умножение, вычитание.', `В скобках ${c} + ${d} = ${c+d}.`, `${b} · ${c+d} = ${b*(c+d)}.`], steps: `${c} + ${d} = ${c+d}; ${b} · ${c+d} = ${b*(c+d)}; ${a} − ${b*(c+d)} = ${a-b*(c+d)}` }; },
+    () => { const d = pick([4, 5, 6, 8]); let n = R(1, d-1); while (gcd(n, d) !== 1) n = R(1, d-1); const w = d * R(4, 12); return { q: `Найди ${n}/${d} от числа ${w}.`, a: w/d*n, hints: [`Сначала одна часть: раздели ${w} на ${d}.`, `Одна часть равна ${w/d}.`, `Теперь возьми ${n} таких частей.`], steps: `${w} : ${d} = ${w/d}; ${w/d} · ${n} = ${w/d*n}` }; },
+    () => { const p = pick([10, 20, 25, 40, 50]), w = pick([120, 240, 360, 480, 600]); return { q: `Найди ${p} процентов от ${w}.`, a: w*p/100, hints: ['Один процент это сотая часть числа.', `${w} : 100 = ${w/100}.`, `Умножь ${w/100} на ${p}.`], steps: `${w} : 100 = ${w/100}; ${w/100} · ${p} = ${w*p/100}` }; },
+    () => { const v = pick([12, 15, 18, 20, 24]), t = R(2, 5); return { q: `Велосипедист едет со скоростью ${v} км/ч. Какой путь он проедет за ${t} ${pl(t, 'час', 'часа', 'часов')}?`, a: v*t, hints: ['Путь равен скорости, умноженной на время.', `За один час ${v} км.`, `Значит за ${t} ${pl(t, 'час', 'часа', 'часов')} ${v} · ${t}.`], steps: `S = v · t = ${v} · ${t} = ${v*t} км` }; },
+    () => { const s = R(6, 20), k = R(2, 4), tot = s + s*k; return { q: `Два числа в сумме дают ${tot}, второе в ${k} раза больше первого. Найди меньшее число.`, a: s, hints: ['Обозначь меньшее число за одну часть.', `Тогда большее это ${k} части, а вместе ${k+1}.`, `Раздели ${tot} на ${k+1}.`], steps: `Всего частей ${k+1}; ${tot} : ${k+1} = ${s}; большее ${s*k}` }; },
+  ],
+  7: [
+    () => { const x = R(2, 12), a = R(2, 9), b = R(3, 20); return { q: `Реши уравнение: ${a}x + ${b} = ${a*x+b}`, a: x, hints: ['Перенеси свободный член вправо.', `${a}x = ${a*x+b} − ${b} = ${a*x}.`, `Раздели обе части на ${a}.`], steps: `${a}x = ${a*x}; x = ${a*x} : ${a} = ${x}` }; },
+    () => { const p = pick([15, 18, 24, 35]), w = pick([200, 400, 800, 1200]); return { q: `Товар стоил ${w} рублей и подорожал на ${p} ${pl(p, 'процент', 'процента', 'процентов')}. Какой стала цена?`, a: w + w*p/100, hints: ['Сначала найди, сколько рублей составляют проценты.', `${w} · ${p} : 100 = ${w*p/100}.`, 'Прибавь к старой цене.'], steps: `${w} · ${p}/100 = ${w*p/100}; ${w} + ${w*p/100} = ${w + w*p/100}` }; },
+    () => { const [a, b] = pick([[3,4],[6,8],[5,12],[9,12]]), c = Math.round(Math.sqrt(a*a+b*b)); return { q: `Катеты прямоугольного треугольника ${a} и ${b}. Найди гипотенузу.`, a: c, hints: ['Теорема Пифагора: квадрат гипотенузы равен сумме квадратов катетов.', `${a}² + ${b}² = ${a*a+b*b}.`, `Извлеки корень из ${a*a+b*b}.`], steps: `${a}² + ${b}² = ${a*a+b*b}; √${a*a+b*b} = ${c}` }; },
+  ],
+  9: [
+    () => { let r1 = R(-6, 6), r2 = R(-6, 6); if (r1 === r2) r2 += 1; const b = -(r1+r2), c = r1*r2; const sb = b >= 0 ? `+ ${b}` : `− ${-b}`, sc = c >= 0 ? `+ ${c}` : `− ${-c}`; return { q: `Реши уравнение и введи больший корень: x² ${sb}x ${sc} = 0`, a: Math.max(r1, r2), hints: ['По теореме Виета: сумма корней равна минус второму коэффициенту, произведение равна свободному члену.', `Сумма корней ${r1+r2}, произведение ${c}.`, `Подбери два числа: ${r1} и ${r2}.`], steps: `x₁ = ${r1}, x₂ = ${r2}; больший ${Math.max(r1,r2)}` }; },
+    () => { const a1 = R(2, 9), d = R(2, 7), n = R(8, 20); return { q: `Арифметическая прогрессия: первый член ${a1}, разность ${d}. Найди ${n}-й член.`, a: a1 + d*(n-1), hints: ['Формула: aₙ = a₁ + d(n − 1).', `d(n − 1) = ${d} · ${n-1} = ${d*(n-1)}.`, `Прибавь первый член.`], steps: `a${n} = ${a1} + ${d} · ${n-1} = ${a1 + d*(n-1)}` }; },
+    () => { const base = pick([2, 3, 5]), e = R(2, 5); return { q: `Реши: ${base}ˣ = ${Math.pow(base, e)}`, a: e, hints: [`Представь правую часть как степень числа ${base}.`, `${base} · ${base} · … сколько раз?`, `Показатели равны.`], steps: `${Math.pow(base,e)} = ${base}^${e}, значит x = ${e}` }; },
+  ],
+};
+function band(g) { return g <= 2 ? 1 : g <= 4 ? 3 : g <= 6 ? 5 : g <= 8 ? 7 : 9; }
+
+/* ---------- состояние ---------- */
+const $ = s => document.querySelector(s);
+const m = document.getElementById('m');
+const esc = t => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const today = () => new Date().toLocaleDateString('sv-SE');
+const KEY = 'smk_lesson';
+const FREE = 3;
+const S = { name: '', grade: 0, voice: 'off', streak: 0, total: 0, clean: 0, today: 0, day: '', days: {} };
+let ME = null;          // данные с сервера, когда он подключён
+let cur = null, hintN = 0, tries = 0, tab = 'lesson';
+let SMK, API;
+
+function load() {
+  try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  if (!S.days || typeof S.days !== 'object') S.days = {};
+  if (S.day !== today()) { S.day = today(); S.today = 0; }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const lev = () => (profile().grade || 0) >= 9;
+function profile() { return ME ? ME.user : S; }
+function stats() {
+  if (ME) return ME.stats;
+  let streak = 0; const d = new Date();
+  if (!S.days[today()]) d.setDate(d.getDate() - 1);
+  while (S.days[d.toLocaleDateString('sv-SE')]?.s) { streak++; d.setDate(d.getDate() - 1); }
+  return { today: S.days[today()]?.s || 0, total: S.total, clean: S.clean, streak };
+}
+function week() {
+  if (ME) return ME.week;
+  const out = [];
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const k = d.toLocaleDateString('sv-SE'); out.push({ day: k, tasks: S.days[k]?.t || 0, solved: S.days[k]?.s || 0 }); }
+  return out;
+}
+function limit() { return ME ? ME.limit : FREE; }
+function left() { return ME ? ME.left : Math.max(0, FREE - (S.days[today()]?.t || 0)); }
+
+/* ---------- боковая панель ---------- */
+function side() {
+  const p = profile(), g = p.grade || 0;
+  if (g) m.setAttribute('age', g);
+  $('#side').classList.toggle('lev', g >= 9);
+  $('#who').textContent = p.name ? p.name : (g >= 9 ? 'Лев' : 'Мыслик');
+  const plan = ME ? ME.user.plan_title + (ME.user.paid_until ? ' до ' + fmtDate(ME.user.paid_until) : '') : 'Знакомство';
+  $('#sub').textContent = g ? `${g} класс · тариф ${plan}` : 'Давай знакомиться';
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+}
+const fmtDate = s => { const [y, mo, d] = s.split('-'); return `${+d}.${mo}.${y}`; };
+function go(t, scroll) { tab = t; side(); ({ lesson, progress, plan, parent, settings, help })[t](); if (scroll && window.innerWidth < 860) $('#pane').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+$('#tabs').onclick = e => { const b = e.target.closest('button'); if (b) go(b.dataset.t, true); };
+function talk(text, kind) {
+  const v = profile().voice || 'off';
+  if (kind) m.react(kind, { text, voice: v !== 'off', profile: v === 'off' ? undefined : v });
+  else if (v !== 'off') m.speak(text, v); else m.say(text);
+}
+
+/* ---------- знакомство (кабинет на устройстве) ---------- */
+function setup(prefill) {
+  $('#pane').innerHTML = `<h2>Давай знакомиться</h2><p class="muted small" style="margin-bottom:16px">Имя можно не писать. Класс нужен, чтобы подобрать задания.</p>
+    <label class="field">Имя<input id="nm" maxlength="20" placeholder="Как тебя зовут?" value="${esc(prefill?.name || S.name)}"></label>
+    <div class="field">Класс<div class="grades" id="gr">${[1,2,3,4,5,6,7,8,9,10,11].map(g => `<button data-g="${g}"${(prefill?.grade || S.grade) == g ? ' class="on"' : ''}>${g}</button>`).join('')}</div></div>
+    <button class="btn btn-main" id="go">Начать</button>
+    <p class="note">Прогресс сохраняется на этом устройстве. Отчёты родителю приходят через бота в Telegram или MAX.</p>`;
+  let grade = +(prefill?.grade || S.grade || 0);
+  $('#gr').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#gr').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); grade = +b.dataset.g; m.setAttribute('age', grade); };
+  $('#go').onclick = () => { if (!grade) { talk('Выбери класс.', 'thinking'); return; } S.name = $('#nm').value.trim(); S.grade = grade; save(); side(); go('lesson'); };
+  m.react('hello', { text: 'Привет! Как тебя зовут и в каком ты классе?' });
+}
+
+/* ---------- занятие ---------- */
+function lesson() {
+  const p = profile();
+  if (!p.grade) return setup();
+  if (left() <= 0) return over();
+  cur = pick(T[band(p.grade)])(); hintN = 0; tries = 0;
+  const done = limit() - left();
+  $('#pane').innerHTML = `<div class="pills"><span class="pill">Задание ${done + 1} из ${limit()} на сегодня</span><span class="pill">Серия: ${stats().streak}</span><span class="pill">Всего решено: ${stats().total}</span></div>
+    <div class="q">${esc(cur.q)}</div>
+    <div class="answer"><input id="ans" inputmode="decimal" placeholder="Ответ числом" autocomplete="off" aria-label="Ответ"><button class="btn btn-main" id="chk">Проверить</button></div>
+    <div class="fb" id="fb"></div><div class="hints" id="hints"></div>
+    <div class="btns" style="margin-top:16px"><button class="btn btn-ghost btn-sm" id="hb">Подсказка</button><button class="btn btn-ghost btn-sm" id="sb">Показать решение</button><button class="btn btn-ghost btn-sm" id="nb">Другое задание</button></div>
+    <p class="small muted" style="margin-top:14px"><kbd>Enter</kbd> проверяет ответ</p>`;
+  if (window.innerWidth > 860) $('#ans').focus();
+  $('#chk').onclick = check; $('#ans').onkeydown = e => { if (e.key === 'Enter') check(); };
+  $('#hb').onclick = hint; $('#sb').onclick = solution; $('#nb').onclick = lesson;
+  m.react('thinking', { text: lev() ? 'Условие прочитал? Начинай.' : 'Прочитай условие два раза. Что известно?' });
+}
+async function record(solved) {
+  if (ME) {
+    try { const r = await SMK.api('/api/log', { solved, hints: hintN, tries }); ME.stats = r.stats; ME.left = r.left; ME.week = r.week; }
+    catch (e) { if (e.status === 429) ME.left = 0; }
+  } else {
+    const d = S.days[today()] || (S.days[today()] = { t: 0, s: 0 });
+    d.t++; if (solved) { d.s++; S.total++; if (!hintN) S.clean++; }
+    const keys = Object.keys(S.days).sort(); while (keys.length > 60) delete S.days[keys.shift()];
+    save();
+  }
+}
+async function check() {
+  const v = parseFloat(($('#ans').value || '').replace(',', '.')); if (isNaN(v)) { talk('Напиши ответ числом.', 'thinking'); return; }
+  const fb = $('#fb');
+  if (Math.abs(v - cur.a) < 1e-6) {
+    $('#ans').disabled = true; $('#chk').disabled = true;
+    fb.className = 'fb ok'; fb.textContent = hintN ? 'Верно.' : 'Верно, без подсказок.';
+    await record(true); side();
+    const st = stats();
+    if (st.today && st.today % 3 === 0) talk(`${st.today} за сегодня!`, 'streak'); else talk(null, 'correct');
+    setTimeout(lesson, 1900);
+  } else {
+    tries++;
+    fb.className = 'fb bad';
+    fb.textContent = tries === 1 ? 'Не то. Проверь, что нашёл именно то, о чём спрашивают.' : tries === 2 ? 'Снова мимо. Запиши условие в черновике и посчитай по шагам.' : 'Возьми подсказку, она поможет.';
+    talk(null, tries >= 2 ? 'wrong' : 'thinking'); $('#ans').select();
+  }
+}
+function hint() {
+  if (hintN >= 3) { talk('Подсказки кончились. Попробуй решить или открой решение.', 'thinking'); return; }
+  const h = cur.hints[hintN++]; const d = document.createElement('div'); d.className = 'hint'; d.textContent = `Подсказка ${hintN}. ${h}`; $('#hints').append(d);
+  talk(h, 'idea');
+}
+async function solution() {
+  const d = document.createElement('div'); d.className = 'steps'; d.innerHTML = `<b>Разбор.</b> ${esc(cur.steps)}<br>Ответ: <b>${cur.a}</b>`; $('#pane').append(d);
+  $('#ans').disabled = true; $('#chk').disabled = true; $('#sb').disabled = true;
+  await record(false);
+  talk('Смотри разбор и возьми похожее задание.', 'thinking');
+  const b = document.createElement('button'); b.className = 'btn btn-main btn-sm'; b.style.marginTop = '12px'; b.textContent = 'Похожее задание'; b.onclick = lesson; $('#pane').append(b);
+}
+function over() {
+  const helper = ME && ME.user.helper;
+  $('#pane').innerHTML = `<div class="limit"><h2>На сегодня хватит</h2><p class="lead" style="margin:8px 0 18px">Задания на сегодня сделаны. Завтра будут новые.</p>
+    ${helper ? '' : `<p class="small muted" style="margin-bottom:18px">С тарифом «Мыслик» заданий 30 в день, плюс разбор домашки по фото и отчёт родителю. В MAX задания для детей бесплатны.</p>`}
+    <div class="btns" style="justify-content:center">${helper ? '' : '<button class="btn btn-main" id="to-plan">Тарифы и оплата</button>'}<a class="btn btn-ghost" href="../viktorina/">Сыграть в викторину</a></div></div>`;
+  const tp = $('#to-plan'); if (tp) tp.onclick = () => go('plan');
+  m.react('tired', { text: 'На сегодня всё. Завтра продолжим.' });
+}
+
+/* ---------- прогресс ---------- */
+function progress() {
+  const st = stats(), w = week(), max = Math.max(1, ...w.map(x => x.tasks));
+  const days = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+  const BADGES = [
+    ['🌱', 'Первое задание', st.total >= 1], ['🔥', '3 дня подряд', st.streak >= 3], ['⭐', '10 решено', st.total >= 10],
+    ['🧠', '5 без подсказок', st.clean >= 5], ['🏅', '50 решено', st.total >= 50], ['🚀', 'Неделя подряд', st.streak >= 7],
+  ];
+  const g = profile().grade || 0;
+  $('#pane').innerHTML = `<h2>Прогресс</h2>
+    <div class="stats"><div class="stat"><b>${st.today}</b><span>решено сегодня</span></div><div class="stat"><b>${st.total}</b><span>всего решено</span></div>
+    <div class="stat"><b>${st.clean}</b><span>без подсказок</span></div><div class="stat"><b>${st.streak}</b><span>дней подряд</span></div></div>
+    <h3 style="margin-top:22px">Последние семь дней</h3>
+    <div class="bars">${w.map(x => { const h = Math.round(x.tasks / max * 100); const wd = days[new Date(x.day + 'T12:00').getDay()]; return `<div class="bar"><em>${x.solved || ''}</em><i class="${x.tasks ? '' : 'zero'}" style="height:${Math.max(4, h)}%" title="${x.day}: решено ${x.solved} из ${x.tasks}"></i><span>${wd}</span></div>`; }).join('')}</div>
+    <h3 style="margin-top:22px">Награды</h3>
+    <div class="badges">${BADGES.map(([e, t, ok]) => `<div class="badge-a${ok ? '' : ' off'}"><span class="e">${e}</span>${t}</div>`).join('')}</div>
+    <p class="note">${g >= 9 ? 'С девятого класса рядом Лев: разговор короче, ближе к экзаменам.' : `Мыслик растёт вместе с тобой: сейчас он как ты, ${g || 1} класс. В девятом классе он станет Львом.`}</p>`;
+  m.react(st.total ? 'love' : 'hello', { text: st.total ? 'Смотри, сколько уже сделано!' : 'Реши первое задание, и тут появится график.' });
+}
+
+/* ---------- тариф и оплата ---------- */
+function plan() {
+  const line = ME ? ME.plan_line : 'Сейчас тариф «Знакомство»: 3 задания в день бесплатно.';
+  $('#pane').innerHTML = `<h2>Тариф и оплата</h2><p>${esc(line)}</p><p class="small muted">В MAX задания для детей бесплатны. Тариф нужен для разбора домашки по фото, закрытого канала, 30 заданий в день и отчётов родителю.</p><div id="payx"></div>`;
+  SMK.pay($('#payx'), (ME && ['tasks', 'myslik', 'family'].includes(ME.user.plan)) ? ME.user.plan : 'myslik');
+  m.react('love', { text: 'Выбирай тариф.' });
+}
+
+/* ---------- родителю ---------- */
+function parent() {
+  if (!ME) {
+    $('#pane').innerHTML = `<h2>Родителю</h2>
+      <p>Раз в неделю родитель получает отчёт: сколько заданий решено, где было трудно и что сделать на следующей неделе.</p>
+      <ol style="margin:12px 0 0 20px;color:var(--ink-2)"><li>Ребёнок открывает бота Мыслик и нажимает «Родителю». Бот покажет код из шести знаков.</li><li>Родитель присылает этот код боту со своего телефона.</li><li>Отчёт приходит по воскресеньям в 19:00, а по команде /report сразу.</li></ol>
+      <div class="btns" style="margin-top:16px"><a class="btn btn-main btn-sm" href="${SMK.CFG.BOT}?start=kabinet" target="_blank" rel="noopener">Бот в Telegram</a><a class="btn btn-ghost btn-sm" href="${SMK.CFG.MAX_BOT}?start=kabinet" target="_blank" rel="noopener">Бот в MAX</a></div>
+      <p class="note">Занятия на этом устройстве в отчёт пока не попадают: отчёт строится по заданиям в боте.</p>`;
+    return;
+  }
+  const kids = ME.kids.map(k => `<div class="kid"><b>${esc(k.name || 'Ребёнок')}, ${k.grade} класс</b><p class="small">За неделю решено ${k.week.solved} из ${k.week.tasks}, занимался дней: ${k.week.days}. Всего решено: ${k.stats.total}.</p>
+    <div class="bars" style="height:110px">${k.days.map(x => `<div class="bar"><i class="${x.tasks ? '' : 'zero'}" style="height:${Math.max(4, Math.round(x.tasks / Math.max(1, ...k.days.map(y => y.tasks)) * 100))}%"></i></div>`).join('')}</div></div>`).join('');
+  $('#pane').innerHTML = `<h2>Родителю</h2>
+    ${kids ? `<h3>Ваши дети</h3>${kids}` : ''}
+    <h3 style="margin-top:20px">Я ребёнок: код для родителя</h3>
+    <p class="small">Покажите код родителю. Он вводит его у себя в кабинете или присылает боту.</p>
+    <button class="btn btn-ghost btn-sm" id="mk">Получить код</button> <span class="rec" id="code" hidden></span>
+    <h3 style="margin-top:20px">Я родитель: ввести код ребёнка</h3>
+    <div class="answer" style="max-width:420px"><input id="pc" maxlength="6" placeholder="Код из шести знаков" style="text-transform:uppercase;font-size:18px"><button class="btn btn-main btn-sm" id="lk">Привязать</button></div>
+    <p class="fb" id="pfb"></p>
+    <p class="note">Отчёт приходит в Telegram или MAX по воскресеньям в 19:00. ${ME.parents ? 'К вашему профилю уже подключён родитель.' : ''}</p>`;
+  $('#mk').onclick = async () => { try { const r = await SMK.api('/api/parent/code', {}); $('#code').hidden = false; $('#code').textContent = r.code; } catch (e) { $('#pfb').textContent = e.message; } };
+  $('#lk').onclick = async () => { try { const r = await SMK.api('/api/parent/link', { code: $('#pc').value.trim().toUpperCase() }); ME = Object.assign(ME, r); $('#pfb').className = 'fb ok'; $('#pfb').textContent = `Готово: ${r.child.name}, ${r.child.grade} класс.`; setTimeout(parent, 900); } catch (e) { $('#pfb').className = 'fb bad'; $('#pfb').textContent = e.message; } };
+}
+
+/* ---------- настройки ---------- */
+function settings() {
+  const p = profile();
+  const V = [['off', 'Без голоса', ''], ['boy', 'Бодрый', 'как с другом'], ['girl', 'Тёплый', 'с улыбкой'], ['parent', 'Спокойный', 'по-взрослому']];
+  if ((p.grade || 0) >= 9) V.push(['lev', 'Лев', 'низкий, спокойный']);
+  $('#pane').innerHTML = `<h2>Настройки</h2>
+    <label class="field">Имя<input id="sn" maxlength="30" value="${esc(p.name)}"></label>
+    <div class="field">Класс<div class="grades" id="sg">${[1,2,3,4,5,6,7,8,9,10,11].map(g => `<button data-g="${g}"${p.grade == g ? ' class="on"' : ''}>${g}</button>`).join('')}</div></div>
+    <div class="field">Голос Мыслика<div class="voices">${V.map(([k, t, d]) => `<label><input type="radio" name="v" value="${k}"${(p.voice || 'off') === k ? ' checked' : ''}> <b>${t}</b> <span class="muted small">${d}</span>${k === 'off' ? '' : `<button type="button" class="btn btn-ghost btn-sm play" data-v="${k}">Послушать</button>`}</label>`).join('')}</div></div>
+    <p class="small muted" style="margin:-6px 0 16px">На сайте голос берётся из браузера и звучит проще, чем в боте. В Telegram и MAX Мыслик говорит голосом Яндекса.</p>
+    <button class="btn btn-main" id="ss">Сохранить</button> <span class="fb ok" id="sfb"></span>
+    ${ME && ME.user.recovery ? `<h3 style="margin-top:24px">Код восстановления</h3><p class="small">Нужен, чтобы войти в кабинет с другого устройства. Сохраните его.</p><span class="rec">${esc(ME.user.recovery)}</span>` : ''}
+    ${ME ? '<p style="margin-top:22px"><button class="btn btn-ghost btn-sm" id="out">Выйти из кабинета</button></p>' : ''}`;
+  let grade = p.grade;
+  $('#sg').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#sg').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); grade = +b.dataset.g; m.setAttribute('age', grade); };
+  $('#pane').querySelectorAll('.play').forEach(b => b.onclick = e => { e.preventDefault(); m.speak('Привет! Я Мыслик. Давай решим задачу вместе.', b.dataset.v); });
+  $('#ss').onclick = async () => {
+    const name = $('#sn').value.trim(), voice = ($('#pane').querySelector('input[name=v]:checked') || {}).value || 'off';
+    if (ME) { try { const r = await SMK.api('/api/profile', { name, grade, voice }); ME = r; } catch (e) { $('#sfb').className = 'fb bad'; $('#sfb').textContent = e.message; return; } }
+    else { S.name = name; S.grade = grade; S.voice = voice; save(); }
+    $('#sfb').className = 'fb ok'; $('#sfb').textContent = 'Сохранено'; side(); m.react('love', { text: 'Запомнил!' });
+  };
+  const out = $('#out'); if (out) out.onclick = async () => { try { await SMK.api('/api/logout', {}); } catch (e) {} SMK.session.set(''); location.reload(); };
+}
+
+/* ---------- помощь ---------- */
+function help() {
+  $('#pane').innerHTML = '<div id="supx"></div>';
+  SMK.support($('#supx'));
+}
+
+/* ---------- вход (когда подключён сервер) ---------- */
+function loginScreen(err) {
+  $('#app').hidden = true; const L = $('#login'); L.hidden = false;
+  L.innerHTML = `<myslik-face age="6" mood="wave"></myslik-face><h2>Вход в личный кабинет</h2>
+    <p class="small muted">Если вы уже занимаетесь в боте, войдите через него: прогресс будет общий.</p>
+    ${err ? `<p class="fb bad">${esc(err)}</p>` : ''}
+    <div class="choice">
+      <a href="${SMK.CFG.BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.tg}</span><div><b>Через Telegram</b><span>Бот пришлёт ссылку для входа</span></div></a>
+      <a href="${SMK.CFG.MAX_BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.max}</span><div><b>Через MAX</b><span>Бот пришлёт ссылку для входа</span></div></a>
+    </div>
+    <form id="wf"><b>Без мессенджера</b><input class="pay-mail" id="wn" placeholder="Имя ребёнка" maxlength="30" style="font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px">
+      <div class="grades" id="wg">${[1,2,3,4,5,6,7,8,9,10,11].map(g => `<button type="button" data-g="${g}">${g}</button>`).join('')}</div>
+      <button class="btn btn-main" type="submit">Создать кабинет</button></form>
+    <form id="rf"><b>Есть код восстановления</b><div class="answer"><input id="rc" placeholder="XXXX-XXXX-XXXX" style="font-size:18px"><button class="btn btn-ghost" type="submit">Войти</button></div></form>`;
+  let g = 0;
+  $('#wg').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#wg').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); g = +b.dataset.g; };
+  $('#wf').onsubmit = async e => { e.preventDefault(); if (!g) { alertIn('Выберите класс'); return; } try { const r = await SMK.api('/api/auth/web', { name: $('#wn').value.trim(), grade: g }); SMK.session.set(r.session); sessionStorage.setItem('smk_new_rec', r.recovery); boot(); } catch (err) { alertIn(err.message); } };
+  $('#rf').onsubmit = async e => { e.preventDefault(); try { const r = await SMK.api('/api/auth/recover', { code: $('#rc').value }); SMK.session.set(r.session); boot(); } catch (err) { alertIn(err.message); } };
+  function alertIn(t) { let p = L.querySelector('.fb.bad'); if (!p) { p = document.createElement('p'); p.className = 'fb bad'; L.querySelector('h2').after(p); } p.textContent = t; }
+}
+function loadScript(src) { return new Promise(ok => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ok; document.head.append(s); }); }
+
+async function boot() {
+  SMK = window.SMK; API = SMK.CFG.API;
+  const hash = new URLSearchParams(location.hash.slice(1));
+  load();
+  if (!API) {
+    // кабинет на устройстве: имя и класс могли прийти из бота в ссылке
+    if (hash.get('grade') && !S.grade) { S.name = hash.get('name') || S.name; S.grade = +hash.get('grade'); save(); }
+    if (hash.get('grade')) history.replaceState(null, '', location.pathname + location.search);
+    $('#login').hidden = true; $('#app').hidden = false; side();
+    if (!S.grade) return setup();
+    return go(new URLSearchParams(location.search).get('tab') || 'lesson');
+  }
+  try {
+    if (hash.get('login')) { const r = await SMK.api('/api/auth/login', { token: hash.get('login') }); SMK.session.set(r.session); history.replaceState(null, '', location.pathname + location.search); }
+    if (!SMK.session.get() && /from=tg/.test(location.search)) {
+      await loadScript('https://telegram.org/js/telegram-web-app.js');
+      const tg = window.Telegram && Telegram.WebApp;
+      if (tg && tg.initData) { tg.ready(); tg.expand(); const r = await SMK.api('/api/auth/telegram', { init_data: tg.initData }); SMK.session.set(r.session); }
+    }
+    if (!SMK.session.get()) return loginScreen();
+    ME = await SMK.api('/api/me');
+  } catch (e) { return loginScreen(e.status === 401 ? '' : e.message); }
+  const next = new URLSearchParams(location.search).get('next');
+  if (next === 'oplata') { location.href = '../oplata.html'; return; }
+  $('#login').hidden = true; $('#app').hidden = false; side();
+  const rec = sessionStorage.getItem('smk_new_rec');
+  if (!ME.user.grade) { tab = 'settings'; settings(); return; }
+  if (location.hash === '#paid') { history.replaceState(null, '', location.pathname); tab = 'plan'; plan(); m.react('party', { text: 'Спасибо! Доступ открыт.' }); return; }
+  if (rec) { sessionStorage.removeItem('smk_new_rec'); tab = 'settings'; settings(); m.react('hello', { text: 'Сохрани код восстановления.' }); return; }
+  go(new URLSearchParams(location.search).get('tab') || 'lesson');
+}
+document.addEventListener('smk-paid', async () => { try { ME = await SMK.api('/api/me'); side(); } catch (e) {} });
+document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 0));
+</script>
+</body>
+</html>

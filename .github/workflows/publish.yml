@@ -2,7 +2,7 @@ name: Публикация постов
 
 on:
   schedule:
-    - cron: "7 6-18 * * *"   # каждый час с 09:07 до 21:07 по Москве
+    - cron: "3,23,43 6-18 * * *"   # три раза в час с 09:03 до 21:43 по Москве: GitHub часть запусков пропускает
   workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
 
 permissions:
@@ -44,6 +44,7 @@ jobs:
           MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
           MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
           MAX_CHAT_ID_CLOSED: ${{ vars.MAX_CHAT_ID_CLOSED || secrets.MAX_CHAT_ID_CLOSED }}
+          MAX_TASKS_FREE: ${{ vars.MAX_TASKS_FREE || '1' }}
           QUIZ_URL: ${{ vars.QUIZ_URL }}
         run: python scripts/publish.py
       - name: Сохранить отметки об отправке

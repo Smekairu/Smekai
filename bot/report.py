@@ -1,21 +1,16 @@
 """Недельный отчёт родителю.
 
 Запускается раз в неделю, обычно в воскресенье вечером:
-  python report.py            отправить отчёты всем привязанным родителям в Telegram
-  python report.py --max      то же для MAX (база myslik-max.db, токен MAX_BOT_TOKEN)
+  python report.py            поставить отчёты в очередь: их разошлют боты Telegram и MAX
   python report.py --dry      показать тексты, никому не отправляя
 
 На сервере ставится в cron:
   0 19 * * 0 cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py
-  5 19 * * 0 cd /root/Smekai/bot && set -a && . ./.env && set +a && .venv/bin/python report.py --max
 """
 import argparse, asyncio, logging, os, sys
 from datetime import date, timedelta
 
-if "--max" in sys.argv:
-    os.environ["DB_PATH"] = os.environ.get("MAX_DB_PATH", "myslik-max.db")
-
-import db
+import db, ids
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("report")
@@ -79,7 +74,7 @@ def build(child):
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry", action="store_true", help="не отправлять, только показать")
-    ap.add_argument("--max", action="store_true", help="отчёты родителям в MAX")
+    ap.add_argument("--max", action="store_true", help="оставлено для совместимости, отчёты теперь уходят всем сразу")
     args = ap.parse_args()
 
     db.init()
@@ -87,40 +82,20 @@ async def main():
     if not pairs:
         log.info("привязанных родителей нет")
         return
-    bot = None
-    if not args.dry and not args.max:
-        from aiogram import Bot
-        from aiogram.client.default import DefaultBotProperties
-        bot = Bot(os.environ["TG_BOT_TOKEN"], default=DefaultBotProperties(parse_mode="HTML"))
-    mx = None
-    if not args.dry and args.max:
-        import max_bot
-        mx = max_bot.api
-        await mx.start()
     sent = 0
     for parent_id, child_id in pairs:
         child = db.get_user(child_id)
-        if not child:
-            continue
+        if not child or ids.platform(parent_id) == "web":
+            continue          # родитель без мессенджера видит отчёт в личном кабинете
         text = build(child)
         if args.dry:
             print("—" * 40)
-            print("родителю", parent_id)
+            print("родителю", parent_id, ids.platform(parent_id))
             print(text)
             continue
-        try:
-            if mx:
-                await mx.send(user_id=parent_id, text=text)
-            else:
-                await bot.send_message(parent_id, text)
-            sent += 1
-        except Exception as e:
-            log.error("не доставлено родителю %s: %s", parent_id, e)
-    if bot:
-        await bot.session.close()
-    if mx:
-        await mx.close()
-    log.info("отправлено отчётов: %s", sent)
+        db.outbox_put(parent_id, text)      # доставит бот Telegram или MAX
+        sent += 1
+    log.info("отчётов в очереди на отправку: %s", sent)
 
 
 if __name__ == "__main__":

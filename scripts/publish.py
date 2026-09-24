@@ -6,7 +6,8 @@
   channels: telegram, max       куда отправлять
   button: Пройти викторину      текст кнопки (необязательно)
   link: quiz                    ссылка кнопки: quiz, boosty или полный адрес
-  image: assets/myslik-navy.png картинка (необязательно)
+  image: assets/posts/2026-09-25-1830.jpg  картинка (необязательно)
+  channel: closed               закрытый канал Telegram; в MAX такие посты идут в открытый канал бесплатно
   animation: assets/anim/myslik-wave.mp4  анимация Мыслика (необязательно, для MAX берётся .mp4)
 Ниже: текст поста. Разметка Telegram HTML: <b>жирный</b>, <i>курсив</i>, <a href="...">ссылка</a>.
 """
@@ -18,11 +19,18 @@ ROOT = Path(__file__).resolve().parent.parent
 POSTS = ROOT / "posts"
 STATE = ROOT / "state" / "published.json"
 MSK = timezone(timedelta(hours=3))
+SITE = "https://smekairu.github.io/Smekai/"
 LINKS = {
-    "quiz": "https://smekairu.github.io/Smekai/viktorina/",
+    "quiz": SITE + "viktorina/",
+    "kabinet": SITE + "kabinet/",
+    "oplata": SITE + "oplata.html",
+    "lev": SITE + "lev.html",
+    "site": SITE,
     "boosty": "https://boosty.to/smekai",
     "telegram": "https://t.me/smekai_ru",
+    "max": "https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo",
 }
+CAPTION_MAX = 1000       # у Telegram подпись к картинке до 1024 знаков
 
 def parse(path):
     raw = path.read_text(encoding="utf-8")
@@ -77,16 +85,19 @@ def send_telegram(p):
     markup = None
     if p.get("button") and p.get("link"):
         markup = json.dumps({"inline_keyboard": [[{"text": p["button"], "url": p["link"]}]]})
-    if p.get("animation"):
+    media = None
+    if p.get("animation") and (ROOT / p["animation"]).exists():
+        media = ("sendAnimation", "animation", ROOT / p["animation"])
+    elif p.get("image") and (ROOT / p["image"]).exists():
+        media = ("sendPhoto", "photo", ROOT / p["image"])
+    if media and len(re.sub(r"<[^>]+>", "", p["text"])) > CAPTION_MAX:
+        # длинный пост: сначала картинка без подписи, потом текст отдельным сообщением
+        http(base + "/" + media[0], {"chat_id": chat}, files={media[1]: (media[2].name, media[2].read_bytes())})
+        media = None
+    if media:
         data = {"chat_id": chat, "caption": p["text"], "parse_mode": "HTML"}
         if markup: data["reply_markup"] = markup
-        anim = ROOT / p["animation"]
-        r = http(base + "/sendAnimation", data, files={"animation": (anim.name, anim.read_bytes())})
-    elif p.get("image"):
-        data = {"chat_id": chat, "caption": p["text"], "parse_mode": "HTML"}
-        if markup: data["reply_markup"] = markup
-        img = ROOT / p["image"]
-        r = http(base + "/sendPhoto", data, files={"photo": (img.name, img.read_bytes())})
+        r = http(base + "/" + media[0], data, files={media[1]: (media[2].name, media[2].read_bytes())})
     else:
         data = {"chat_id": chat, "text": p["text"], "parse_mode": "HTML", "disable_web_page_preview": False}
         if markup: data["reply_markup"] = json.loads(markup)
@@ -95,12 +106,15 @@ def send_telegram(p):
     return (r.get("result") or {}).get("message_id") if ok else None
 
 def max_chat(p):
-    """Открытый канал MAX по умолчанию, закрытый если в посте указано channel: closed."""
+    """Открытый канал MAX по умолчанию. Задания из закрытого канала в MAX для детей бесплатны,
+    поэтому идут в открытый канал, если отдельный закрытый не задан или MAX_TASKS_FREE=1."""
     if str(p.get("channel", "")).strip().lower() in ("closed", "закрытый"):
-        return os.environ.get("MAX_CHAT_ID_CLOSED") or ""
+        free = os.environ.get("MAX_TASKS_FREE", "1") == "1"
+        if not free and os.environ.get("MAX_CHAT_ID_CLOSED"):
+            return os.environ["MAX_CHAT_ID_CLOSED"]
     return os.environ.get("MAX_CHAT_ID") or ""
 
-SPOILER = re.compile(r"\s*Ответы:\s*<tg-spoiler>(.*?)</tg-spoiler>\s*", re.S)
+SPOILER = re.compile(r"\s*Ответы?:\s*<tg-spoiler>(.*?)</tg-spoiler>\s*", re.S)
 PENDING = ROOT / "state" / "max_pending.json"
 ANSWER_DELAY_MIN = 60
 
@@ -109,7 +123,7 @@ def split_answers(text):
     m = SPOILER.search(text)
     if not m:
         return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", ""), ""
-    body = SPOILER.sub("\n", text).strip()
+    body = SPOILER.sub("\n\n", text).strip()
     return body, m.group(1).strip()
 
 def pending_read():
@@ -171,7 +185,8 @@ def send_max_pending():
         if due > now:
             left.append(it); continue
         try:
-            max_send_text(it["chat"], "<b>Ответы к заданиям</b>\n\n" + it["text"])
+            head = f"<b>Ответ к посту «{it['title']}»</b>" if it.get("title") else "<b>Ответы к заданиям</b>"
+            max_send_text(it["chat"], head + "\n\n" + it["text"])
             print("MAX: отправлены ответы к", it.get("post"))
         except Exception as e:
             detail = e.read().decode() if hasattr(e, "read") else str(e)
@@ -194,7 +209,7 @@ def send_max(p):
             mp4 = mp4.with_suffix(".mp4")
         if mp4.exists():
             media = max_upload("video", mp4)
-    elif p.get("image"):
+    elif p.get("image") and (ROOT / p["image"]).exists():
         media = max_upload("image", ROOT / p["image"])
     try:
         max_send_text(chat, body, markup, media)
@@ -204,7 +219,9 @@ def send_max(p):
     print("MAX: отправлено")
     if answers:
         items = pending_read()
+        t = re.search(r"<b>(.*?)</b>", body)
         items.append({"chat": str(chat), "text": answers, "post": p.get("name", ""),
+                      "title": re.sub(r"<[^>]+>", "", t.group(1)).strip() if t else "",
                       "due": (datetime.now(MSK) + timedelta(minutes=ANSWER_DELAY_MIN)).isoformat()})
         pending_write(items)
         print(f"MAX: ответы уйдут через {ANSWER_DELAY_MIN} минут")

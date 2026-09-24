@@ -9,11 +9,14 @@
 Чего скрипт не может (делается руками один раз):
   Telegram: аватар бота (BotFather -> /setuserpic, файл assets/avatar-myslik.png).
   MAX: всё делается через API, руками ничего не нужно.
+
+Когда запущен сервер кабинета (переменная API_PUBLIC), кнопка меню в Telegram
+открывает личный кабинет прямо внутри Telegram.
 """
 import json, os, ssl, sys, urllib.parse, urllib.request, urllib.error
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import COMMANDS, DESCRIPTION, SHORT_DESCRIPTION
+from common import COMMANDS, DESCRIPTION, DESCRIPTION_MAX, SHORT_DESCRIPTION, CABINET_URL
 
 NAME = os.environ.get("BOT_NAME", "Мыслик · Смекай")
 AVATAR_URL = os.environ.get("BOT_AVATAR_URL", "https://smekairu.github.io/Smekai/assets/avatar-myslik.png")
@@ -47,7 +50,8 @@ def telegram():
         ("setMyDescription", {"description": DESCRIPTION}),
         ("setMyShortDescription", {"short_description": SHORT_DESCRIPTION}),
         ("setMyName", {"name": NAME}),
-        ("setChatMenuButton", {"menu_button": {"type": "commands"}}),
+        ("setChatMenuButton", {"menu_button": {"type": "web_app", "text": "Кабинет", "web_app": {"url": CABINET_URL + "?from=tg"}}}
+         if os.environ.get("API_PUBLIC") else {"menu_button": {"type": "commands"}}),
     ]
     for method, body in steps:
         res, err = http(api + method, body)
@@ -66,11 +70,11 @@ def max_bot():
         print("MAX: токен не принят:", err); return
     print("MAX: бот %s (@%s), user_id %s" % (me.get("name"), me.get("username"), me.get("user_id")))
     commands = [{"name": c, "description": d} for c, d in COMMANDS]
-    body = {"name": NAME, "description": DESCRIPTION, "commands": commands, "photo": {"url": AVATAR_URL}}
+    body = {"name": NAME, "description": DESCRIPTION_MAX, "commands": commands, "photo": {"url": AVATAR_URL}}
     res, err = http(base + "/me", body, headers=h, method="PATCH")
     if err:
         print("   PATCH /me целиком не прошёл:", err)
-        for part in ({"name": NAME}, {"description": DESCRIPTION}, {"commands": commands}, {"photo": {"url": AVATAR_URL}}):
+        for part in ({"name": NAME}, {"description": DESCRIPTION_MAX}, {"commands": commands}, {"photo": {"url": AVATAR_URL}}):
             res, err = http(base + "/me", part, headers=h, method="PATCH")
             print("   ", list(part)[0], "ок" if not err else f"не удалось: {err}")
         res, err = http(base + "/me/commands", {"commands": commands}, headers=h, method="PATCH")

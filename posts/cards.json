@@ -1,0 +1,796 @@
+[
+ {
+  "file": "assets/posts/2026-10-04-1830.jpg",
+  "kicker": "Новое",
+  "title": "Личный кабинет открыт",
+  "sub": "Заниматься с Мысликом на планшете и компьютере",
+  "theme": "sun",
+  "stickers": [
+   "myslik-wave"
+  ],
+  "date": "4 октября"
+ },
+ {
+  "file": "assets/posts/2026-09-25-1830.jpg",
+  "kicker": "Пятничная викторина",
+  "title": "Три вопроса на вечер",
+  "sub": "Отвечайте всей семьёй, счёт на салфетке",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "25 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-26-1830.jpg",
+  "kicker": "Игра на выходные",
+  "title": "Цепочка слов",
+  "sub": "Для дороги и очереди, ничего не нужно",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay"
+  ],
+  "date": "26 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-27-1830.jpg",
+  "kicker": "Для детей в MAX",
+  "title": "Задания бесплатно",
+  "sub": "Каждое утро задания по классам",
+  "theme": "blue",
+  "stickers": [
+   "junior-wave",
+   "lev-idle"
+  ],
+  "date": "27 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-28-1830.jpg",
+  "kicker": "Совет на неделю",
+  "title": "Три вопроса вместо подсказки",
+  "sub": "Когда ребёнок застрял над задачей",
+  "theme": "cream",
+  "stickers": [
+   "myslik-think"
+  ],
+  "date": "28 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-29-1830.jpg",
+  "kicker": "Мыслик объясняет",
+  "title": "Почему 2 + 2 · 2 = 6",
+  "sub": "Порядок действий за минуту",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think"
+  ],
+  "date": "29 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-30-1830.jpg",
+  "kicker": "Задача для всей семьи",
+  "title": "Три выключателя и лампа",
+  "sub": "Зайти в комнату можно один раз",
+  "theme": "sun",
+  "stickers": [
+   "myslik-surprised"
+  ],
+  "date": "30 сентября"
+ },
+ {
+  "file": "assets/posts/2026-10-01-1830.jpg",
+  "kicker": "Факт дня",
+  "title": "Почему небо голубое",
+  "sub": "А закат красный",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised"
+  ],
+  "date": "1 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-02-1830.jpg",
+  "kicker": "Пятничная викторина",
+  "title": "Кит, шестиугольник и столица",
+  "sub": "Три вопроса для всей семьи",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "junior-yay"
+  ],
+  "date": "2 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-03-1830.jpg",
+  "kicker": "Игра на выходные",
+  "title": "Угадай число за семь вопросов",
+  "sub": "Учимся делить пополам",
+  "theme": "peach",
+  "stickers": [
+   "junior-think"
+  ],
+  "date": "3 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-11-1830.jpg",
+  "kicker": "Новое",
+  "title": "Оплата на сайте",
+  "sub": "Картой, МИР или по QR-коду СБП",
+  "theme": "sun",
+  "stickers": [
+   "myslik-love"
+  ],
+  "date": "11 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-05-1830.jpg",
+  "kicker": "Совет на неделю",
+  "title": "Сначала пересказ, потом решение",
+  "sub": "Приём для текстовых задач",
+  "theme": "cream",
+  "stickers": [
+   "myslik-idle"
+  ],
+  "date": "5 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-06-1830.jpg",
+  "kicker": "Мыслик объясняет",
+  "title": "Безударная гласная",
+  "sub": "Проверяем ударением",
+  "theme": "blue",
+  "stickers": [
+   "junior-think"
+  ],
+  "date": "6 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-07-1830.jpg",
+  "kicker": "Задача для всей семьи",
+  "title": "Две задачи на внимательность",
+  "sub": "Взрослые ошибаются чаще",
+  "theme": "sun",
+  "stickers": [
+   "myslik-surprised"
+  ],
+  "date": "7 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-08-1830.jpg",
+  "kicker": "Факт дня",
+  "title": "Почему желтеют листья",
+  "sub": "Жёлтый цвет был в листе всё лето",
+  "theme": "mint",
+  "stickers": [
+   "myslik-surprised"
+  ],
+  "date": "8 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-09-1830.jpg",
+  "kicker": "Пятничная викторина",
+  "title": "Високосный год и рыбка",
+  "sub": "Три вопроса на вечер",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "9 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-10-1830.jpg",
+  "kicker": "Игра на выходные",
+  "title": "Посчитай сдачу",
+  "sub": "Математика в магазине",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay"
+  ],
+  "date": "10 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-24-1830.jpg",
+  "kicker": "Мыслик растёт",
+  "title": "С 9 класса он Лев",
+  "sub": "Помощник взрослеет вместе с ребёнком",
+  "theme": "navy",
+  "stickers": [
+   "junior-wave",
+   "lev-idle"
+  ],
+  "date": "24 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-12-1830.jpg",
+  "kicker": "Совет на неделю",
+  "title": "15 минут каждый день",
+  "sub": "Лучше, чем час в воскресенье",
+  "theme": "cream",
+  "stickers": [
+   "myslik-idle"
+  ],
+  "date": "12 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-13-1830.jpg",
+  "kicker": "Мыслик объясняет",
+  "title": "Что такое процент",
+  "sub": "Одна сотая часть",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think"
+  ],
+  "date": "13 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-14-1830.jpg",
+  "kicker": "Задача для всей семьи",
+  "title": "Волк, коза и капуста",
+  "sub": "Старинная задача на логику",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think"
+  ],
+  "date": "14 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-15-1830.jpg",
+  "kicker": "Факт дня",
+  "title": "Сколько весит облако",
+  "sub": "Сотня слонов над головой",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised"
+  ],
+  "date": "15 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-16-1830.jpg",
+  "kicker": "Пятничная викторина",
+  "title": "Кости, таблица и осьминог",
+  "sub": "Три вопроса на вечер",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "16 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-17-1830.jpg",
+  "kicker": "Игра на выходные",
+  "title": "Найди ошибки у взрослого",
+  "sub": "Ребёнок проверяет родителя",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay"
+  ],
+  "date": "17 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-18-1830.jpg",
+  "kicker": "Родителю",
+  "title": "Отчёт о занятиях",
+  "sub": "Раз в неделю, по воскресеньям",
+  "theme": "cream",
+  "stickers": [
+   "myslik-love"
+  ],
+  "date": "18 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-19-1830.jpg",
+  "kicker": "Совет на неделю",
+  "title": "Хвалите за способ",
+  "sub": "А не за ум",
+  "theme": "cream",
+  "stickers": [
+   "myslik-yay"
+  ],
+  "date": "19 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-20-1830.jpg",
+  "kicker": "Мыслик объясняет",
+  "title": "Умножение на 9 на пальцах",
+  "sub": "Для 2–3 класса",
+  "theme": "blue",
+  "stickers": [
+   "junior-yay"
+  ],
+  "date": "20 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-21-1830.jpg",
+  "kicker": "Задача для всей семьи",
+  "title": "Палки и возраст",
+  "sub": "Для младших и для старших",
+  "theme": "sun",
+  "stickers": [
+   "junior-think",
+   "lev-idle"
+  ],
+  "date": "21 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-22-1830.jpg",
+  "kicker": "Факт дня",
+  "title": "Почему кошка падает на лапы",
+  "sub": "Рефлекс и гибкая спина",
+  "theme": "mint",
+  "stickers": [
+   "myslik-surprised"
+  ],
+  "date": "22 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-23-1830.jpg",
+  "kicker": "Пятничная викторина",
+  "title": "Планеты, гепард и метр",
+  "sub": "Три вопроса на вечер",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "23 октября"
+ },
+ {
+  "file": "assets/posts/2026-09-24-0900.jpg",
+  "kicker": "Задания на 24 сентября",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": "24 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-25-0900.jpg",
+  "kicker": "Задания на 25 сентября",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "25 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-26-0900.jpg",
+  "kicker": "Задания на 26 сентября",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": "26 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-27-0900.jpg",
+  "kicker": "Задания на 27 сентября",
+  "title": "Задача для всей семьи",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay",
+   "myslik-love"
+  ],
+  "date": "27 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-28-0900.jpg",
+  "kicker": "Задания на 28 сентября",
+  "title": "Математика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think",
+   "lev-idle"
+  ],
+  "date": "28 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-29-0900.jpg",
+  "kicker": "Задания на 29 сентября",
+  "title": "Русский язык",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "cream",
+  "stickers": [
+   "junior-think",
+   "myslik-idle"
+  ],
+  "date": "29 сентября"
+ },
+ {
+  "file": "assets/posts/2026-09-30-0900.jpg",
+  "kicker": "Задания на 30 сентября",
+  "title": "Окружающий мир",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised",
+   "myslik-surprised"
+  ],
+  "date": "30 сентября"
+ },
+ {
+  "file": "assets/posts/2026-10-01-0900.jpg",
+  "kicker": "Задания на 1 октября",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": "1 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-02-0900.jpg",
+  "kicker": "Задания на 2 октября",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "2 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-03-0900.jpg",
+  "kicker": "Задания на 3 октября",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": "3 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-04-0900.jpg",
+  "kicker": "Задания на 4 октября",
+  "title": "Задание для всей семьи",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay",
+   "myslik-love"
+  ],
+  "date": "4 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-05-0900.jpg",
+  "kicker": "Задания на 5 октября",
+  "title": "Математика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think",
+   "lev-idle"
+  ],
+  "date": "5 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-06-0900.jpg",
+  "kicker": "Задания на 6 октября",
+  "title": "Русский язык",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "cream",
+  "stickers": [
+   "junior-think",
+   "myslik-idle"
+  ],
+  "date": "6 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-07-0900.jpg",
+  "kicker": "Задания на 7 октября",
+  "title": "Окружающий мир",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised",
+   "myslik-surprised"
+  ],
+  "date": "7 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-08-0900.jpg",
+  "kicker": "Задания на 8 октября",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": "8 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-09-0900.jpg",
+  "kicker": "Задания на 9 октября",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "9 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-10-0900.jpg",
+  "kicker": "Задания на 10 октября",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": "10 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-11-0900.jpg",
+  "kicker": "Задания на 11 октября",
+  "title": "Задание для всей семьи",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay",
+   "myslik-love"
+  ],
+  "date": "11 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-12-0900.jpg",
+  "kicker": "Задания на 12 октября",
+  "title": "Математика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think",
+   "lev-idle"
+  ],
+  "date": "12 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-13-0900.jpg",
+  "kicker": "Задания на 13 октября",
+  "title": "Русский язык",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "cream",
+  "stickers": [
+   "junior-think",
+   "myslik-idle"
+  ],
+  "date": "13 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-14-0900.jpg",
+  "kicker": "Задания на 14 октября",
+  "title": "Окружающий мир",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised",
+   "myslik-surprised"
+  ],
+  "date": "14 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-15-0900.jpg",
+  "kicker": "Задания на 15 октября",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": "15 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-16-0900.jpg",
+  "kicker": "Задания на 16 октября",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "16 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-17-0900.jpg",
+  "kicker": "Задания на 17 октября",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": "17 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-18-0900.jpg",
+  "kicker": "Задания на 18 октября",
+  "title": "Задание для всей семьи",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay",
+   "myslik-love"
+  ],
+  "date": "18 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-19-0900.jpg",
+  "kicker": "Задания на 19 октября",
+  "title": "Математика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think",
+   "lev-idle"
+  ],
+  "date": "19 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-20-0900.jpg",
+  "kicker": "Задания на 20 октября",
+  "title": "Русский язык",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "cream",
+  "stickers": [
+   "junior-think",
+   "myslik-idle"
+  ],
+  "date": "20 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-21-0900.jpg",
+  "kicker": "Задания на 21 октября",
+  "title": "Окружающий мир",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised",
+   "myslik-surprised"
+  ],
+  "date": "21 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-22-0900.jpg",
+  "kicker": "Задания на 22 октября",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": "22 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-23-0900.jpg",
+  "kicker": "Задания на 23 октября",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": "23 октября"
+ },
+ {
+  "file": "assets/posts/2026-10-24-0900.jpg",
+  "kicker": "Задания на 24 октября",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": "24 октября"
+ },
+ {
+  "file": "assets/posts/subject-math.jpg",
+  "kicker": "Задания дня",
+  "title": "Математика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "blue",
+  "stickers": [
+   "myslik-think",
+   "lev-idle"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-rus.jpg",
+  "kicker": "Задания дня",
+  "title": "Русский язык",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "cream",
+  "stickers": [
+   "junior-think",
+   "myslik-idle"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-nature.jpg",
+  "kicker": "Задания дня",
+  "title": "Окружающий мир",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "mint",
+  "stickers": [
+   "junior-surprised",
+   "myslik-surprised"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-logic.jpg",
+  "kicker": "Задания дня",
+  "title": "Логика",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "sun",
+  "stickers": [
+   "myslik-think",
+   "lev-think"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-quiz.jpg",
+  "kicker": "Задания дня",
+  "title": "Викторина",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "navy",
+  "stickers": [
+   "myslik-party",
+   "lev-yay"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-razbor.jpg",
+  "kicker": "Задания дня",
+  "title": "Разбор недели",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "white",
+  "stickers": [
+   "myslik-idle",
+   "lev-idle"
+  ],
+  "date": ""
+ },
+ {
+  "file": "assets/posts/subject-family.jpg",
+  "kicker": "Задания дня",
+  "title": "Задание для всей семьи",
+  "sub": "С 1 по 11 класс, ответы в конце",
+  "theme": "peach",
+  "stickers": [
+   "junior-yay",
+   "myslik-love"
+  ],
+  "date": ""
+ }
+]
