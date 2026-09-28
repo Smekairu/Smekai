@@ -275,8 +275,12 @@ async def api_pay(request):
     if plan not in PLANS:
         return fail("Нет такого тарифа")
     if not yk.available():
+        if PLANS[plan].get("trial"):
+            return fail("Пробная неделя станет доступна после подключения оплаты на сайте", 503)
         return ok(fallback=BOOSTY_URL)
     uid = auth(request)
+    if PLANS[plan].get("trial") and db.trial_used(uid):
+        return fail("Пробную неделю можно подключить только один раз")
     try:
         res = yk.create(uid, plan, "sbp" if method == "sbp" else "card", str(d.get("email", "")).strip())
     except ValueError as e:
@@ -319,7 +323,14 @@ async def process_payment(oid):
         return
     db.order_status(oid, status)
     if status == "succeeded":
-        until, kids = db.grant_plan(o["uid"], o["plan"], SUB_DAYS, float(p["amount"]["value"]), "yookassa")
+        spec = PLANS.get(o["plan"])
+        if not spec:
+            raise RuntimeError("неизвестный тариф в платеже")
+        access_plan = spec.get("base_plan", o["plan"])
+        days = int(spec.get("days", SUB_DAYS))
+        until, kids = db.grant_plan(o["uid"], access_plan, days, float(p["amount"]["value"]), "yookassa")
+        if spec.get("trial"):
+            db.trial_mark(o["uid"])
         await after_payment(o["uid"], o["plan"], until, o["amount"], kids)
         log.info("оплата %s: тариф %s для %s до %s", oid, o["plan"], o["uid"], until)
 
@@ -378,8 +389,6 @@ def app():
     r = a.router
     r.add_post("/api/auth/telegram", auth_telegram)
     r.add_post("/api/auth/login", auth_login)
-    r.add_post("/api/auth/web", auth_web)
-    r.add_post("/api/auth/recover", auth_recover)
     r.add_post("/api/logout", logout)
     r.add_get("/api/me", api_me)
     r.add_post("/api/profile", api_profile)

@@ -16,6 +16,15 @@ SUB_DAYS = int(os.environ.get("SUB_DAYS", "30"))
 
 # тарифы: одинаковые для сайта, ботов и оплаты
 PLANS = {
+    "trial_tasks": {"title": "Задания — пробная неделя", "price": 49, "helper": False,
+                    "days": 7, "trial": True, "base_plan": "tasks",
+                    "about": "закрытый канал с заданиями и разборами на 7 дней"},
+    "trial_myslik": {"title": "Мыслик — пробная неделя", "price": 149, "helper": True,
+                     "days": 7, "trial": True, "base_plan": "myslik",
+                     "about": "30 разборов в день, фото домашки и отчёт родителю на 7 дней"},
+    "trial_family": {"title": "Семья — пробная неделя", "price": 299, "helper": True,
+                     "days": 7, "trial": True, "base_plan": "family",
+                     "about": "возможности тарифа Мыслик для двух детей на 7 дней"},
     "tasks": {"title": "Задания", "price": 390, "helper": False,
               "about": "закрытый канал с ежедневными заданиями и разборами"},
     "myslik": {"title": "Мыслик", "price": 890, "helper": True,
@@ -42,8 +51,8 @@ def daily_limit(uid, helper):
 PRAISE = ["Верно!", "Точно!", "Да, именно так.", "Отлично, правильно."]
 SOFT = ["Пока не то.", "Почти, но нет.", "Не сходится."]
 GRADE_ROWS = ([1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11])
-VOICE_NAMES = {"boy": "бодрый, как с другом", "girl": "тёплый, с улыбкой",
-               "parent": "спокойный, по делу", "lev": "Лев, спокойный", "off": "выключен"}
+VOICE_NAMES = {"boy": "мягкий, дружелюбный", "girl": "живой, с улыбкой",
+               "parent": "спокойный, без спешки", "lev": "Лев, спокойный", "off": "выключен"}
 
 COMMANDS = [
     ("start", "Начать или вернуться в меню"),
@@ -107,6 +116,7 @@ LIMIT_OVER = ("На сегодня бесплатные задания конч�
               f"С подпиской их {PAID_LIMIT} в день, плюс разбор домашки и отчёт родителю.")
 
 SUB_TEXT = ("<b>Тарифы</b>\n\n"
+            "<b>Пробная неделя, один раз:</b> Задания — 49 ₽, Мыслик — 149 ₽, Семья — 299 ₽.\n\n"
             f"• <b>Задания</b>, {PLANS['tasks']['price']} ₽ в месяц: {PLANS['tasks']['about']}\n"
             f"• <b>Мыслик</b>, {PLANS['myslik']['price']} ₽ в месяц: {PLANS['myslik']['about']}\n"
             f"• <b>Семья</b>, {PLANS['family']['price']} ₽ в месяц: {PLANS['family']['about']}\n\n"

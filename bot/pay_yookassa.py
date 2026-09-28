@@ -46,10 +46,11 @@ def create(uid, plan, method="card", email=""):
     """Создаёт платёж. method: card (страница оплаты ЮKassa) или sbp (QR-код СБП).
     Возвращает {'id', 'url'} для карты или {'id', 'qr'} для СБП."""
     p = PLANS[plan]
+    period = "7 дней" if p.get("trial") else "1 месяц"
     body = {
         "amount": {"value": f"{p['price']:.2f}", "currency": "RUB"},
         "capture": True,
-        "description": f"Мыслик, тариф «{p['title']}», 1 месяц",
+        "description": f"Мыслик, «{p['title']}», {period}",
         "metadata": {"uid": str(uid), "plan": plan},
     }
     if method == "sbp":
@@ -63,7 +64,7 @@ def create(uid, plan, method="card", email=""):
         body["receipt"] = {
             "customer": {"email": email},
             "items": [{
-                "description": f"Доступ к сервису Мыслик, тариф «{p['title']}», 1 месяц",
+                "description": f"Доступ к сервису Мыслик, «{p['title']}», {period}",
                 "quantity": "1.00",
                 "amount": {"value": f"{p['price']:.2f}", "currency": "RUB"},
                 "vat_code": 1,

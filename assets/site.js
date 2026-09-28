@@ -17,6 +17,9 @@
   };
   const PLANS = {
     free:   { title: 'Знакомство', price: 0,    about: '3 задания в день, открытый канал, викторина' },
+    trial_tasks:  { title: 'Задания — пробная неделя', price: 49,  days: 7, trial: true, about: 'закрытый канал с заданиями и разборами на 7 дней' },
+    trial_myslik: { title: 'Мыслик — пробная неделя',  price: 149, days: 7, trial: true, about: '30 разборов в день, фото домашки и отчёт родителю на 7 дней' },
+    trial_family: { title: 'Семья — пробная неделя',   price: 299, days: 7, trial: true, about: 'возможности тарифа Мыслик для двух детей на 7 дней' },
     tasks:  { title: 'Задания',    price: 390,  about: 'закрытый канал с ежедневными заданиями и разборами по классу' },
     myslik: { title: 'Мыслик',     price: 890,  about: '30 разборов в день, фото домашки, закрытый канал, отчёт родителю' },
     family: { title: 'Семья',      price: 1490, about: 'всё из тарифа Мыслик для двух детей, отчёт по каждому' },
@@ -34,6 +37,8 @@
     home: '<svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>',
     card: '<svg viewBox="0 0 24 24"><path d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 4v8h18V9H3zm2 5h6v2H5z"/></svg>',
     qr: '<svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h2v2h-2v-2zm4 0h4v2h-2v2h-2v-4zm-4 4h2v4h-2v-4zm4 2h2v2h-2v-2zm2-2h2v4h-2v-4z"/></svg>',
+    mir: '<svg viewBox="0 0 64 24" class="pay-brand" aria-label="МИР"><rect width="64" height="24" rx="6" fill="#F3F6F5"/><path fill="#12825B" d="M7 6h6l3 7 3-7h6v12h-4V10l-3.5 8h-3L11 10v8H7z"/><path fill="#159E73" d="M28 6h4v7l6-7h4v12h-4v-7l-6 7h-4z"/><path fill="#28B7D8" d="M45 6h7.5c3.5 0 5.5 2 5.5 5s-2 5-5.5 5H49v2h-4zm4 3v4h3c1.3 0 2-.7 2-2s-.7-2-2-2z"/></svg>',
+    sbp: '<svg viewBox="0 0 64 24" class="pay-brand" aria-label="СБП"><rect width="64" height="24" rx="6" fill="#F5F5F7"/><path fill="#6B2FB8" d="M7 5l8 7-8 7V5z"/><path fill="#E93C87" d="M15 5l8 7-8 7v-4l3-3-3-3z"/><path fill="#1CA8A5" d="M23 5l8 7-8 7v-4l3-3-3-3z"/><text x="35" y="16" font-size="10" font-weight="800" font-family="Arial,sans-serif" fill="#202333">СБП</text></svg>',
     help: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 14.5a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM12 6c-2.2 0-3.8 1.3-4 3.3h2.2c.1-.9.8-1.4 1.8-1.4s1.8.6 1.8 1.4c0 .7-.4 1.1-1.3 1.7-1.1.7-1.7 1.4-1.6 2.9v.5h2.1V14c0-.8.3-1.1 1.3-1.8 1-.7 1.8-1.5 1.8-3C16.1 7.4 14.5 6 12 6z"/></svg>',
   };
 
@@ -75,7 +80,7 @@
   function header(active) {
     const items = [['kak-rabotaet.html', 'Как работает'], ['tarify.html', 'Цены'], ['lev.html', 'Мыслик и Лев'], ['viktorina/', 'Викторина'], ['faq.html', 'Вопросы']];
     return `<header class="top"><div class="wrap nav">
-      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Мыслик</a>
+      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=1" alt="">Мыслик</a>
       <nav class="nav-links" id="navlinks">${items.map(([h, t]) => `<a href="${root}${h}"${active === h ? ' aria-current="page"' : ''}>${t}</a>`).join('')}
         <a href="${root}kabinet/" class="only-mob"${active === 'kabinet' ? ' aria-current="page"' : ''}>Личный кабинет</a></nav>
       <span class="sp"></span>
@@ -88,7 +93,7 @@
   function footer() {
     return `<footer class="site"><div class="wrap">
       <div class="foot">
-        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Мыслик</a>
+        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=1" alt="">Мыслик</a>
           <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
           <div class="social">
             <a href="${CFG.TG}" target="_blank" rel="noopener" title="Канал в Telegram" aria-label="Telegram">${ICONS.tg}</a>
@@ -101,9 +106,9 @@
         <div><div class="col-title">Помощь</div>
           <a href="${root}faq.html">Вопросы и ответы</a><a href="#" data-modal="support">Поддержка</a><a href="${root}lev.html">Мыслик и Лев</a></div>
         <div><div class="col-title">Документы</div>
-          <a href="${root}oferta.html">Публичная оферта</a><a href="${root}policy.html">Обработка данных</a><a href="${root}rekvizity.html">Реквизиты</a></div>
+          <a href="${root}terms.html">Условия использования</a><a href="${root}oferta.html">Публичная оферта</a><a href="${root}policy.html">Обработка данных</a><a href="${root}rekvizity.html">Реквизиты</a></div>
       </div>
-      <p class="copy">© 2026 Мыслик. ${CFG.REQ.name}, ИНН ${CFG.REQ.inn}, ОГРНИП ${CFG.REQ.ogrnip}.<br>Условия оказания услуг в <a href="${root}oferta.html">публичной оферте</a>. Почта: <a href="mailto:${CFG.EMAIL}">${CFG.EMAIL}</a>.</p>
+      <p class="copy">© 2026 Мыслик. <a href="${root}rekvizity.html">Реквизиты</a> · <a href="${root}oferta.html">Публичная оферта</a> · <a href="mailto:${CFG.EMAIL}">${CFG.EMAIL}</a></p>
     </div></footer>`;
   }
 
@@ -182,10 +187,13 @@
   function renderPay(el, plan, opt = {}) {
     if (!el) return;
     plan = PLANS[plan] && plan !== 'free' ? plan : 'myslik';
-    const paid = ['tasks', 'myslik', 'family'];
-    const renew = CFG.API && session.get() ? 'Автосписаний нет: оплачивается один месяц.' : 'Подписка на Boosty продлевается каждый месяц, отменить можно в настройках Boosty в один клик.';
-    const legal = `<p class="pay-legal">Оплачивая, вы принимаете условия <a href="${root}oferta.html">публичной оферты</a>. Исполнитель ${CFG.REQ.short}, ИНН ${CFG.REQ.inn}. ${renew}</p>`;
-    const pick = opt.compact ? '' : `<div class="pay-plans">${paid.map(k => `<button type="button" data-plan="${k}"${k === plan ? ' class="on"' : ''}><b>${PLANS[k].title}</b><span>${rub(PLANS[k].price)} в месяц</span></button>`).join('')}</div>`;
+    const trial = ['trial_tasks', 'trial_myslik', 'trial_family'];
+    const monthly = ['tasks', 'myslik', 'family'];
+    const period = p => p.trial ? 'на 7 дней' : 'на месяц';
+    const renew = PLANS[plan].trial ? 'Пробная неделя доступна один раз и не продлевается автоматически.' : 'Автосписаний нет: каждый месяц оплачивается отдельно.';
+    const legal = `<p class="pay-legal">Оплачивая, вы принимаете условия <a href="${root}oferta.html">публичной оферты</a>. ${renew} Полные сведения — на странице <a href="${root}rekvizity.html">реквизитов</a>.</p>`;
+    const buttons = keys => keys.map(k => `<button type="button" data-plan="${k}"${k === plan ? ' class="on"' : ''}><b>${PLANS[k].title.replace(' — пробная неделя','')}</b><span>${rub(PLANS[k].price)} ${period(PLANS[k])}</span></button>`).join('');
+    const pick = opt.compact ? '' : `<p class="label">Попробовать один раз</p><div class="pay-plans">${buttons(trial)}</div><p class="label" style="margin-top:18px">Доступ на месяц</p><div class="pay-plans">${buttons(monthly)}</div>`;
     el.innerHTML = `<div class="pay">${pick}<div class="pay-body"></div>${legal}</div>`;
     el.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => renderPay(el, b.dataset.plan, opt));
     const body = el.querySelector('.pay-body');
@@ -193,11 +201,11 @@
     const serverPay = CFG.API && session.get();
 
     if (serverPay) {
-      body.innerHTML = `<p class="pay-sum">К оплате: <b>${rub(p.price)}</b>, тариф «${p.title}» на месяц</p>
+      body.innerHTML = `<p class="pay-sum">К оплате: <b>${rub(p.price)}</b>, «${p.title}» ${period(p)}</p>
         <label class="pay-mail">Почта для чека<input type="email" id="pay-email" placeholder="name@mail.ru" autocomplete="email"></label>
         <div class="choice">
-          <a href="#" data-m="card"><span class="ci">${ICONS.card}</span><div><b>Картой или МИР</b><span>Откроется защищённая страница оплаты</span></div></a>
-          <a href="#" data-m="sbp"><span class="ci">${ICONS.qr}</span><div><b>СБП по QR-коду</b><span>Наведите камеру телефона, оплата в приложении банка</span></div></a>
+          <a href="#" data-m="card"><span class="ci">${ICONS.card}</span><div><b>Банковской картой ${ICONS.mir}</b><span>Откроется защищённая страница ЮKassa</span></div></a>
+          <a href="#" data-m="sbp"><span class="ci">${ICONS.qr}</span><div><b>По QR-коду ${ICONS.sbp}</b><span>Оплата в приложении банка через СБП</span></div></a>
         </div><div class="pay-qr" id="pay-qr"></div><p class="pay-msg" id="pay-msg"></p>`;
       body.querySelectorAll('[data-m]').forEach(a => a.onclick = async e => {
         e.preventDefault();
@@ -225,7 +233,7 @@
 
     const loginHint = CFG.API ? `<p class="small" style="margin:6px 0 10px"><a href="${root}kabinet/?next=oplata">Войдите в личный кабинет</a>, чтобы доступ открылся сам сразу после оплаты.</p>` : '';
     const sbp = CFG.SBP_QR ? `<div class="pay-static"><img src="${root}${CFG.SBP_QR}" alt="QR-код СБП"><div><b>СБП по QR-коду банка</b><p class="small">Сумма ${rub(p.price)}. В назначении платежа укажите тариф и имя ребёнка, затем напишите в поддержку. Доступ откроем в течение часа.</p></div></div>` : '';
-    body.innerHTML = `<p class="pay-sum">К оплате: <b>${rub(p.price)}</b>, тариф «${p.title}» на месяц</p>${loginHint}
+    body.innerHTML = `<p class="pay-sum">К оплате: <b>${rub(p.price)}</b>, «${p.title}» ${period(p)}</p>${loginHint}
       <div class="choice"><a href="${CFG.BOOSTY}" target="_blank" rel="noopener"><span class="ci">${ICONS.card}</span><div><b>Картой, МИР или СБП</b><span>Оплата на Boosty, выберите уровень «${p.title}». Чек приходит на почту</span></div></a></div>
       <div class="pay-phone"><div class="pay-qr" id="pay-qr"></div><div><b>Оплатить с телефона</b><p class="small">Наведите камеру на код: страница оплаты откроется на телефоне, там можно заплатить через СБП в приложении банка.</p></div></div>
       ${sbp}

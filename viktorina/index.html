@@ -195,6 +195,14 @@ a.btn{text-decoration:none}
 .foot{text-align:center;color:var(--ink-3);font-size:.8rem}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:800px){
+  body{padding:24px 32px 48px}.wrap{max-width:920px;gap:18px}.bar{max-width:920px;margin:0 auto}
+  .who{grid-template-columns:repeat(3,minmax(0,1fr))}.whob{height:100%}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.opts.tf{grid-template-columns:1fr 1fr}
+  .opt{min-height:68px;font-size:1.08rem}.qcard{padding:30px}.qt{font-size:1.5rem}.big{font-size:4rem}
+  .hero{max-width:760px}.card{padding:28px}.bz-opts{max-width:680px;margin:0 auto}
+}
+@media (min-width:1180px){.wrap,.bar{max-width:1040px}.qcard{padding:34px 48px}}
 </style>
 </head><body data-root="../" data-src="quiz" data-float="off" data-metrika="">
 
@@ -210,6 +218,38 @@ const LINKS={
   channel:'https://t.me/smekai_ru',
   max:'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo', // канал в MAX              // открытый Telegram-канал «Мыслик»
 };
+
+/* Дополнительные вычислительные вопросы. Они собираются из шаблонов,
+   поэтому банк растёт без тяжёлого файла и ответы остаются точными. */
+function mc(id,q,ans,f){
+  const variants=[ans+1,ans-1,ans+2,ans-2,ans+10,ans-10].filter((v,i,a)=>v!==ans&&a.indexOf(v)===i&&v>=0);
+  return {id,s:'math',q,a:[String(ans),...variants.slice(0,3).map(String)],f};
+}
+function extraQuestions(b){
+  const out=[];
+  if(b==='A') for(let i=1;i<=24;i++){
+    const x=4+i, y=2+(i*3)%9;
+    out.push(i%2?mc(`A-add-${i}`,`Сколько будет ${x} + ${y}?`,x+y,`${x} + ${y} = ${x+y}.`):mc(`A-sub-${i}`,`Сколько будет ${x+y} − ${y}?`,x,`${x+y} − ${y} = ${x}.`));
+  }
+  if(b==='B') for(let i=1;i<=24;i++){
+    const x=2+i%8, y=2+(i*5)%8;
+    out.push(i%2?mc(`B-mul-${i}`,`Сколько будет ${x} × ${y}?`,x*y,`${x} × ${y} = ${x*y}.`):mc(`B-div-${i}`,`Сколько будет ${x*y} : ${x}?`,y,`${x*y} : ${x} = ${y}.`));
+  }
+  if(b==='C') for(let i=1;i<=24;i++){
+    if(i%2){const x=12+i,y=3+i%6;out.push(mc(`C-mul-${i}`,`Вычисли ${x} × ${y}.`,x*y,`${x} × ${y} = ${x*y}.`));}
+    else {const p=[10,20,25,50][i%4],x=40+(i%6)*20;out.push(mc(`C-pct-${i}`,`Сколько составляет ${p}% от ${x}?`,x*p/100,`${p}% от ${x} = ${x*p/100}.`));}
+  }
+  if(b==='D') for(let i=1;i<=24;i++){
+    const a=2+i%5, x=2+i, c=3+(i*2)%9, rhs=a*x+c;
+    out.push(mc(`D-eq-${i}`,`Найди x: ${a}x + ${c} = ${rhs}.`,x,`${a}x = ${rhs-c}, поэтому x = ${x}.`));
+  }
+  if(b==='E') for(let i=1;i<=24;i++){
+    if(i%2){const x=5+i;out.push(mc(`E-square-${i}`,`Чему равен квадрат числа ${x}?`,x*x,`${x}² = ${x*x}.`));}
+    else {const a=2+i%7,d=2+i%5,n=5;const ans=a+(n-1)*d;out.push(mc(`E-ap-${i}`,`Первый член прогрессии ${a}, разность ${d}. Чему равен пятый член?`,ans,`${a} + 4 · ${d} = ${ans}.`));}
+  }
+  return out;
+}
+const EXTRA={A:extraQuestions('A'),B:extraQuestions('B'),C:extraQuestions('C'),D:extraQuestions('D'),E:extraQuestions('E')};
 /* ====================================================================== */
 
 const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
@@ -437,7 +477,7 @@ function mood(m){ document.querySelectorAll('.mys').forEach(el=>{ el.classList.r
 
 /* ---------- каркас ---------- */
 function topbar(){
-  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><img src="../assets/brand/mark.png?v=2" alt="" style="width:30px;height:30px;border-radius:9px;display:block">Мыслик</a><div class="sp"></div>
+  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><img src="../assets/brand/mark-myslik.png?v=1" alt="" style="width:30px;height:30px;border-radius:9px;display:block">Мыслик</a><div class="sp"></div>
     <a class="kab" href="../kabinet/">Личный кабинет</a>
     <button class="ib" id="snd" aria-label="Звук">${S.sound?'🔊':'🔇'}</button>
     ${S.screen!=='start'?'<button class="ib" id="home" aria-label="В начало">⌂</button>':''}</div>`);
@@ -523,14 +563,19 @@ function DuoSetup(){
 
 /* ---------- сборка игры ---------- */
 function pick(band,n,interests,exclude){
-  const pool=shuffle(Q[band].filter(q=>!(exclude||[]).includes(q)));
+  const all=[...(Q[band]||[]),...(EXTRA[band]||[])].filter(q=>!(exclude||[]).includes(q));
+  const qkey=q=>q.id||`${q.s}|${q.q}|${q.big||''}`;
+  const recent=store.get(`smk_recent_${band}`,[]), fresh=all.filter(q=>!recent.includes(qkey(q)));
+  const pool=shuffle((fresh.length>=n?fresh:all));
   const favS=new Set(); (interests||[]).forEach(id=>{const i=INTERESTS.find(x=>x.id===id); if(i) i.s.forEach(s=>favS.add(s));});
   const fav=pool.filter(q=>favS.has(q.s)), rest=pool.filter(q=>!favS.has(q.s));
   const out=[], cnt={};
   const tryAdd=q=>{ if(out.length>=n||out.includes(q)) return; if((cnt[q.s]||0)>=3) return; out.push(q); cnt[q.s]=(cnt[q.s]||0)+1; };
   fav.slice(0,Math.ceil(n/2)).forEach(tryAdd); rest.forEach(tryAdd); pool.forEach(tryAdd);
   // чередуем типы: эмодзи и «верю не верю» не подряд
-  return spread(out);
+  const result=spread(out);
+  store.set(`smk_recent_${band}`,[...recent,...result.map(qkey)].slice(-Math.min(60,Math.max(20,all.length-n))));
+  return result;
 }
 function spread(arr){ const a=arr.filter(q=>!q.big&&q.tf===undefined), b=arr.filter(q=>q.big||q.tf!==undefined), out=[]; while(a.length||b.length){ if(a.length) out.push(a.shift()); if(a.length) out.push(a.shift()); if(b.length) out.push(b.shift()); } return out; }
 function prep(q){ const c={...q}; if(q.a){ c.correct=q.a[0]; c.opts=q.a.length>2?shuffle(q.a):q.a.slice(); } return c; }

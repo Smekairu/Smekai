@@ -8,7 +8,7 @@
 
 Переменные окружения:
   YANDEX_API_KEY, YANDEX_FOLDER   те же, что для распознавания фото
-  VOICE_BOY, VOICE_GIRL, VOICE_PARENT   имена голосов, по умолчанию anton, masha, alexander
+  VOICE_BOY, VOICE_GIRL, VOICE_PARENT   имена голосов, по умолчанию zahar, alena, marina
   VOICE_EMOTION                   оттенок для голосов, где он есть: good, neutral
 
 Живость даёт не только голос: ударения ставим знаком плюс перед гласной (Мы+слик),
@@ -21,12 +21,13 @@ log = logging.getLogger("voice")
 YA_KEY = os.environ.get("YANDEX_API_KEY", "")
 YA_FOLDER = os.environ.get("YANDEX_FOLDER", "")
 VOICES = {
-    "boy": os.environ.get("VOICE_BOY", "anton"),
-    "girl": os.environ.get("VOICE_GIRL", "masha"),
-    "parent": os.environ.get("VOICE_PARENT", "alexander"),
+    "boy": os.environ.get("VOICE_BOY", "zahar"),
+    "girl": os.environ.get("VOICE_GIRL", "alena"),
+    "parent": os.environ.get("VOICE_PARENT", "marina"),
     "lev": os.environ.get("VOICE_LEV", "ermil"),
 }
-SPEED = {"boy": "1.05", "girl": "1.0", "parent": "0.95", "lev": "0.95"}
+SPEED = {"boy": "0.96", "girl": "0.96", "parent": "0.92", "lev": "0.94"}
+ROLE = {"boy": "good", "girl": "good", "parent": "neutral", "lev": "neutral"}
 
 # все голоса Яндекса для команды /voicetest: имя, пол, коротко о манере
 CATALOG = [
@@ -73,8 +74,7 @@ def synth(text, profile="boy", voice_name=None):
         return None
     data = {"text": prep(text)[:4900], "lang": "ru-RU", "voice": name,
             "speed": SPEED.get(profile, "1.0"), "format": "oggopus", "folderId": YA_FOLDER}
-    if EMOTION:
-        data["emotion"] = EMOTION
+    data["emotion"] = EMOTION or ROLE.get(profile, "neutral")
     req = urllib.request.Request("https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize",
                                  data=urllib.parse.urlencode(data).encode(),
                                  headers={"Authorization": f"Api-Key {YA_KEY}"})

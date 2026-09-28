@@ -142,6 +142,7 @@ footer.site{background:var(--bg-2);padding:40px 0 28px;margin-top:60px;border-to
 .choice .ci svg{width:24px;height:24px;fill:var(--ink)}
 .choice .ci .brand-ico{width:30px;height:30px}
 .choice b{display:block;font-size:16px}
+.pay-brand{width:64px;height:24px;display:inline-block;vertical-align:middle;margin-left:6px}
 .choice span{font-size:14px;color:var(--ink-3)}
 .qr{display:grid;place-items:center;margin-top:14px}
 .qr img{width:150px;height:150px;border:1px solid var(--line);border-radius:12px;padding:6px;background:#fff}

@@ -7,9 +7,9 @@
 <meta name="description" content="Мыслик разбирает домашние задания вместе с ребёнком: не даёт готовый ответ, а ведёт к нему подсказками. Родителю раз в неделю приходит отчёт.">
 <meta property="og:title" content="Мыслик — ребёнок думает сам, родитель спокоен">
 <meta property="og:description" content="Помощник по учёбе для 1–11 класса. Разбирает задания подсказками, а не выдаёт ответы.">
-<meta property="og:image" content="https://myslik.ru/assets/brand/logo-smekai.png">
+<meta property="og:image" content="https://myslik.ru/assets/avatar-myslik.png">
 <meta property="og:type" content="website">
-<link rel="icon" href="assets/favicon.png">
+<link rel="icon" href="assets/brand/mark-myslik.png">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/site.css">
 <script src="assets/myslik.js"></script>
@@ -40,6 +40,13 @@
 @media(max-width:820px){.where{grid-template-columns:1fr}}
 .where .card{display:flex;flex-direction:column}
 .where .card .btn{margin-top:auto;align-self:flex-start}
+.demo-tabs{display:flex;gap:8px;overflow:auto;padding:2px 2px 10px;scrollbar-width:thin}
+.demo-tabs button{white-space:nowrap;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:9px 13px;font:700 14px var(--body);cursor:pointer}
+.demo-tabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.demo-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.demo-head .sp{flex:1}.demo-arrow{width:38px;height:38px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:20px;cursor:pointer}
+.demo-panel[hidden]{display:none}.demo-panel .chat{min-height:390px}
+@media(max-width:700px){.demo-panel .chat{min-height:0}.demo-arrow{display:none}}
 </style>
 </head>
 <body data-page="index.html" data-src="site" data-metrika="">
@@ -86,19 +93,36 @@
       <div class="card"><div class="num">4</div><h3>Отчёт родителю</h3><p class="small">Раз в неделю: сколько заданий, по каким темам, где было трудно.</p></div>
     </div>
     <div class="cards c2" style="margin-top:34px">
-      <div>
-        <h3 style="font-size:22px;margin-bottom:10px">Так это выглядит</h3>
-        <p class="small muted" style="margin-bottom:14px">Разбор задачи за 5 класс.</p>
-        <div class="chat">
-          <div class="msg kid">В корзине 12 яблок. Половину отдали, потом треть остатка съели. Сколько осталось?</div>
-          <div class="msg bot">Давай по порядку. Половину от двенадцати это сколько?</div>
-          <div class="msg kid">6</div>
-          <div class="msg bot">Верно, осталось 6. Теперь внимание: треть берём от чего, от двенадцати или от остатка?</div>
-          <div class="msg kid">От остатка</div>
-          <div class="msg bot">Точно. Треть от шести это 2. Сколько тогда осталось?</div>
-          <div class="msg kid">4</div>
-          <div class="msg bot"><b>Правильно.</b> И главное, ты сам заметил, что треть берётся от остатка. На этом обычно и ошибаются.</div>
+      <div id="demo-carousel">
+        <div class="demo-head"><h3 style="font-size:22px">Так это выглядит</h3><span class="sp"></span><button class="demo-arrow" data-demo-prev aria-label="Предыдущий пример">←</button><button class="demo-arrow" data-demo-next aria-label="Следующий пример">→</button></div>
+        <div class="demo-tabs" role="tablist" aria-label="Примеры по возрасту">
+          <button class="on" role="tab" aria-selected="true" data-demo="0">1–3 класс</button><button role="tab" aria-selected="false" data-demo="1">5–7 класс</button><button role="tab" aria-selected="false" data-demo="2">8–9 класс</button><button role="tab" aria-selected="false" data-demo="3">10–11 класс</button>
         </div>
+        <div class="demo-panel" data-demo-panel="0"><div class="chat">
+          <div class="msg kid">У Маши 14 наклеек. 6 она подарила. Сколько осталось?</div>
+          <div class="msg bot">Давай представим 14 наклеек. Если шесть убрать, какое действие нужно?</div><div class="msg kid">Вычитание.</div>
+          <div class="msg bot">Верно. Удобно сначала убрать 4 и получить 10. Сколько ещё осталось убрать?</div><div class="msg kid">Ещё 2. Ответ 8!</div>
+          <div class="msg bot"><b>Точно.</b> Ты разложил 6 на 4 и 2 — так считать быстрее.</div>
+        </div></div>
+        <div class="demo-panel" data-demo-panel="1" hidden><div class="chat">
+          <div class="msg kid">В корзине 12 яблок. Половину отдали, потом треть остатка съели. Сколько осталось?</div>
+          <div class="msg bot">Половину от двенадцати отдали. Сколько осталось?</div><div class="msg kid">6.</div>
+          <div class="msg bot">Теперь треть берём от двенадцати или от остатка?</div><div class="msg kid">От остатка. Треть от 6 — это 2.</div>
+          <div class="msg bot">Значит, сколько осталось после двух действий?</div><div class="msg kid">4.</div>
+          <div class="msg bot"><b>Правильно.</b> Главное — ты заметил, от какого числа брать треть.</div>
+        </div></div>
+        <div class="demo-panel" data-demo-panel="2" hidden><div class="chat">
+          <div class="msg kid">Решить: 3(x − 2) = 2x + 5.</div>
+          <div class="msg bot">Сначала раскрой скобки. Что получится слева?</div><div class="msg kid">3x − 6.</div>
+          <div class="msg bot">Хорошо. Перенеси 2x влево, а −6 вправо. Только следи за знаками.</div><div class="msg kid">3x − 2x = 5 + 6, значит x = 11.</div>
+          <div class="msg bot"><b>Да.</b> Быстрая проверка: 3·9 = 27, справа 22 + 5 = 27.</div>
+        </div></div>
+        <div class="demo-panel" data-demo-panel="3" hidden><div class="chat">
+          <div class="msg kid">Почему в задании ЕГЭ ответ не 0,25, а 25?</div>
+          <div class="msg bot">Посмотри, в каких единицах просят ответ. В условии доля или процент?</div><div class="msg kid">Процент.</div>
+          <div class="msg bot">Тогда 0,25 — это доля. Что нужно сделать, чтобы получить проценты?</div><div class="msg kid">Умножить на 100. Получится 25.</div>
+          <div class="msg bot"><b>Именно.</b> В решении оставь переход: 0,25 · 100% = 25%.</div>
+        </div></div>
       </div>
       <div class="card" style="align-self:center">
         <h3>Что получает родитель</h3>
@@ -130,13 +154,13 @@
     <p class="center lead muted" style="margin-bottom:30px">Коротко: они помогают списать, мы помогаем понять.</p>
     <div class="tbl-scroll">
       <table class="compare">
-        <tr><th>Что важно родителю</th><th>ИИ-решалка</th><th>Репетитор</th><th>Мыслик</th></tr>
+        <tr><th>Что важно родителю</th><th>Решалка по фото</th><th>Репетитор</th><th>Мыслик</th></tr>
         <tr><td>Даёт готовый ответ</td><td class="no">Да, сразу</td><td class="yes">Нет</td><td class="yes">Нет</td></tr>
         <tr><td>Объясняет, пока не поймёт</td><td class="no">Нет</td><td class="yes">Да</td><td class="yes">Да</td></tr>
         <tr><td>Видно, чем занимался ребёнок</td><td class="no">Нет</td><td>Со слов педагога</td><td class="yes">Отчёт раз в неделю</td></tr>
         <tr><td>Нужно подстраивать расписание</td><td class="yes">Нет</td><td class="no">Да</td><td class="yes">Нет</td></tr>
         <tr><td>Цена в месяц</td><td>200–800 ₽</td><td class="no">от 12 000 ₽</td><td class="yes">от 390 ₽</td></tr>
-        <tr><td>Ответы по математике проверяет</td><td>нейросеть</td><td>человек</td><td class="yes">точный расчёт</td></tr>
+        <tr><td>Ответы по математике проверяет</td><td>автоматическая проверка</td><td>человек</td><td class="yes">точный расчёт</td></tr>
       </table>
     </div>
   </div>
@@ -169,7 +193,7 @@
 <section id="price" class="soft-bg">
   <div class="wrap">
     <h2 class="center">Сколько стоит</h2>
-    <p class="center lead muted" style="margin-bottom:38px">Оплата помесячная. Отменить можно в любой момент, без объяснений.</p>
+    <p class="center lead muted" style="margin-bottom:38px">Сначала можно взять пробную неделю. Дальше — помесячно, без автосписаний.</p>
     <div class="cards c4">
       <div class="plan">
         <h3>Знакомство</h3><div class="price">0 ₽</div><p class="small muted">навсегда</p>
@@ -179,18 +203,18 @@
       <div class="plan">
         <h3>Задания</h3><div class="price">390 ₽ <span>в месяц</span></div><p class="small muted">без личного помощника</p>
         <ul><li>Закрытый канал по классу</li><li>Задание каждое утро</li><li>Ответы с разбором</li></ul>
-        <a class="btn btn-ghost" href="oplata.html?plan=tasks">Подключить</a>
+        <p class="small"><a href="oplata.html?plan=trial_tasks">7 дней за 49 ₽</a> · один раз</p><a class="btn btn-ghost" href="oplata.html?plan=tasks">Подключить на месяц</a>
       </div>
       <div class="plan best">
         <span class="badge">Основной</span>
         <h3>Мыслик</h3><div class="price">890 ₽ <span>в месяц</span></div><p class="small muted">один ребёнок</p>
         <ul><li>30 разборов заданий в день</li><li>Разбор домашки по фото</li><li>Закрытый канал по классу</li><li>Отчёт родителю раз в неделю</li></ul>
-        <a class="btn btn-main" href="oplata.html?plan=myslik">Подключить</a>
+        <p class="small"><a href="oplata.html?plan=trial_myslik">7 дней за 149 ₽</a> · один раз</p><a class="btn btn-main" href="oplata.html?plan=myslik">Подключить на месяц</a>
       </div>
       <div class="plan">
         <h3>Семья</h3><div class="price">1 490 ₽ <span>в месяц</span></div><p class="small muted">до двух детей</p>
         <ul><li>Всё из тарифа Мыслик</li><li>Два ребёнка на одной подписке</li><li>Отдельный отчёт по каждому</li><li>Ответы в первую очередь</li></ul>
-        <a class="btn btn-ghost" href="oplata.html?plan=family">Подключить</a>
+        <p class="small"><a href="oplata.html?plan=trial_family">7 дней за 299 ₽</a> · один раз</p><a class="btn btn-ghost" href="oplata.html?plan=family">Подключить на месяц</a>
       </div>
     </div>
     <p class="center small muted" style="margin-top:22px">Оплата на сайте картой российского банка, МИР или по QR-коду СБП. <a href="tarify.html">Все тарифы и ответы про оплату</a></p>
@@ -220,10 +244,10 @@
     <h2 class="center">Частые вопросы</h2>
     <p class="center lead muted" style="margin-bottom:30px">Коротко о главном. <a href="faq.html">Все вопросы</a></p>
     <details open><summary>А ребёнок не будет просто списывать?</summary><p>Мыслик устроен так, что готового ответа сначала нет вообще. Он задаёт вопрос, потом даёт первую подсказку, вторую, третью, и только после попыток показывает разбор по шагам. Списать нечего, придётся думать.</p></details>
-    <details><summary>Он не ошибается в решениях?</summary><p>По математике ответ считает программа, а не нейросеть, поэтому неверного ответа быть не может. В остальных предметах родитель видит весь диалог в отчёте и может поправить.</p></details>
+    <details><summary>Он не ошибается в решениях?</summary><p>По математике ответ проверяется точным расчётом, а в остальных предметах сверяется с эталоном. Родитель видит весь диалог в отчёте и может заметить спорный момент.</p></details>
     <details><summary>Нужно что-то устанавливать?</summary><p>Нет. Занятие идёт в личном кабинете на сайте, с планшета или компьютера, или в боте в Telegram и MAX. Отдельного приложения нет.</p></details>
     <details><summary>Что с данными ребёнка?</summary><p>Храним минимум: имя, класс и историю заданий. Всё на сервере в России, как требует закон. Фотографии домашних заданий удаляются сразу после разбора. Подробности в <a href="policy.html">политике обработки данных</a>.</p></details>
-    <details><summary>Кто стоит за проектом?</summary><p>Мыслик сделан родителями для родителей. Идея выросла из вечерних уроков в обычной семье и желания получить инструмент, который учит думать, а не списывать. Задания составляются по школьной программе и проверяются вручную, а математика считается точно, без участия нейросети.</p></details>
+    <details><summary>Кто стоит за проектом?</summary><p>Мыслик сделан родителями для родителей. Идея выросла из вечерних уроков в обычной семье и желания получить инструмент, который учит думать, а не списывать. Задания составляются по школьной программе и проверяются вручную, а математические ответы рассчитываются точно.</p></details>
   </div>
 </section>
 
@@ -256,6 +280,15 @@ window.addEventListener('load', () => {
   const gb = document.getElementById('grow-btn');
   gb.onclick = () => { gb.disabled = true; gg.setAttribute('age', 1); gg.react('hello', { text: 'Я первоклассник.' }); setTimeout(() => gg.grow(10, 6500), 900); };
   gg.addEventListener('myslik-grown', () => { gb.disabled = false; gb.textContent = 'Показать ещё раз'; });
+  const demo = document.getElementById('demo-carousel');
+  if (demo) {
+    const tabs = [...demo.querySelectorAll('[data-demo]')], panels = [...demo.querySelectorAll('[data-demo-panel]')];
+    let current = 0, startX = null;
+    const show = n => { current = (n + panels.length) % panels.length; tabs.forEach((b, i) => { b.classList.toggle('on', i === current); b.setAttribute('aria-selected', i === current ? 'true' : 'false'); }); panels.forEach((p, i) => p.hidden = i !== current); tabs[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); };
+    tabs.forEach((b, i) => b.onclick = () => show(i));
+    demo.querySelector('[data-demo-prev]').onclick = () => show(current - 1); demo.querySelector('[data-demo-next]').onclick = () => show(current + 1);
+    demo.addEventListener('pointerdown', e => startX = e.clientX); demo.addEventListener('pointerup', e => { if (startX === null) return; const dx = e.clientX - startX; startX = null; if (Math.abs(dx) > 60) show(current + (dx < 0 ? 1 : -1)); });
+  }
 });
 </script>
 </body>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Личный кабинет — Мыслик</title>
 <meta name="description" content="Личный кабинет Мыслик: занятие с Мысликом, прогресс по дням, тариф и оплата, отчёты родителю, настройки голоса.">
-<link rel="icon" href="../assets/favicon.png">
+<link rel="icon" href="../assets/brand/mark-myslik.png">
 <link rel="stylesheet" href="../assets/fonts.css">
 <link rel="stylesheet" href="../assets/site.css">
 <script src="../assets/myslik.js"></script>
@@ -358,7 +358,7 @@ function parent() {
 /* ---------- настройки ---------- */
 function settings() {
   const p = profile();
-  const V = [['off', 'Без голоса', ''], ['boy', 'Бодрый', 'как с другом'], ['girl', 'Тёплый', 'с улыбкой'], ['parent', 'Спокойный', 'по-взрослому']];
+  const V = [['off', 'Без голоса', ''], ['boy', 'Дружелюбный', 'мягкий и спокойный'], ['girl', 'Живой', 'тёплый, с улыбкой'], ['parent', 'Спокойный', 'без спешки']];
   if ((p.grade || 0) >= 9) V.push(['lev', 'Лев', 'низкий, спокойный']);
   $('#pane').innerHTML = `<h2>Настройки</h2>
     <label class="field">Имя<input id="sn" maxlength="30" value="${esc(p.name)}"></label>
@@ -366,7 +366,6 @@ function settings() {
     <div class="field">Голос Мыслика<div class="voices">${V.map(([k, t, d]) => `<label><input type="radio" name="v" value="${k}"${(p.voice || 'off') === k ? ' checked' : ''}> <b>${t}</b> <span class="muted small">${d}</span>${k === 'off' ? '' : `<button type="button" class="btn btn-ghost btn-sm play" data-v="${k}">Послушать</button>`}</label>`).join('')}</div></div>
     <p class="small muted" style="margin:-6px 0 16px">На сайте голос берётся из браузера и звучит проще, чем в боте. В Telegram и MAX Мыслик говорит голосом Яндекса.</p>
     <button class="btn btn-main" id="ss">Сохранить</button> <span class="fb ok" id="sfb"></span>
-    ${ME && ME.user.recovery ? `<h3 style="margin-top:24px">Код восстановления</h3><p class="small">Нужен, чтобы войти в кабинет с другого устройства. Сохраните его.</p><span class="rec">${esc(ME.user.recovery)}</span>` : ''}
     ${ME ? '<p style="margin-top:22px"><button class="btn btn-ghost btn-sm" id="out">Выйти из кабинета</button></p>' : ''}`;
   let grade = p.grade;
   $('#sg').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#sg').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); grade = +b.dataset.g; m.setAttribute('age', grade); };
@@ -390,21 +389,13 @@ function help() {
 function loginScreen(err) {
   $('#app').hidden = true; const L = $('#login'); L.hidden = false;
   L.innerHTML = `<myslik-face age="6" mood="wave"></myslik-face><h2>Вход в личный кабинет</h2>
-    <p class="small muted">Если вы уже занимаетесь в боте, войдите через него: прогресс будет общий.</p>
+    <p class="small muted">Без пароля и постоянного кода: бот проверит ваш аккаунт и пришлёт одноразовую ссылку, которая действует 30 минут.</p>
     ${err ? `<p class="fb bad">${esc(err)}</p>` : ''}
     <div class="choice">
       <a href="${SMK.CFG.BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.tg}</span><div><b>Через Telegram</b><span>Бот пришлёт ссылку для входа</span></div></a>
       <a href="${SMK.CFG.MAX_BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.max}</span><div><b>Через MAX</b><span>Бот пришлёт ссылку для входа</span></div></a>
     </div>
-    <form id="wf"><b>Без мессенджера</b><input class="pay-mail" id="wn" placeholder="Имя ребёнка" maxlength="30" style="font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px">
-      <div class="grades" id="wg">${[1,2,3,4,5,6,7,8,9,10,11].map(g => `<button type="button" data-g="${g}">${g}</button>`).join('')}</div>
-      <button class="btn btn-main" type="submit">Создать кабинет</button></form>
-    <form id="rf"><b>Есть код восстановления</b><div class="answer"><input id="rc" placeholder="XXXX-XXXX-XXXX" style="font-size:18px"><button class="btn btn-ghost" type="submit">Войти</button></div></form>`;
-  let g = 0;
-  $('#wg').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#wg').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); g = +b.dataset.g; };
-  $('#wf').onsubmit = async e => { e.preventDefault(); if (!g) { alertIn('Выберите класс'); return; } try { const r = await SMK.api('/api/auth/web', { name: $('#wn').value.trim(), grade: g }); SMK.session.set(r.session); sessionStorage.setItem('smk_new_rec', r.recovery); boot(); } catch (err) { alertIn(err.message); } };
-  $('#rf').onsubmit = async e => { e.preventDefault(); try { const r = await SMK.api('/api/auth/recover', { code: $('#rc').value }); SMK.session.set(r.session); boot(); } catch (err) { alertIn(err.message); } };
-  function alertIn(t) { let p = L.querySelector('.fb.bad'); if (!p) { p = document.createElement('p'); p.className = 'fb bad'; L.querySelector('h2').after(p); } p.textContent = t; }
+    <p class="small muted" style="margin-top:14px">Если мессенджер недоступен, напишите в <a href="mailto:hello@myslik.ru">поддержку</a>. Вход по SMS добавим после подключения российского SMS-провайдера.</p>`;
 }
 function loadScript(src) { return new Promise(ok => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ok; document.head.append(s); }); }
 

@@ -64,6 +64,7 @@ def init():
       created TEXT DEFAULT CURRENT_TIMESTAMP, status TEXT DEFAULT 'new');
     CREATE TABLE IF NOT EXISTS dialog(uid INTEGER PRIMARY KEY, state TEXT, data TEXT);
     CREATE TABLE IF NOT EXISTS free_users(uid INTEGER PRIMARY KEY, note TEXT, created TEXT DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS trial_users(uid INTEGER PRIMARY KEY, used TEXT DEFAULT CURRENT_TIMESTAMP);
     """)
     c.commit()
     cols = [r["name"] for r in c.execute("PRAGMA table_info(users)").fetchall()]
@@ -239,6 +240,14 @@ def grant_plan(uid, plan, days=30, amount=0, source="manual"):
             grant(kid, days, 0, source + ":family", plan)
             extra.append(kid)
     return until, extra
+
+
+def trial_used(uid):
+    return bool(_one("SELECT uid FROM trial_users WHERE uid=?", (uid,)))
+
+
+def trial_mark(uid):
+    _run("INSERT OR IGNORE INTO trial_users(uid) VALUES(?)", (uid,))
 
 
 # ---------- лимиты и текущее задание ----------
