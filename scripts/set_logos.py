@@ -1,4 +1,4 @@
-"""Ставит логотип Смекай аватаркой каналов в Telegram и MAX.
+"""Ставит логотип Мыслик аватаркой каналов в Telegram и MAX.
 
 Запуск: GitHub -> Actions -> «Обновить логотипы» -> Run workflow.
 Telegram: бот должен быть администратором канала с правом «Изменение профиля канала».
@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGO = ROOT / "assets" / "brand" / "logo-smekai.png"
-LOGO_URL = "https://smekairu.github.io/Smekai/assets/brand/logo-smekai.png"
+LOGO_URL = "https://myslik.ru/assets/brand/logo-smekai.png"
 
 
 def call(url, data=None, headers=None, files=None, method=None):

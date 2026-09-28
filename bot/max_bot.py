@@ -518,7 +518,7 @@ async def admin_free(uid, text, add=True):
         await say(uid, text="Убрал из бесплатного доступа."); return
     db.free_add(target, parts[2] if len(parts) > 2 else "")
     await say(uid, text=f"Готово: {target} занимается бесплатно.")
-    msg = "Для тебя все задания Смекая бесплатны. Нажимай «Задание»!"
+    msg = "Для тебя все задания Мыслика бесплатны. Нажимай «Задание»!"
     if ids.platform(target) == "max" and INVITE:
         msg += f"\n\nЗакрытый канал с заданиями в MAX:\n{INVITE}"
     db.outbox_put(target, msg)

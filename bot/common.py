@@ -6,7 +6,7 @@ import os
 
 import ids
 
-SITE_URL = os.environ.get("SITE_URL", "https://smekairu.github.io/Smekai/")
+SITE_URL = os.environ.get("SITE_URL", "https://myslik.ru/")
 PAY_URL = os.environ.get("PAY_URL") or SITE_URL + "oplata.html"
 BOOSTY_URL = os.environ.get("BOOSTY_URL", "https://boosty.to/smekai")
 CABINET_URL = SITE_URL + "kabinet/"

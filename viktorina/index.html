@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Викторина Смекай</title>
+<title>Викторина Мыслик</title>
 <link rel="stylesheet" href="../assets/fonts.css">
 <script src="../assets/myslik.js"></script>
 <script src="../assets/site.js" defer></script>
@@ -206,9 +206,9 @@ a.btn{text-decoration:none}
 const LINKS={
   site:'../',                                 // главная страница сайта
   bot:'https://t.me/smekai_ru_bot?start=quiz',           // бот Мыслик
-  boosty:'https://boosty.to/smekai',          // страница «Смекай» на Boosty
+  boosty:'https://boosty.to/smekai',          // страница «Мыслик» на Boosty
   channel:'https://t.me/smekai_ru',
-  max:'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo', // канал в MAX              // открытый Telegram-канал «Смекай»
+  max:'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo', // канал в MAX              // открытый Telegram-канал «Мыслик»
 };
 /* ====================================================================== */
 
@@ -437,7 +437,7 @@ function mood(m){ document.querySelectorAll('.mys').forEach(el=>{ el.classList.r
 
 /* ---------- каркас ---------- */
 function topbar(){
-  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><img src="../assets/brand/mark.png?v=2" alt="" style="width:30px;height:30px;border-radius:9px;display:block">Смекай</a><div class="sp"></div>
+  const b=$(`<div class="bar"><a class="logo" href="../" style="text-decoration:none;color:inherit"><img src="../assets/brand/mark.png?v=2" alt="" style="width:30px;height:30px;border-radius:9px;display:block">Мыслик</a><div class="sp"></div>
     <a class="kab" href="../kabinet/">Личный кабинет</a>
     <button class="ib" id="snd" aria-label="Звук">${S.sound?'🔊':'🔇'}</button>
     ${S.screen!=='start'?'<button class="ib" id="home" aria-label="В начало">⌂</button>':''}</div>`);
@@ -683,7 +683,7 @@ function Blitz(){
 function finishBlitz(){ const bz=G.bz; if(!bz||bz.done) return; clearTimers(); bz.done=true; const gain=bz.ok*30; G.players[0].pts+=gain; G.blitzScore=bz.ok; G.res[G.i]={blitz:true,ok:true}; render(); }
 
 /* ---------- итоги ---------- */
-function rankKid(p){ return p>=1?['🏆','Легенда Смекай']:p>=.8?['🥇','Главный умник']:p>=.6?['🥈','Смекалистый']:p>=.4?['🥉','Растущий мыслитель']:['🌱','Разминка засчитана']; }
+function rankKid(p){ return p>=1?['🏆','Легенда Мыслик']:p>=.8?['🥇','Главный умник']:p>=.6?['🥈','Смекалистый']:p>=.4?['🥉','Растущий мыслитель']:['🌱','Разминка засчитана']; }
 function rankAdult(p){ return p>=.9?['🏆','Школу помните на пятёрку']:p>=.7?['🥇','Твёрдая четвёрка']:p>=.5?['🥈','Пора освежить']:['📚','Дети вас подтянут']; }
 function Result(){
   const w=$('<div class="wrap" style="gap:14px"></div>');
@@ -707,7 +707,7 @@ function Result(){
     const weak=Object.entries(bySub).filter(([s,[o,t]])=>o<t).map(([s])=>SUBJ[s]);
     if(S.mode==='adult'){
       const kidsTxt=S.kids.filter(k=>k!=='none').map(k=>GRADES.find(g=>g.b===k).g).join(', ');
-      w.appendChild(offer(kidsTxt?`Ваш ребёнок (${esc(kidsTxt)}) каждый день сталкивается с такими вопросами. Мыслик объясняет их по шагам, не решает за ребёнка и присылает вам отчёт.`:`Понравилось? В канале Смекай каждую неделю новые викторины для детей и взрослых.`, !kidsTxt));
+      w.appendChild(offer(kidsTxt?`Ваш ребёнок (${esc(kidsTxt)}) каждый день сталкивается с такими вопросами. Мыслик объясняет их по шагам, не решает за ребёнка и присылает вам отчёт.`:`Понравилось? В канале Мыслик каждую неделю новые викторины для детей и взрослых.`, !kidsTxt));
     } else {
       w.appendChild(offer(`${weak.length?'Есть над чем поработать: '+esc(weak.slice(0,2).join(', '))+'. ':''}Мыслик может помогать тебе с домашкой каждый день: объясняет по шагам, даёт подсказки и игры по твоим темам.`));
     }
@@ -719,7 +719,7 @@ function Result(){
   w.appendChild(again);
   const a3=$('<button class="btn ghost">⚔️ Семейная дуэль</button>'); a3.onclick=()=>{ S.mode='duo'; S.screen='duo'; render(); };
   if(S.mode!=='duo') w.appendChild(a3);
-  w.appendChild($('<div class="foot">Смекай · помощник по учёбе Мыслик для 1–8 класса</div>'));
+  w.appendChild($('<div class="foot">Мыслик · помощник по учёбе Мыслик для 1–8 класса</div>'));
   return w;
 }
 function offer(text,channelOnly){
@@ -734,8 +734,8 @@ function offer(text,channelOnly){
 }
 function share(){
   const p=G.players[0];
-  const txt=S.mode==='duo'?`Сыграли в семейную дуэль Смекай: ${G.players[0].name} ${G.players[0].pts} : ${G.players[1].pts} ${G.players[1].name}. А вы?`:`Я набрал(а) ${p.pts} очков в викторине Смекай. Сможешь больше?`;
-  window.open('https://t.me/share/url?url='+encodeURIComponent('https://smekairu.github.io/Smekai/')+'&text='+encodeURIComponent(txt),'_blank','noopener');
+  const txt=S.mode==='duo'?`Сыграли в семейную дуэль Мыслик: ${G.players[0].name} ${G.players[0].pts} : ${G.players[1].pts} ${G.players[1].name}. А вы?`:`Я набрал(а) ${p.pts} очков в викторине Мыслик. Сможешь больше?`;
+  window.open('https://t.me/share/url?url='+encodeURIComponent('https://myslik.ru/')+'&text='+encodeURIComponent(txt),'_blank','noopener');
 }
 
 /* ---------- финальная анимация ---------- */

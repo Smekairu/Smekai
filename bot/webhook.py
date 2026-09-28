@@ -29,7 +29,7 @@ CLOSED_CHANNEL = os.environ.get("TG_CHANNEL_CLOSED", "")
 MAX_INVITE = os.environ.get("MAX_CHANNEL_INVITE", "")
 TRIBUTE_PLAN = os.environ.get("TRIBUTE_PLAN", "myslik")
 ORIGINS = {o.strip().rstrip("/") for o in os.environ.get(
-    "SITE_ORIGINS", "https://smekairu.github.io,http://localhost:8765").split(",") if o.strip()}
+    "SITE_ORIGINS", "https://myslik.ru,https://www.myslik.ru,http://localhost:8765").split(",") if o.strip()}
 
 
 # ---------------- общее ----------------

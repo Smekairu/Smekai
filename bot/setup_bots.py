@@ -18,8 +18,8 @@ import json, os, ssl, sys, urllib.parse, urllib.request, urllib.error
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import COMMANDS, DESCRIPTION, DESCRIPTION_MAX, SHORT_DESCRIPTION, CABINET_URL
 
-NAME = os.environ.get("BOT_NAME", "Мыслик · Смекай")
-AVATAR_URL = os.environ.get("BOT_AVATAR_URL", "https://smekairu.github.io/Smekai/assets/avatar-myslik.png")
+NAME = os.environ.get("BOT_NAME", "Мыслик · Мыслик")
+AVATAR_URL = os.environ.get("BOT_AVATAR_URL", "https://myslik.ru/assets/avatar-myslik.png")
 CTX = ssl.create_default_context()
 
 

@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 POSTS = ROOT / "posts"
 STATE = ROOT / "state" / "published.json"
 MSK = timezone(timedelta(hours=3))
-SITE = "https://smekairu.github.io/Smekai/"
+SITE = "https://myslik.ru/"
 LINKS = {
     "quiz": SITE + "viktorina/",
     "kabinet": SITE + "kabinet/",

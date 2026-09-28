@@ -40,7 +40,7 @@ body{{width:1080px;height:1080px;overflow:hidden;background:{bg};color:{ink};fon
 .two .sub{{width:340px}}
 .url{{position:absolute;right:72px;bottom:40px;font:600 22px 'Golos Text';opacity:.55}}
 </style></head><body class="{cls}">
-<div class="brand"><i>С</i>Смекай</div><div class="date">{date}</div>
+<div class="brand"><i>С</i>Мыслик</div><div class="date">{date}</div>
 <div class="kicker">{kicker}</div><div class="title">{title}</div>
 <div class="sub">{sub}</div>{stickers}
 </body></html>"""

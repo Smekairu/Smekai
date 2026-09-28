@@ -20,7 +20,7 @@ API = "https://api.yookassa.ru/v3"
 SHOP = os.environ.get("YOOKASSA_SHOP_ID", "")
 SECRET = os.environ.get("YOOKASSA_SECRET", "")
 RECEIPT = os.environ.get("YOOKASSA_RECEIPT", "") == "1"
-SITE = os.environ.get("SITE_URL", "https://smekairu.github.io/Smekai/")
+SITE = os.environ.get("SITE_URL", "https://myslik.ru/")
 CTX = ssl.create_default_context()
 
 
@@ -49,7 +49,7 @@ def create(uid, plan, method="card", email=""):
     body = {
         "amount": {"value": f"{p['price']:.2f}", "currency": "RUB"},
         "capture": True,
-        "description": f"Смекай, тариф «{p['title']}», 1 месяц",
+        "description": f"Мыслик, тариф «{p['title']}», 1 месяц",
         "metadata": {"uid": str(uid), "plan": plan},
     }
     if method == "sbp":
@@ -63,7 +63,7 @@ def create(uid, plan, method="card", email=""):
         body["receipt"] = {
             "customer": {"email": email},
             "items": [{
-                "description": f"Доступ к сервису Смекай, тариф «{p['title']}», 1 месяц",
+                "description": f"Доступ к сервису Мыслик, тариф «{p['title']}», 1 месяц",
                 "quantity": "1.00",
                 "amount": {"value": f"{p['price']:.2f}", "currency": "RUB"},
                 "vat_code": 1,

@@ -1,16 +1,16 @@
-/* Смекай: общие сценарии сайта.
+/* Мыслик: общие сценарии сайта.
    Шапка и подвал, всплывающие окна, оплата с QR-кодом, поддержка с Мысликом,
    связь с сервером личного кабинета, cookie, плавающий Мыслик. */
 (function () {
   /* ---------- настройки: всё, что может понадобиться поменять ---------- */
   const CFG = {
-    API: '',                      // адрес сервера кабинета, например https://api.smekai.ru. Пусто: кабинет работает на устройстве
+    API: 'https://myslik.ru',     // сайт и сервер кабинета работают на одном HTTPS-адресе
     BOT: 'https://t.me/smekai_ru_bot',
     MAX_BOT: 'https://max.ru/id501807779599_bot',
     MAX: 'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo',
     TG: 'https://t.me/smekai_ru',
     BOOSTY: 'https://boosty.to/smekai',
-    EMAIL: 'hello@smekai.ru',
+    EMAIL: 'hello@myslik.ru',
     SBP_QR: '',                   // статический QR-код СБП из банка, например assets/pay/sbp.png. Пусто: не показывается
     REQ: { name: 'Индивидуальный предприниматель Ярмак Николай Владимирович', short: 'ИП Ярмак Н. В.',
            inn: '501807779599', ogrnip: '325774600563025' },
@@ -75,7 +75,7 @@
   function header(active) {
     const items = [['kak-rabotaet.html', 'Как работает'], ['tarify.html', 'Цены'], ['lev.html', 'Мыслик и Лев'], ['viktorina/', 'Викторина'], ['faq.html', 'Вопросы']];
     return `<header class="top"><div class="wrap nav">
-      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Смекай</a>
+      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Мыслик</a>
       <nav class="nav-links" id="navlinks">${items.map(([h, t]) => `<a href="${root}${h}"${active === h ? ' aria-current="page"' : ''}>${t}</a>`).join('')}
         <a href="${root}kabinet/" class="only-mob"${active === 'kabinet' ? ' aria-current="page"' : ''}>Личный кабинет</a></nav>
       <span class="sp"></span>
@@ -88,7 +88,7 @@
   function footer() {
     return `<footer class="site"><div class="wrap">
       <div class="foot">
-        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Смекай</a>
+        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark.png?v=2" alt="">Мыслик</a>
           <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
           <div class="social">
             <a href="${CFG.TG}" target="_blank" rel="noopener" title="Канал в Telegram" aria-label="Telegram">${ICONS.tg}</a>
@@ -103,7 +103,7 @@
         <div><div class="col-title">Документы</div>
           <a href="${root}oferta.html">Публичная оферта</a><a href="${root}policy.html">Обработка данных</a><a href="${root}rekvizity.html">Реквизиты</a></div>
       </div>
-      <p class="copy">© 2026 Смекай. ${CFG.REQ.name}, ИНН ${CFG.REQ.inn}, ОГРНИП ${CFG.REQ.ogrnip}.<br>Условия оказания услуг в <a href="${root}oferta.html">публичной оферте</a>. Почта: <a href="mailto:${CFG.EMAIL}">${CFG.EMAIL}</a>.</p>
+      <p class="copy">© 2026 Мыслик. ${CFG.REQ.name}, ИНН ${CFG.REQ.inn}, ОГРНИП ${CFG.REQ.ogrnip}.<br>Условия оказания услуг в <a href="${root}oferta.html">публичной оферте</a>. Почта: <a href="mailto:${CFG.EMAIL}">${CFG.EMAIL}</a>.</p>
     </div></footer>`;
   }
 
@@ -255,7 +255,7 @@
     if (!el) return;
     const d = await supData();
     el.innerHTML = `<div class="sup">
-      <div class="sup-head"><myslik-face age="6" mood="idle" class="sup-face"></myslik-face><div><b>Мыслик</b><span>поддержка Смекай, отвечаю сразу</span></div></div>
+      <div class="sup-head"><myslik-face age="6" mood="idle" class="sup-face"></myslik-face><div><b>Мыслик</b><span>поддержка Мыслик, отвечаю сразу</span></div></div>
       <div class="sup-log" aria-live="polite"></div>
       <div class="sup-quick"></div>
       <form class="sup-in"><input type="text" placeholder="Напишите вопрос своими словами" maxlength="400" aria-label="Вопрос"><button class="btn btn-main btn-sm" type="submit">Спросить</button></form>
@@ -293,7 +293,7 @@
           try { const r = await api('/api/ticket', { kind, text, contact }); add(esc(r.text)); if (face.react) face.react('love', { bubble: false }); return; }
           catch (err) { add('Не получилось отправить: ' + esc(err.message) + '. Письмо можно отправить на почту.'); }
         }
-        const subj = (kind === 'refund' ? 'Возврат денег' : 'Вопрос в поддержку') + ' Смекай';
+        const subj = (kind === 'refund' ? 'Возврат денег' : 'Вопрос в поддержку') + ' Мыслик';
         const bodyTxt = `${text}\n\nКак связаться: ${contact}`;
         location.href = `mailto:${CFG.EMAIL}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(bodyTxt)}`;
         add(`Открываю почту с готовым письмом на ${CFG.EMAIL}. Если почта не открылась, отправьте этот текст туда же или <a href="${CFG.BOT}?start=support" target="_blank" rel="noopener">в бота</a>. ${kind === 'refund' ? 'Деньги вернём в течение десяти рабочих дней.' : 'Ответим в течение рабочего дня.'}`);

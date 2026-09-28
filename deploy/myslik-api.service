@@ -1,0 +1,22 @@
+[Unit]
+Description=Myslik web API and payment webhooks
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=myslik
+Group=myslik
+WorkingDirectory=/opt/myslik/bot
+EnvironmentFile=/etc/myslik/myslik.env
+ExecStart=/opt/myslik/bot/.venv/bin/python webhook.py
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/myslik
+
+[Install]
+WantedBy=multi-user.target

@@ -5,7 +5,7 @@
 """
 import json, os, sys, urllib.request, urllib.parse
 
-QUIZ = "https://smekairu.github.io/Smekai/"
+QUIZ = "https://myslik.ru/"
 
 def http(url, data):
     req = urllib.request.Request(url, data=json.dumps(data).encode(),

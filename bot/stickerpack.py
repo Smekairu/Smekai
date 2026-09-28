@@ -1,4 +1,4 @@
-"""Создаёт наборы стикеров и эмодзи Смекай в Telegram через Bot API.
+"""Создаёт наборы стикеров и эмодзи Мыслик в Telegram через Bot API.
 
 Что создаётся (владелец набора: ADMIN_ID, то есть вы):
   smekai_junior_by_<бот>        стикеры младшего Мыслика, 1–3 класс (WEBP 512)
@@ -100,15 +100,15 @@ def main():
     a = ap.parse_args()
     bot = bot_name()
     sets = {
-        "junior": (f"smekai_junior_by_{bot}", "Мыслик младший · Смекай",
+        "junior": (f"smekai_junior_by_{bot}", "Мыслик младший · Мыслик",
                    [(PACK / "sticker" / f"junior-{m}.webp", e) for m, e in EMOJI.items()], "regular"),
-        "myslik": (f"smekai_myslik_by_{bot}", "Мыслик · Смекай",
+        "myslik": (f"smekai_myslik_by_{bot}", "Мыслик · Мыслик",
                    [(PACK / "sticker" / f"myslik-{m}.webp", e) for m, e in EMOJI.items()], "regular"),
-        "lev": (f"smekai_lev_by_{bot}", "Лев · Смекай",
+        "lev": (f"smekai_lev_by_{bot}", "Лев · Мыслик",
                 [(PACK / "sticker" / f"lev-{m}.webp", e) for m, e in EMOJI.items()], "regular"),
-        "anim": (f"smekai_anim_by_{bot}", "Мыслик живой · Смекай",
+        "anim": (f"smekai_anim_by_{bot}", "Мыслик живой · Мыслик",
                  [(ANIM / f"myslik-{m}.webm", e) for m, e in EMOJI.items() if m != "shy"], "regular"),
-        "emoji": (f"smekai_emoji_by_{bot}", "Эмодзи Смекай",
+        "emoji": (f"smekai_emoji_by_{bot}", "Эмодзи Мыслик",
                   [(PACK / "emoji" / f"{who}-{m}.webp", e) for who in ("junior", "myslik", "lev") for m, e in EMOJI.items()], "custom_emoji"),
     }
     for key, (name, title, items, kind) in sets.items():

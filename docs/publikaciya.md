@@ -16,7 +16,7 @@
 
 1. Зарегистрироваться на https://cron-job.org (бесплатно).
 2. Create cronjob:
-   - Title: `Смекай публикация`
+   - Title: `Мыслик публикация`
    - URL: `https://api.github.com/repos/Smekairu/Smekai/actions/workflows/publish.yml/dispatches`
    - Schedule: часовой пояс Europe/Moscow, каждый день в 09:01 и 18:31 (утренние и вечерние посты).
      Для страховки заведите копию этого задания на 09:20 и 18:50.

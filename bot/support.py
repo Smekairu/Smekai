@@ -10,7 +10,7 @@ import db
 
 ROOT = Path(__file__).resolve().parent.parent
 FILE = Path(os.environ.get("SUPPORT_FILE") or ROOT / "assets" / "support.json")
-SITE = os.environ.get("SITE_URL", "https://smekairu.github.io/Smekai/")
+SITE = os.environ.get("SITE_URL", "https://myslik.ru/")
 MAX_LINK = os.environ.get("MAX_CHANNEL_URL", "https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo")
 
 

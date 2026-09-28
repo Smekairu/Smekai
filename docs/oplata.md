@@ -31,7 +31,7 @@ QR появится на странице оплаты. Такие платеж�
    YOOKASSA_SECRET=...
    YOOKASSA_RECEIPT=1
    ```
-5. В «Интеграция → HTTP-уведомления» указать `https://api.smekai.ru/pay/yookassa` и событие `payment.succeeded`.
+5. В «Интеграция → HTTP-уведомления» указать `https://myslik.ru/pay/yookassa` и событие `payment.succeeded`.
 6. Перезапустить `myslik-pay`, провести тестовый платёж в тестовом магазине ЮKassa.
 
 После этого на странице оплаты два способа: «Картой или МИР» (страница ЮKassa) и «СБП по QR-коду»

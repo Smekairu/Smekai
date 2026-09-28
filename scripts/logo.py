@@ -1,4 +1,4 @@
-"""Рисует логотип Смекай: Мыслик и подпись «С в рамке + Смекай» (аватарки каналов), тёмный вариант, значок С для шапки сайта и favicon.
+"""Рисует логотип Мыслик: Мыслик и подпись «С в рамке + Мыслик» (аватарки каналов), тёмный вариант, значок С для шапки сайта и favicon.
 
 Запуск (нужен Playwright и запущенный рядом сервер с сайтом):
   python -m http.server 8765 &
@@ -43,7 +43,7 @@ async def main():
                 face_html, word = "", f'<div class="big">С</div>'
             else:
                 face_html = f'<myslik-face age="6" mood="idle"></myslik-face>'
-                word = f'<div class="word"><i>С</i>Смекай</div>'
+                word = f'<div class="word"><i>С</i>Мыслик</div>'
             fs = int(ws * 1.32)
             html = PAGE.format(base=BASE, w=w, bg=bg, ink=ink, face=face, top=top, face_html=face_html,
                                wy=int(w * .70), ws=ws, gap=int(ws * .32), fs=fs, fr=int(fs * .28), fz=int(ws * .86),

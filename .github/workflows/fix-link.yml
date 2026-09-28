@@ -13,7 +13,7 @@ on:
       url:
         description: "Новая ссылка"
         required: false
-        default: "https://smekairu.github.io/Smekai/"
+        default: "https://myslik.ru/"
 
 jobs:
   fix:

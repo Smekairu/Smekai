@@ -547,7 +547,7 @@ async def admin_free(m: Message):
     uid = int(parts[1])
     db.free_add(uid, parts[2] if len(parts) > 2 else "")
     await m.answer(f"Готово: {uid} занимается бесплатно.")
-    text = "Для тебя все задания Смекая бесплатны. Нажимай «Задание»!"
+    text = "Для тебя все задания Мыслика бесплатны. Нажимай «Задание»!"
     if ids.platform(uid) == "tg" and CLOSED_CHANNEL:
         try:
             text += "\n\nСсылка в закрытый канал с заданиями:\n" + await make_invite()
@@ -572,7 +572,7 @@ async def admin_unfree(m: Message):
 async def make_invite():
     if not CLOSED_CHANNEL:
         return PAY_URL
-    link = await bot.create_chat_invite_link(CLOSED_CHANNEL, member_limit=1, name="Подписка Смекай")
+    link = await bot.create_chat_invite_link(CLOSED_CHANNEL, member_limit=1, name="Подписка Мыслик")
     return link.invite_link
 
 
