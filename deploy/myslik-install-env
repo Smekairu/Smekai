@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+source_file=/home/github-deploy/myslik.env
+target_file=/etc/myslik/myslik.env
+
+test -f "$source_file"
+test "$(stat -c %U "$source_file")" = github-deploy
+
+/usr/bin/python3 - "$source_file" <<'PY'
+import sys
+from pathlib import Path
+
+allowed = {
+    "SITE_URL", "API_PUBLIC", "SITE_ORIGINS", "PORT", "DB_PATH", "AI_PROVIDER",
+    "SUB_DAYS", "FREE_LIMIT", "PAID_LIMIT", "TG_BOT_TOKEN", "TG_CHANNEL",
+    "MAX_BOT_TOKEN",
+}
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+if len(text) > 32768:
+    raise SystemExit("Файл настроек слишком большой")
+seen = set()
+for raw in text.splitlines():
+    if not raw or "=" not in raw:
+        raise SystemExit("Неверная строка в файле настроек")
+    name, value = raw.split("=", 1)
+    if name not in allowed or name in seen:
+        raise SystemExit(f"Недопустимая настройка: {name}")
+    if any(ord(ch) < 32 for ch in value):
+        raise SystemExit(f"Недопустимый символ в {name}")
+    seen.add(name)
+required = {"SITE_URL", "API_PUBLIC", "SITE_ORIGINS", "PORT", "DB_PATH", "TG_BOT_TOKEN", "MAX_BOT_TOKEN"}
+if not required.issubset(seen):
+    raise SystemExit("Не хватает обязательных настроек")
+PY
+
+/usr/bin/install -m 640 -o root -g myslik "$source_file" "$target_file"
+/usr/bin/rm -f "$source_file"
+/usr/bin/systemctl daemon-reload
+/usr/bin/systemctl enable --now myslik-api myslik-telegram myslik-max
+/usr/bin/systemctl restart myslik-api myslik-telegram myslik-max
