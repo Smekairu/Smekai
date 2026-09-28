@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+work_dir=$(mktemp -d /tmp/myslik-max-ca.XXXXXX)
+case "$work_dir" in
+  /tmp/myslik-max-ca.*) ;;
+  *) exit 1 ;;
+esac
+
+cleanup() {
+  rm -f "$work_dir/root.cer" "$work_dir/sub.cer" "$work_dir/root.pem" \
+    "$work_dir/sub.pem" "$work_dir/max-ca.pem"
+  rmdir "$work_dir"
+}
+trap cleanup EXIT
+
+curl -fsSL -o "$work_dir/root.cer" https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
+curl -fsSL -o "$work_dir/sub.cer" https://gu-st.ru/content/Other/doc/russian_trusted_sub_ca.cer
+openssl x509 -in "$work_dir/root.cer" -out "$work_dir/root.pem" 2>/dev/null || \
+  openssl x509 -inform DER -in "$work_dir/root.cer" -out "$work_dir/root.pem"
+openssl x509 -in "$work_dir/sub.cer" -out "$work_dir/sub.pem" 2>/dev/null || \
+  openssl x509 -inform DER -in "$work_dir/sub.cer" -out "$work_dir/sub.pem"
+
+cat /opt/myslik/bot/.venv/lib/python3.12/site-packages/certifi/cacert.pem \
+  "$work_dir/root.pem" "$work_dir/sub.pem" > "$work_dir/max-ca.pem"
+install -d -m 755 /opt/myslik/certs
+install -m 644 -o root -g root "$work_dir/max-ca.pem" /opt/myslik/certs/max-ca.pem

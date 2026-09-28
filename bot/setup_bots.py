@@ -8,7 +8,7 @@
 
 Чего скрипт не может (делается руками один раз):
   Telegram: аватар бота (BotFather -> /setuserpic, файл assets/avatar-myslik.png).
-  MAX: всё делается через API, руками ничего не нужно.
+  MAX: имя, описание и аватар меняются на business.max.ru; API меняет только команды.
 
 Когда запущен сервер кабинета (переменная API_PUBLIC), кнопка меню в Telegram
 открывает личный кабинет прямо внутри Telegram.
@@ -16,7 +16,7 @@
 import json, os, ssl, sys, urllib.parse, urllib.request, urllib.error
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import COMMANDS, DESCRIPTION, DESCRIPTION_MAX, SHORT_DESCRIPTION, CABINET_URL
+from common import COMMANDS, DESCRIPTION, SHORT_DESCRIPTION, CABINET_URL
 
 NAME = os.environ.get("BOT_NAME", "Мыслик · Мыслик")
 AVATAR_URL = os.environ.get("BOT_AVATAR_URL", "https://myslik.ru/assets/avatar-myslik.png")
@@ -70,17 +70,9 @@ def max_bot():
         print("MAX: токен не принят:", err); return
     print("MAX: бот %s (@%s), user_id %s" % (me.get("name"), me.get("username"), me.get("user_id")))
     commands = [{"name": c, "description": d} for c, d in COMMANDS]
-    body = {"name": NAME, "description": DESCRIPTION_MAX, "commands": commands, "photo": {"url": AVATAR_URL}}
-    res, err = http(base + "/me", body, headers=h, method="PATCH")
-    if err:
-        print("   PATCH /me целиком не прошёл:", err)
-        for part in ({"name": NAME}, {"description": DESCRIPTION_MAX}, {"commands": commands}, {"photo": {"url": AVATAR_URL}}):
-            res, err = http(base + "/me", part, headers=h, method="PATCH")
-            print("   ", list(part)[0], "ок" if not err else f"не удалось: {err}")
-        res, err = http(base + "/me/commands", {"commands": commands}, headers=h, method="PATCH")
-        print("    команды через /me/commands:", "ок" if not err else f"не удалось: {err}")
-    else:
-        print("   имя, описание, команды и аватар записаны")
+    res, err = http(base + "/me/commands", {"commands": commands}, headers=h, method="PATCH")
+    print("   команды:", "ок" if not err else f"не удалось: {err}")
+    print("   имя, описание и аватар: меняются в кабинете business.max.ru")
     me, err = http(base + "/me", headers=h)
     if me:
         print("   сейчас:", me.get("name"), "| команд:", len(me.get("commands") or []),

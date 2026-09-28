@@ -9,6 +9,7 @@ User=myslik
 Group=myslik
 WorkingDirectory=/opt/myslik/bot
 EnvironmentFile=/etc/myslik/myslik.env
+Environment=SSL_CERT_FILE=/opt/myslik/certs/max-ca.pem
 ExecStart=/opt/myslik/bot/.venv/bin/python max_bot.py
 Restart=always
 RestartSec=5
