@@ -2,10 +2,10 @@
 
 Без BRANDING_APPLY=1 работает как безопасная проверка и только печатает план.
 """
-import html, json, os, re, time, urllib.parse, urllib.request, uuid
+import html, json, os, re, time, urllib.error, urllib.parse, urllib.request, uuid
 from pathlib import Path
 
-from publish import ROOT, POSTS, STATE, parse, split_answers, max_upload
+from publish import ROOT, POSTS, STATE, parse, split_answers, max_upload, tg_chat
 
 APPLY = os.environ.get("BRANDING_APPLY") == "1"
 TAG = re.compile(r"<[^>]+>")
@@ -32,6 +32,18 @@ def request(url, data=None, headers=None, files=None, method=None):
                                  method=method or ("POST" if body is not None else "GET"))
     with urllib.request.urlopen(req, timeout=60) as response:
         return json.loads(response.read().decode() or "{}")
+
+
+def request_or_skip(url, data=None, headers=None, files=None, method=None):
+    """Не прерывает весь ремонт из-за уже исправленного или удалённого поста."""
+    try:
+        return request(url, data, headers, files, method)
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode(errors="replace")
+        if error.code == 400:
+            print(f"  пропущено: HTTP 400: {detail[:300]}")
+            return None
+        raise urllib.error.HTTPError(error.url, error.code, detail, error.hdrs, None)
 
 
 def plain(text):
@@ -74,7 +86,6 @@ def markup(post):
 
 def telegram(items):
     token = os.environ.get("TG_BOT_TOKEN", "")
-    chat = os.environ.get("TG_CHANNEL") or "@smekai_ru"
     if not token:
         print("Telegram: нет токена"); return
     state = json.loads(STATE.read_text(encoding="utf-8"))
@@ -82,6 +93,10 @@ def telegram(items):
     for name, message_id in state.get("messages", {}).items():
         post = by_name.get(name)
         if not post or "telegram" not in post["channels"]:
+            continue
+        chat = tg_chat(post)
+        if not chat:
+            print(f"Telegram: {name} — канал не задан, пропущено")
             continue
         image = ROOT / post.get("image", "") if post.get("image") else None
         print(f"Telegram: {name}, сообщение {message_id}" + (" — обновляю" if APPLY else " — запланировано"))
@@ -95,12 +110,12 @@ def telegram(items):
                     "media": json.dumps(media, ensure_ascii=False)}
             if reply:
                 data["reply_markup"] = json.dumps(reply, ensure_ascii=False)
-            request(base + "/editMessageMedia", data, files={"photo": (image.name, image.read_bytes())})
+            request_or_skip(base + "/editMessageMedia", data, files={"photo": (image.name, image.read_bytes())})
         else:
             data = {"chat_id": chat, "message_id": message_id, "text": post["text"], "parse_mode": "HTML"}
             if reply:
                 data["reply_markup"] = reply
-            request(base + "/editMessageText", data)
+            request_or_skip(base + "/editMessageText", data)
 
 
 def max_posts(items):
