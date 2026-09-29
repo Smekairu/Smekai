@@ -8,8 +8,8 @@ import json, os, urllib.error, urllib.parse, urllib.request, uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO = ROOT / "assets" / "brand" / "logo-smekai.png"
-LOGO_URL = "https://myslik.ru/assets/brand/logo-smekai.png"
+LOGO = ROOT / "assets" / "brand" / "logo-myslik.png"
+LOGO_URL = "https://myslik.ru/assets/brand/logo-myslik.png"
 
 
 def call(url, data=None, headers=None, files=None, method=None):

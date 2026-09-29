@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 state/_card.html
+state/pydeps/
 bot/.env
 bot/*.db
 bot/*.db-*

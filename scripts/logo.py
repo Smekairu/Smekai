@@ -1,12 +1,12 @@
-"""Рисует логотип Мыслик: Мыслик и подпись «С в рамке + Мыслик» (аватарки каналов), тёмный вариант, значок С для шапки сайта и favicon.
+"""Рисует логотип Мыслик: Мыслик и подпись «М в рамке + Мыслик» (аватарки каналов), тёмный вариант, значок М для шапки сайта и favicon.
 
 Запуск (нужен Playwright и запущенный рядом сервер с сайтом):
   python -m http.server 8765 &
   python scripts/logo.py
-Файлы: assets/brand/logo-smekai.png (1024, жёлтый), logo-smekai-dark.png (1024, тёмный),
-assets/brand/mark.png (128, буква С на жёлтом, в шапке сайта скругляется CSS), assets/favicon.png (64).
+Файлы: assets/brand/logo-myslik.png (1024, жёлтый), logo-myslik-dark.png (1024, тёмный),
+assets/brand/mark.png (128, буква М на жёлтом, в шапке сайта скругляется CSS), assets/favicon.png (64).
 """
-import asyncio
+import asyncio, os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,9 +23,9 @@ myslik-face{{position:absolute;left:50%;top:{top}px;width:{face}px;height:{face}
 </style></head><body>{face_html}{word}</body></html>"""
 
 VARIANTS = [
-    # файл, размер, фон, цвет слова, лицо, отступ сверху, рамка С (фон, буква), только буква С (цвет) или None
-    ("assets/brand/logo-smekai.png", 1024, "radial-gradient(circle at 50% 38%,#FFE391,#FFC933 72%)", "#1B1F3B", 590, 40, ("#1B1F3B", "#FFC933"), None),
-    ("assets/brand/logo-smekai-dark.png", 1024, "radial-gradient(circle at 50% 38%,#2E3668,#1B1F3B 72%)", "#FFFFFF", 590, 40, ("#FFC933", "#1B1F3B"), None),
+    # файл, размер, фон, цвет слова, лицо, отступ сверху, рамка М (фон, буква), только буква М (цвет) или None
+    ("assets/brand/logo-myslik.png", 1024, "radial-gradient(circle at 50% 38%,#FFE391,#FFC933 72%)", "#1B1F3B", 590, 40, ("#1B1F3B", "#FFC933"), None),
+    ("assets/brand/logo-myslik-dark.png", 1024, "radial-gradient(circle at 50% 38%,#2E3668,#1B1F3B 72%)", "#FFFFFF", 590, 40, ("#FFC933", "#1B1F3B"), None),
     ("assets/brand/mark.png", 128, "#FFC933", "#5C4300", 0, 0, None, "#5C4300"),
     ("assets/favicon.png", 64, "#FFC933", "#5C4300", 0, 0, None, "#5C4300"),
 ]
@@ -34,16 +34,19 @@ VARIANTS = [
 async def main():
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
-        b = await p.chromium.launch()
+        exe = os.environ.get("PLAYWRIGHT_CHROMIUM")
+        if not exe and Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe").exists():
+            exe = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        b = await p.chromium.launch(executable_path=exe)
         for out, w, bg, ink, face, top, frame, letter in VARIANTS:
             pg = await b.new_page(viewport={"width": w, "height": w})
             await pg.emulate_media(reduced_motion="reduce")
             ws = int(w * .10)
             if letter:
-                face_html, word = "", f'<div class="big">С</div>'
+                face_html, word = "", f'<div class="big">М</div>'
             else:
                 face_html = f'<myslik-face age="6" mood="idle"></myslik-face>'
-                word = f'<div class="word"><i>С</i>Мыслик</div>'
+                word = f'<div class="word"><i>М</i>Мыслик</div>'
             fs = int(ws * 1.32)
             html = PAGE.format(base=BASE, w=w, bg=bg, ink=ink, face=face, top=top, face_html=face_html,
                                wy=int(w * .70), ws=ws, gap=int(ws * .32), fs=fs, fr=int(fs * .28), fz=int(ws * .86),

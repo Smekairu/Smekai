@@ -146,6 +146,16 @@ def new_web_user(name, grade):
     return uid, rec
 
 
+def review_user():
+    """Стабильный тестовый покупатель для проверки магазина платёжным партнёром."""
+    uid = ids.WEB_BASE
+    _run("INSERT INTO users(id,name,grade,source,voice,plan,paid_until) VALUES(?,?,?,?,?,?,?) "
+         "ON CONFLICT(id) DO UPDATE SET name=excluded.name, grade=excluded.grade, "
+         "source=excluded.source, voice=excluded.voice, plan=excluded.plan, paid_until=excluded.paid_until",
+         (uid, "Тестовый покупатель", 7, "review", "off", "myslik", "2099-12-31"))
+    return uid
+
+
 def by_recovery(code):
     code = (code or "").strip().upper().replace(" ", "")
     r = _one("SELECT id FROM users WHERE recovery=?", (code,))

@@ -18,7 +18,7 @@ from aiohttp import web
 
 import db, ids, support
 import pay_yookassa as yk
-from common import PLANS, SITE_URL, CABINET_URL, BOOSTY_URL, SUB_DAYS, FREE_LIMIT, PAID_LIMIT, daily_limit, plan_line
+from common import PLANS, SITE_URL, CABINET_URL, SUB_DAYS, FREE_LIMIT, PAID_LIMIT, daily_limit, plan_line
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("server")
@@ -30,6 +30,9 @@ MAX_INVITE = os.environ.get("MAX_CHANNEL_INVITE", "")
 TRIBUTE_PLAN = os.environ.get("TRIBUTE_PLAN", "myslik")
 ORIGINS = {o.strip().rstrip("/") for o in os.environ.get(
     "SITE_ORIGINS", "https://myslik.ru,https://www.myslik.ru,http://localhost:8765").split(",") if o.strip()}
+REVIEW_LOGIN = os.environ.get("REVIEW_LOGIN", "").strip()
+REVIEW_PASSWORD = os.environ.get("REVIEW_PASSWORD", "")
+_review_attempts = {}
 
 
 # ---------------- общее ----------------
@@ -112,6 +115,26 @@ async def auth_login(request):
     if not uid:
         return fail("Ссылка для входа устарела. Попросите в боте новую: кнопка «Личный кабинет».", 403)
     return ok(session=db.new_session(uid))
+
+
+async def auth_reviewer(request):
+    """Временный парольный вход только для проверки магазина ЮKassa."""
+    ip = request.headers.get("X-Forwarded-For", request.remote or "").split(",", 1)[0].strip()
+    now = time.time()
+    tries = [t for t in _review_attempts.get(ip, []) if now - t < 300]
+    if len(tries) >= 8:
+        return fail("Слишком много попыток. Повторите через пять минут.", 429)
+    d = await body(request)
+    login, password = str(d.get("login", "")).strip(), str(d.get("password", ""))
+    valid = bool(REVIEW_LOGIN and REVIEW_PASSWORD)
+    valid = valid and hmac.compare_digest(login, REVIEW_LOGIN)
+    valid = valid and hmac.compare_digest(password, REVIEW_PASSWORD)
+    if not valid:
+        tries.append(now)
+        _review_attempts[ip] = tries
+        return fail("Неверный логин или пароль", 403)
+    _review_attempts.pop(ip, None)
+    return ok(session=db.new_session(db.review_user()))
 
 
 async def auth_web(request):
@@ -275,9 +298,7 @@ async def api_pay(request):
     if plan not in PLANS:
         return fail("Нет такого тарифа")
     if not yk.available():
-        if PLANS[plan].get("trial"):
-            return fail("Пробная неделя станет доступна после подключения оплаты на сайте", 503)
-        return ok(fallback=BOOSTY_URL)
+        return fail("Оплата на сайте временно недоступна: подключаем ЮKassa.", 503)
     uid = auth(request)
     if PLANS[plan].get("trial") and db.trial_used(uid):
         return fail("Пробную неделю можно подключить только один раз")
@@ -287,7 +308,7 @@ async def api_pay(request):
         return fail(str(e))
     except Exception as e:
         log.error("платёж не создан: %s", e)
-        return fail("Платёж не создался. Попробуйте ещё раз или оплатите на Boosty.", 502)
+        return fail("Платёж не создался. Попробуйте ещё раз или напишите в поддержку.", 502)
     db.order_put(res["id"], uid, plan, PLANS[plan]["price"], res.get("status", "pending"))
     return ok(**res)
 
@@ -389,6 +410,7 @@ def app():
     r = a.router
     r.add_post("/api/auth/telegram", auth_telegram)
     r.add_post("/api/auth/login", auth_login)
+    r.add_post("/api/auth/reviewer", auth_reviewer)
     r.add_post("/api/logout", logout)
     r.add_get("/api/me", api_me)
     r.add_post("/api/profile", api_profile)

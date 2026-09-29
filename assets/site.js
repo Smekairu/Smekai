@@ -9,7 +9,6 @@
     MAX_BOT: 'https://max.ru/id501807779599_bot',
     MAX: 'https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo',
     TG: 'https://t.me/smekai_ru',
-    BOOSTY: 'https://boosty.to/smekai',
     EMAIL: 'hello@myslik.ru',
     SBP_QR: '',                   // статический QR-код СБП из банка, например assets/pay/sbp.png. Пусто: не показывается
     REQ: { name: 'Индивидуальный предприниматель Ярмак Николай Владимирович', short: 'ИП Ярмак Н. В.',
@@ -32,7 +31,6 @@
   const ICONS = {
     tg: '<svg viewBox="0 0 240 240" class="brand-ico"><circle cx="120" cy="120" r="120" fill="#2AABEE"/><path fill="#fff" d="M54.3 118.8c35-15.2 58.3-25.3 70-30.2 33.3-13.9 40.3-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3.2 1 .4 3.1.2 4.7-1.8 19-9.6 65.1-13.6 86.3-1.7 9-5 12-8.2 12.3-7 .6-12.3-4.6-19-9-10.6-6.9-16.5-11.2-26.8-18-11.8-7.8-4.2-12.1 2.6-19.1 1.8-1.8 32.5-29.8 33.1-32.3.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1 .2-17.9 11.4-50.6 33.5-4.8 3.3-9.1 4.9-13 4.8-4.3-.1-12.5-2.4-18.6-4.4-7.5-2.4-13.5-3.7-12.9-7.9.3-2.2 3.3-4.4 8.9-6.7z"/></svg>',
     max: `<img src="${root}assets/brand/max.svg" alt="" class="brand-ico">`,
-    boosty: '<svg viewBox="0 0 24 24" class="brand-ico"><rect width="24" height="24" rx="6" fill="#F15F2C"/><path fill="#fff" d="M9.2 4.5h5.1l-1.9 5.6h3.9L9.6 19.5l1.8-6.4H7.5z"/></svg>',
     web: '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6v2h3v2H7v-2h3v-2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v10h16V6H4z"/></svg>',
     home: '<svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>',
     card: '<svg viewBox="0 0 24 24"><path d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 4v8h18V9H3zm2 5h6v2H5z"/></svg>',
@@ -80,7 +78,7 @@
   function header(active) {
     const items = [['kak-rabotaet.html', 'Как работает'], ['tarify.html', 'Цены'], ['lev.html', 'Мыслик и Лев'], ['viktorina/', 'Викторина'], ['faq.html', 'Вопросы']];
     return `<header class="top"><div class="wrap nav">
-      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=1" alt="">Мыслик</a>
+      <a class="brand" href="${root}"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=2" alt="Логотип Мыслика">Мыслик</a>
       <nav class="nav-links" id="navlinks">${items.map(([h, t]) => `<a href="${root}${h}"${active === h ? ' aria-current="page"' : ''}>${t}</a>`).join('')}
         <a href="${root}kabinet/" class="only-mob"${active === 'kabinet' ? ' aria-current="page"' : ''}>Личный кабинет</a></nav>
       <span class="sp"></span>
@@ -93,12 +91,11 @@
   function footer() {
     return `<footer class="site"><div class="wrap">
       <div class="foot">
-        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=1" alt="">Мыслик</a>
+        <div style="max-width:300px"><a class="brand" href="${root}" style="margin-bottom:10px"><img class="brand-mark" src="${root}assets/brand/mark-myslik.png?v=2" alt="Логотип Мыслика">Мыслик</a>
           <p class="small muted">Помощник по учёбе для школьника. Ребёнок думает сам, родитель спокоен.</p>
           <div class="social">
             <a href="${CFG.TG}" target="_blank" rel="noopener" title="Канал в Telegram" aria-label="Telegram">${ICONS.tg}</a>
             <a href="${CFG.MAX}" target="_blank" rel="noopener" title="Канал в MAX" aria-label="MAX">${ICONS.max}</a>
-            <a href="${CFG.BOOSTY}" target="_blank" rel="noopener" title="Boosty" aria-label="Boosty">${ICONS.boosty}</a>
           </div>
         </div>
         <div><div class="col-title">Продукт</div>
@@ -212,7 +209,6 @@
         const msg = body.querySelector('#pay-msg'); msg.textContent = 'Создаю платёж…';
         try {
           const d = await api('/api/pay', { plan, method: a.dataset.m, email: body.querySelector('#pay-email').value.trim() });
-          if (d.fallback) { location.href = d.fallback; return; }
           if (d.url) { location.href = d.url; return; }
           const box = body.querySelector('#pay-qr');
           if (window.matchMedia('(max-width:860px)').matches) box.innerHTML = `<a class="btn btn-main" href="${esc(d.qr)}">Открыть приложение банка</a>`;
@@ -232,13 +228,9 @@
     }
 
     const loginHint = CFG.API ? `<p class="small" style="margin:6px 0 10px"><a href="${root}kabinet/?next=oplata">Войдите в личный кабинет</a>, чтобы доступ открылся сам сразу после оплаты.</p>` : '';
-    const sbp = CFG.SBP_QR ? `<div class="pay-static"><img src="${root}${CFG.SBP_QR}" alt="QR-код СБП"><div><b>СБП по QR-коду банка</b><p class="small">Сумма ${rub(p.price)}. В назначении платежа укажите тариф и имя ребёнка, затем напишите в поддержку. Доступ откроем в течение часа.</p></div></div>` : '';
     body.innerHTML = `<p class="pay-sum">К оплате: <b>${rub(p.price)}</b>, «${p.title}» ${period(p)}</p>${loginHint}
-      <div class="choice"><a href="${CFG.BOOSTY}" target="_blank" rel="noopener"><span class="ci">${ICONS.card}</span><div><b>Картой, МИР или СБП</b><span>Оплата на Boosty, выберите уровень «${p.title}». Чек приходит на почту</span></div></a></div>
-      <div class="pay-phone"><div class="pay-qr" id="pay-qr"></div><div><b>Оплатить с телефона</b><p class="small">Наведите камеру на код: страница оплаты откроется на телефоне, там можно заплатить через СБП в приложении банка.</p></div></div>
-      ${sbp}
-      <p class="small muted" style="margin-top:12px">После оплаты бот пришлёт ссылку в закрытый канал и откроет доступ. Если за 15 минут ничего не пришло, <a href="#" data-modal="support">напишите в поддержку</a>, откроем вручную в тот же день.</p>`;
-    qr(body.querySelector('#pay-qr'), CFG.BOOSTY, 170).catch(() => {});
+      <div class="choice"><a href="${root}kabinet/?next=oplata"><span class="ci">${ICONS.home}</span><div><b>Войти для оплаты на сайте</b><span>После входа можно будет оплатить картой МИР или по QR-коду СБП через ЮKassa</span></div></a></div>
+      <p class="small muted" style="margin-top:12px">Оплата принимается только на myslik.ru. Перехода на сторонние площадки нет. Если платёж временно недоступен, <a href="#" data-modal="support">напишите в поддержку</a>.</p>`;
   }
 
   /* ---------- поддержка: Мыслик отвечает на вопросы ---------- */

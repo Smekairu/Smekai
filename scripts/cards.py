@@ -10,7 +10,7 @@
    "stickers": ["myslik-wave"], "date": "25 сентября"}
 Темы: sun, blue, mint, peach, navy, cream, white. Стикеры из assets/pack/sticker.
 """
-import asyncio, html, json, sys
+import asyncio, html, json, os, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -40,7 +40,7 @@ body{{width:1080px;height:1080px;overflow:hidden;background:{bg};color:{ink};fon
 .two .sub{{width:340px}}
 .url{{position:absolute;right:72px;bottom:40px;font:600 22px 'Golos Text';opacity:.55}}
 </style></head><body class="{cls}">
-<div class="brand"><i>С</i>Мыслик</div><div class="date">{date}</div>
+<div class="brand"><i>М</i>Мыслик</div><div class="date">{date}</div>
 <div class="kicker">{kicker}</div><div class="title">{title}</div>
 <div class="sub">{sub}</div>{stickers}
 </body></html>"""
@@ -65,7 +65,10 @@ def page(c):
 async def render(cards):
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
-        b = await p.chromium.launch()
+        exe = os.environ.get("PLAYWRIGHT_CHROMIUM")
+        if not exe and Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe").exists():
+            exe = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        b = await p.chromium.launch(executable_path=exe)
         pg = await b.new_page(viewport={"width": 1080, "height": 1080})
         tmp = ROOT / "state" / "_card.html"
         for c in cards:

@@ -395,7 +395,21 @@ function loginScreen(err) {
       <a href="${SMK.CFG.BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.tg}</span><div><b>Через Telegram</b><span>Бот пришлёт ссылку для входа</span></div></a>
       <a href="${SMK.CFG.MAX_BOT}?start=kabinet" target="_blank" rel="noopener"><span class="ci">${SMK.ICONS.max}</span><div><b>Через MAX</b><span>Бот пришлёт ссылку для входа</span></div></a>
     </div>
+    <details style="margin-top:18px;text-align:left"><summary><b>Вход для проверки сервиса</b></summary>
+      <form id="review-form" autocomplete="on">
+        <label>Логин<input id="review-login" name="username" autocomplete="username" required></label>
+        <label>Пароль<input id="review-password" name="password" type="password" autocomplete="current-password" required></label>
+        <button class="btn btn-main" type="submit">Войти</button><p class="fb bad" id="review-error" hidden></p>
+      </form>
+    </details>
     <p class="small muted" style="margin-top:14px">Если мессенджер недоступен, напишите в <a href="mailto:hello@myslik.ru">поддержку</a>. Вход по SMS добавим после подключения российского SMS-провайдера.</p>`;
+  $('#review-form').onsubmit = async e => {
+    e.preventDefault(); const out = $('#review-error'); out.hidden = true;
+    try {
+      const r = await SMK.api('/api/auth/reviewer', { login: $('#review-login').value.trim(), password: $('#review-password').value });
+      SMK.session.set(r.session); location.reload();
+    } catch (x) { out.textContent = x.message; out.hidden = false; }
+  };
 }
 function loadScript(src) { return new Promise(ok => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ok; document.head.append(s); }); }
 
