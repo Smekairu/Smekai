@@ -28,8 +28,10 @@ sudo update-ca-certificates
 
 ## 2. Боты и приём оплаты
 
-Три сервиса systemd: `/etc/systemd/system/myslik.service` (Telegram), `myslik-max.service` (MAX)
-и `myslik-pay.service` (оплата):
+Три сервиса systemd: `myslik-api.service` (сайт, кабинет и оплата),
+`myslik-telegram.service` (Telegram) и `myslik-max.service` (MAX).
+Код находится в `/opt/myslik`, настройки — в `/etc/myslik/myslik.env`, база —
+в `/var/lib/myslik/myslik.db`. Готовые unit-файлы лежат в `deploy/`.
 
 ```ini
 [Unit]
@@ -37,9 +39,9 @@ Description=Myslik bot
 After=network.target
 
 [Service]
-WorkingDirectory=/root/Smekai/bot
-EnvironmentFile=/root/Smekai/bot/.env
-ExecStart=/root/Smekai/bot/.venv/bin/python main.py
+WorkingDirectory=/opt/myslik/bot
+EnvironmentFile=/etc/myslik/myslik.env
+ExecStart=/opt/myslik/bot/.venv/bin/python main.py
 Restart=always
 RestartSec=5
 
@@ -47,12 +49,12 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-В остальных файлах меняются только `Description` и `ExecStart`: `... max_bot.py` и `... webhook.py`.
+В остальных файлах меняются `Description` и `ExecStart`: `max_bot.py` и `webhook.py`.
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now myslik myslik-max myslik-pay
-sudo journalctl -u myslik -f
+sudo systemctl enable --now myslik-api myslik-telegram myslik-max
+sudo journalctl -u myslik-telegram -f
 sudo journalctl -u myslik-max -f
 ```
 
@@ -110,7 +112,7 @@ cd /root/Smekai && git pull      # спросит логин и токен од�
 ## 4. Проверка после установки
 
 ```bash
-systemctl status myslik myslik-max myslik-pay --no-pager
+systemctl status myslik-api myslik-telegram myslik-max --no-pager
 tail -20 /root/publish.log
 curl -s http://127.0.0.1:8080/health
 ```
@@ -141,7 +143,7 @@ sudo certbot --nginx -d myslik.ru           # бесплатный сертиф�
 
 1. В `bot/.env`: `API_PUBLIC=https://myslik.ru` и `SITE_ORIGINS=https://myslik.ru,https://www.myslik.ru`.
 2. В `assets/site.js` в самом верху: `API: 'https://myslik.ru'`. Закоммитить и отправить в GitHub.
-3. `sudo systemctl restart myslik myslik-max myslik-pay`, затем в GitHub запустить «Настроить ботов»:
+3. `sudo systemctl restart myslik-api myslik-telegram myslik-max`, затем в GitHub запустить «Настроить ботов»:
    в Telegram появится кнопка «Кабинет», которая открывает кабинет прямо внутри Telegram.
 
 Проверка: `curl https://myslik.ru/health` отвечает `{"ok": true, ...}`. На сайте в кабинете

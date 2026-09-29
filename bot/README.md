@@ -96,7 +96,8 @@ python main.py
 
 ## Автозапуск
 
-Два сервиса systemd, `/etc/systemd/system/myslik.service`:
+На сервере используются три сервиса systemd: `myslik-api`, `myslik-telegram` и `myslik-max`.
+Готовые unit-файлы находятся в `deploy/`. Пример сервиса:
 
 ```ini
 [Unit]
@@ -113,11 +114,11 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Второй такой же для `webhook.py` с именем `myslik-pay.service` и `ExecStart=... webhook.py`,
-третий для `max_bot.py` с именем `myslik-max.service`.
+`myslik-api` запускает `webhook.py`, `myslik-telegram` — `main.py`,
+`myslik-max` — `max_bot.py`.
 
 ```bash
-sudo systemctl enable --now myslik myslik-max myslik-pay
+sudo systemctl enable --now myslik-api myslik-telegram myslik-max
 sudo journalctl -u myslik -f     # смотреть логи
 ```
 
