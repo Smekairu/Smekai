@@ -14,7 +14,7 @@ from pathlib import Path
 allowed = {
     "SITE_URL", "API_PUBLIC", "SITE_ORIGINS", "PORT", "DB_PATH", "AI_PROVIDER",
     "SUB_DAYS", "FREE_LIMIT", "PAID_LIMIT", "TG_BOT_TOKEN", "TG_CHANNEL",
-    "MAX_BOT_TOKEN",
+    "MAX_BOT_TOKEN", "YOOKASSA_SHOP_ID", "YOOKASSA_SECRET", "YOOKASSA_RECEIPT",
 }
 text = Path(sys.argv[1]).read_text(encoding="utf-8")
 if len(text) > 32768:
