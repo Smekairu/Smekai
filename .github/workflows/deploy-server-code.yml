@@ -25,7 +25,9 @@ jobs:
       - name: Собрать и передать код
         run: |
           tar --exclude=.git --exclude=bot/.venv --exclude=bot/myslik.db --exclude=state/pydeps -czf "$RUNNER_TEMP/myslik-code.tar.gz" .
-          tar -czf "$RUNNER_TEMP/myslik-site.tar.gz" .nojekyll *.html robots.txt sitemap.xml assets bank docs kabinet myslik viktorina zanyatie
+          find . -maxdepth 1 -type f \( -name '*.html' -o -name robots.txt -o -name sitemap.xml -o -name .nojekyll \) -print0 > "$RUNNER_TEMP/site-files.list"
+          find assets bank docs kabinet myslik viktorina zanyatie -type f -print0 >> "$RUNNER_TEMP/site-files.list"
+          tar --null --no-recursion -czf "$RUNNER_TEMP/myslik-site.tar.gz" -T "$RUNNER_TEMP/site-files.list"
           scp -q "$RUNNER_TEMP/myslik-code.tar.gz" github-deploy@135.106.229.87:/home/github-deploy/myslik-code.tar.gz
           scp -q "$RUNNER_TEMP/myslik-site.tar.gz" github-deploy@135.106.229.87:/home/github-deploy/myslik-site.tar.gz
 
@@ -35,7 +37,7 @@ jobs:
             set -eu
             tar --no-overwrite-dir -xzf /home/github-deploy/myslik-code.tar.gz -C /opt/myslik
             test -w /var/www/myslik
-            tar --unlink-first --no-overwrite-dir -xzf /home/github-deploy/myslik-site.tar.gz -C /var/www/myslik
+            tar --unlink-first -xzf /home/github-deploy/myslik-site.tar.gz -C /var/www/myslik
             rm -f /home/github-deploy/myslik-code.tar.gz
             rm -f /home/github-deploy/myslik-site.tar.gz
             test -f /opt/myslik/bot/webhook.py
@@ -44,4 +46,4 @@ jobs:
 
       - name: Удалить временный ключ
         if: always()
-        run: rm -f ~/.ssh/id_ed25519 "$RUNNER_TEMP/myslik-code.tar.gz" "$RUNNER_TEMP/myslik-site.tar.gz"
+        run: rm -f ~/.ssh/id_ed25519 "$RUNNER_TEMP/myslik-code.tar.gz" "$RUNNER_TEMP/myslik-site.tar.gz" "$RUNNER_TEMP/site-files.list"
