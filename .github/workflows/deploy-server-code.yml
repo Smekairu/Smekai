@@ -24,8 +24,8 @@ jobs:
 
       - name: Собрать и передать код
         run: |
-          tar --exclude=.git --exclude=bot/.venv --exclude=bot/myslik.db --exclude=state/pydeps -czf myslik-code.tar.gz .
-          scp -q myslik-code.tar.gz github-deploy@135.106.229.87:/home/github-deploy/myslik-code.tar.gz
+          tar --exclude=.git --exclude=bot/.venv --exclude=bot/myslik.db --exclude=state/pydeps -czf "$RUNNER_TEMP/myslik-code.tar.gz" .
+          scp -q "$RUNNER_TEMP/myslik-code.tar.gz" github-deploy@135.106.229.87:/home/github-deploy/myslik-code.tar.gz
 
       - name: Установить свежий код
         run: |
@@ -39,4 +39,4 @@ jobs:
 
       - name: Удалить временный ключ
         if: always()
-        run: rm -f ~/.ssh/id_ed25519 myslik-code.tar.gz
+        run: rm -f ~/.ssh/id_ed25519 "$RUNNER_TEMP/myslik-code.tar.gz"
