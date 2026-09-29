@@ -1,0 +1,40 @@
+name: Обновить код на сервере
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Подготовить защищённое подключение
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          test -n "$SERVER_SSH_KEY"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' '135.106.229.87 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJSNwJTsHZUe8Htc1Z3Xe9hTtR3uM1/P/yPKMXOHBVEr' > ~/.ssh/known_hosts
+
+      - name: Получить свежий код и перезапустить сервисы
+        run: |
+          ssh root@135.106.229.87 '
+            set -eu
+            cd /opt/myslik
+            test -z "$(git status --porcelain)"
+            git fetch origin main
+            git merge --ff-only origin/main
+            install -m 755 deploy/myslik-install-env /usr/local/sbin/myslik-install-env
+            systemctl restart myslik-api myslik-telegram myslik-max
+            sleep 5
+            systemctl --quiet is-active myslik-api myslik-telegram myslik-max
+            curl -fsS http://127.0.0.1:8080/health
+          '
+
+      - name: Удалить временный ключ
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519
