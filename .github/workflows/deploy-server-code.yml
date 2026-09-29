@@ -10,6 +10,8 @@ jobs:
   deploy:
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/checkout@v5
+
       - name: Подготовить защищённое подключение
         env:
           SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
@@ -20,16 +22,21 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           printf '%s\n' '135.106.229.87 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJSNwJTsHZUe8Htc1Z3Xe9hTtR3uM1/P/yPKMXOHBVEr' > ~/.ssh/known_hosts
 
-      - name: Получить свежий код
+      - name: Собрать и передать код
+        run: |
+          tar --exclude=.git --exclude=bot/.venv --exclude=bot/myslik.db --exclude=state/pydeps -czf myslik-code.tar.gz .
+          scp -q myslik-code.tar.gz github-deploy@135.106.229.87:/home/github-deploy/myslik-code.tar.gz
+
+      - name: Установить свежий код
         run: |
           ssh github-deploy@135.106.229.87 '
             set -eu
-            cd /opt/myslik
-            git -c safe.directory=/opt/myslik fetch origin main
-            git -c safe.directory=/opt/myslik merge --ff-only origin/main
+            tar -xzf /home/github-deploy/myslik-code.tar.gz -C /opt/myslik
+            rm -f /home/github-deploy/myslik-code.tar.gz
+            test -f /opt/myslik/bot/webhook.py
             curl -fsS http://127.0.0.1:8080/health
           '
 
       - name: Удалить временный ключ
         if: always()
-        run: rm -f ~/.ssh/id_ed25519
+        run: rm -f ~/.ssh/id_ed25519 myslik-code.tar.gz
