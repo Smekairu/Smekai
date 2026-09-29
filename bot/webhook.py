@@ -30,8 +30,9 @@ MAX_INVITE = os.environ.get("MAX_CHANNEL_INVITE", "")
 TRIBUTE_PLAN = os.environ.get("TRIBUTE_PLAN", "myslik")
 ORIGINS = {o.strip().rstrip("/") for o in os.environ.get(
     "SITE_ORIGINS", "https://myslik.ru,https://www.myslik.ru,http://localhost:8765").split(",") if o.strip()}
-REVIEW_LOGIN = os.environ.get("REVIEW_LOGIN", "").strip()
-REVIEW_PASSWORD = os.environ.get("REVIEW_PASSWORD", "")
+REVIEW_LOGIN = os.environ.get("REVIEW_LOGIN", "yookassa-review").strip()
+REVIEW_PASSWORD_SHA256 = os.environ.get(
+    "REVIEW_PASSWORD_SHA256", "575d2bea4da6380060f007f211430550242929b8ed7789a2cf44062cd3456697")
 _review_attempts = {}
 
 
@@ -126,9 +127,10 @@ async def auth_reviewer(request):
         return fail("Слишком много попыток. Повторите через пять минут.", 429)
     d = await body(request)
     login, password = str(d.get("login", "")).strip(), str(d.get("password", ""))
-    valid = bool(REVIEW_LOGIN and REVIEW_PASSWORD)
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    valid = bool(REVIEW_LOGIN and REVIEW_PASSWORD_SHA256)
     valid = valid and hmac.compare_digest(login, REVIEW_LOGIN)
-    valid = valid and hmac.compare_digest(password, REVIEW_PASSWORD)
+    valid = valid and hmac.compare_digest(password_hash, REVIEW_PASSWORD_SHA256)
     if not valid:
         tries.append(now)
         _review_attempts[ip] = tries

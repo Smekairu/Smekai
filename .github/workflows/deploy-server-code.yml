@@ -20,12 +20,14 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           printf '%s\n' '135.106.229.87 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJSNwJTsHZUe8Htc1Z3Xe9hTtR3uM1/P/yPKMXOHBVEr' > ~/.ssh/known_hosts
 
-      - name: Проверить права развёртывания
+      - name: Получить свежий код
         run: |
           ssh github-deploy@135.106.229.87 '
-            sudo -n -l
-            stat -c "%U:%G %A %n" /opt/myslik /opt/myslik/bot /usr/local/sbin/myslik-install-env
-            test -w /opt/myslik && echo OPT_WRITABLE=yes || echo OPT_WRITABLE=no
+            set -eu
+            cd /opt/myslik
+            git -c safe.directory=/opt/myslik fetch origin main
+            git -c safe.directory=/opt/myslik merge --ff-only origin/main
+            curl -fsS http://127.0.0.1:8080/health
           '
 
       - name: Удалить временный ключ
