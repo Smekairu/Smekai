@@ -31,7 +31,7 @@ jobs:
         run: |
           ssh github-deploy@135.106.229.87 '
             set -eu
-            tar -xzf /home/github-deploy/myslik-code.tar.gz -C /opt/myslik
+            tar --overwrite --no-overwrite-dir -xzf /home/github-deploy/myslik-code.tar.gz -C /opt/myslik
             rm -f /home/github-deploy/myslik-code.tar.gz
             test -f /opt/myslik/bot/webhook.py
             curl -fsS http://127.0.0.1:8080/health
