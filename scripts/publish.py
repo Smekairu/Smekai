@@ -26,7 +26,7 @@ LINKS = {
     "oplata": SITE + "oplata.html",
     "lev": SITE + "lev.html",
     "site": SITE,
-    "boosty": "https://boosty.to/smekai",
+    "boosty": SITE + "oplata.html",
     "telegram": "https://t.me/smekai_ru",
     "max": "https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo",
 }

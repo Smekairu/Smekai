@@ -1,0 +1,36 @@
+name: Обновить старые посты на Мыслик
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Применить изменения (false — только показать план)"
+        required: true
+        type: choice
+        options: ["false", "true"]
+        default: "false"
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Сертификаты НУЦ Минцифры
+        continue-on-error: true
+        run: |
+          curl -fsSL -o root.cer https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
+          curl -fsSL -o sub.cer https://gu-st.ru/content/Other/doc/russian_trusted_sub_ca.cer
+          for f in root sub; do openssl x509 -in $f.cer -out $f.pem 2>/dev/null || openssl x509 -inform DER -in $f.cer -out $f.pem; done
+          sudo cp root.pem /usr/local/share/ca-certificates/russian_trusted_root_ca.crt
+          sudo cp sub.pem /usr/local/share/ca-certificates/russian_trusted_sub_ca.crt
+          sudo update-ca-certificates
+      - run: python scripts/repair_branding.py
+        env:
+          BRANDING_APPLY: ${{ inputs.apply == 'true' && '1' || '0' }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHANNEL: ${{ vars.TG_CHANNEL || secrets.TG_CHANNEL }}
+          MAX_BOT_TOKEN: ${{ secrets.MAX_BOT_TOKEN }}
+          MAX_CHAT_ID: ${{ vars.MAX_CHAT_ID || secrets.MAX_CHAT_ID }}
