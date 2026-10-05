@@ -1,4 +1,4 @@
-name: Обновить логотипы
+name: Обновить оформление каналов
 
 on:
   workflow_dispatch: {}
@@ -25,9 +25,10 @@ jobs:
           sudo update-ca-certificates
           echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
           rm -f root.cer sub.cer root.pem sub.pem
-      - name: Аватарки каналов
+      - name: Названия и аватарки каналов
         run: python scripts/set_logos.py
         env:
+          BRAND_TITLE: Мыслик
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHANNEL: ${{ vars.TG_CHANNEL || secrets.TG_CHANNEL }}
           TG_CHANNEL_CLOSED: ${{ vars.TG_CHANNEL_CLOSED || secrets.TG_CHANNEL_CLOSED }}
