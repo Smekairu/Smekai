@@ -19,5 +19,20 @@
       "status": "unconfigured",
       "time": "2026-11-23T10:48:49+03:00"
     }
+  },
+  "2026-11-23-1830-sovet-dvoyka.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-23T20:26:51+03:00",
+      "message_id": 71
+    },
+    "max": {
+      "status": "sent",
+      "time": "2026-11-23T20:26:55+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a209724b277795",
+      "views": 1,
+      "views_at": "2026-11-23T20:26:50+03:00",
+      "sample_day": "2026-11-23"
+    }
   }
 }
