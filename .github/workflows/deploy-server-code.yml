@@ -26,7 +26,7 @@ jobs:
         run: |
           tar --exclude=.git --exclude=bot/.venv --exclude=bot/myslik.db --exclude=state/pydeps -czf "$RUNNER_TEMP/myslik-code.tar.gz" .
           find . -maxdepth 1 -type f \( -name '*.html' -o -name robots.txt -o -name sitemap.xml -o -name .nojekyll \) -print0 > "$RUNNER_TEMP/site-files.list"
-          find assets bank docs kabinet myslik viktorina zanyatie -type f -print0 >> "$RUNNER_TEMP/site-files.list"
+          find assets docs kabinet myslik viktorina zanyatie -type f -print0 >> "$RUNNER_TEMP/site-files.list"
           tar --null --no-recursion -czf "$RUNNER_TEMP/myslik-site.tar.gz" -T "$RUNNER_TEMP/site-files.list"
           scp -q "$RUNNER_TEMP/myslik-code.tar.gz" github-deploy@135.106.229.87:/home/github-deploy/myslik-code.tar.gz
           scp -q "$RUNNER_TEMP/myslik-site.tar.gz" github-deploy@135.106.229.87:/home/github-deploy/myslik-site.tar.gz

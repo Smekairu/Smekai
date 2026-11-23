@@ -312,6 +312,8 @@ def main():
             p = parse(path)
         except Exception as e:
             print("Ошибка в файле:", e); errors += 1; continue
+        if p.get("channel") in ("closed","закрытый"):
+            print("Закрытый выпуск обслуживает Selectel");continue
         if p["time"] > now: continue
         print(f"Публикую {path.name}")
         p["name"]=path.name

@@ -6,7 +6,6 @@ cd "$(dirname "$0")"
 set -a; . ./bot/.env; set +a
 
 git pull -q --rebase origin main || true
-python3 scripts/build_posts.py --days 3 >/dev/null || true
 python3 scripts/publish.py || true
 
 if ! git diff --quiet -- state posts; then
