@@ -1,0 +1,23 @@
+{
+  "2026-11-22-1830-zadacha-nedeli-rycari.md": {
+    "max_answer": {
+      "status": "sent",
+      "time": "2026-11-23T10:48:48+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a2076105cb3357",
+      "views": 1,
+      "views_at": "2026-11-23T10:48:48+03:00",
+      "sample_day": "2026-11-23"
+    }
+  },
+  "2026-11-23-0900-math.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-23T10:48:49+03:00",
+      "message_id": 76
+    },
+    "max": {
+      "status": "unconfigured",
+      "time": "2026-11-23T10:48:49+03:00"
+    }
+  }
+}
