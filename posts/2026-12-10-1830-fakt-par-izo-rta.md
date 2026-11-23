@@ -2,6 +2,8 @@
 time: 2026-12-10 18:30
 channels: telegram, max
 image: assets/posts/2026-12-10-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Факт дня: почему на морозе идёт пар изо рта</b>
 

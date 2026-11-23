@@ -2,6 +2,8 @@
 time: 2026-12-08 18:30
 channels: telegram, max
 image: assets/posts/2026-12-08-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Мыслик объясняет: периметр и площадь</b>
 

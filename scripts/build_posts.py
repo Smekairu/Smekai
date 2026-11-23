@@ -90,6 +90,8 @@ def main():
     made = 0
     for i in range(args.days):
         day = today + timedelta(days=i)
+        if day.isoformat()>'2027-06-30':
+            break
         when = datetime.strptime(f"{day:%Y-%m-%d} {args.time}", "%Y-%m-%d %H:%M").replace(tzinfo=MSK)
         if when < datetime.now(MSK):
             continue
@@ -114,3 +116,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -2,6 +2,8 @@
 time: 2026-12-06 18:30
 channels: telegram, max
 image: assets/posts/2026-12-06-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Задача недели: сколько страниц в книге</b>
 

@@ -2,6 +2,8 @@
 time: 2026-11-25 18:30
 channels: telegram, max
 image: assets/posts/2026-11-25-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Задача для всей семьи: возраст и остатки</b>
 

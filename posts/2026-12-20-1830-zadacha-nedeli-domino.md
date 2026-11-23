@@ -2,6 +2,8 @@
 time: 2026-12-20 18:30
 channels: telegram, max
 image: assets/posts/2026-12-20-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Задача недели: доска без двух углов</b>
 

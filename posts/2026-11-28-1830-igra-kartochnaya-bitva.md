@@ -2,6 +2,8 @@
 time: 2026-11-28 18:30
 channels: telegram, max
 image: assets/posts/2026-11-28-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Игра на выходные: карточная битва на умножение</b>
 

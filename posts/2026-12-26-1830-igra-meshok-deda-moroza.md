@@ -2,6 +2,8 @@
 time: 2026-12-26 18:30
 channels: telegram, max
 image: assets/posts/2026-12-26-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Игра на выходные: мешок Деда Мороза</b>
 

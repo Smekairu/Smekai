@@ -2,6 +2,8 @@
 time: 2026-12-14 18:30
 channels: telegram, max
 image: assets/posts/2026-12-14-1830.jpg
+button: Обсудить с Мысликом
+link: mentor
 ---
 <b>Совет на неделю: большую работу делите на шаги</b>
 

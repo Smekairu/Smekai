@@ -31,6 +31,22 @@ LINKS = {
     "max": "https://max.ru/join/nQJFTVidgdh_w-lFQo9rbmy54ErMxxp_vbMRjOdTJFo",
 }
 CAPTION_MAX = 1000       # у Telegram подпись к картинке до 1024 знаков
+MENTOR = {'telegram':'https://t.me/smekai_ru_bot?start=chat','max':'https://max.ru/id501807779599_bot?start=chat'}
+DELIVERY = ROOT/'state'/'delivery.json'
+
+def save_json(path, value):
+    tmp=path.with_suffix('.tmp')
+    tmp.write_text(json.dumps(value,ensure_ascii=False,indent=2),encoding='utf-8')
+    tmp.replace(path)
+
+def button_link(post,channel):
+    return MENTOR[channel] if post.get('link')=='mentor' else post.get('link')
+
+def record(book,name,channel,status,mid=None):
+    entry={'status':status,'time':datetime.now(MSK).isoformat(timespec='seconds')}
+    if mid:entry['message_id']=mid
+    book.setdefault(name,{})[channel]=entry
+    save_json(DELIVERY,book)
 
 def parse(path):
     raw = path.read_text(encoding="utf-8")
@@ -84,7 +100,7 @@ def send_telegram(p):
     base = f"https://api.telegram.org/bot{token}"
     markup = None
     if p.get("button") and p.get("link"):
-        markup = json.dumps({"inline_keyboard": [[{"text": p["button"], "url": p["link"]}]]})
+        markup = json.dumps({"inline_keyboard": [[{"text": p["button"], "url": button_link(p,'telegram')}]]})
     media = None
     if p.get("animation") and (ROOT / p["animation"]).exists():
         media = ("sendAnimation", "animation", ROOT / p["animation"])
@@ -92,7 +108,6 @@ def send_telegram(p):
         media = ("sendPhoto", "photo", ROOT / p["image"])
     if media and len(re.sub(r"<[^>]+>", "", p["text"])) > CAPTION_MAX:
         # длинный пост: сначала картинка без подписи, потом текст отдельным сообщением
-        http(base + "/" + media[0], {"chat_id": chat}, files={media[1]: (media[2].name, media[2].read_bytes())})
         media = None
     if media:
         data = {"chat_id": chat, "caption": p["text"], "parse_mode": "HTML"}
@@ -124,7 +139,7 @@ def split_answers(text):
     m = SPOILER.search(text)
     if not m:
         return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", ""), ""
-    body = SPOILER.sub("\n\n", text).strip()
+    body = SPOILER.sub("\n\n", text).strip()+"\n\nРазбор появится здесь отдельным сообщением."
     return body, m.group(1).strip()
 
 def pending_read():
@@ -134,7 +149,7 @@ def pending_read():
 
 def pending_write(items):
     PENDING.parent.mkdir(exist_ok=True)
-    PENDING.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json(PENDING,items)
 
 def max_upload(kind, path):
     """Загружает файл в MAX. kind: image или video. Возвращает вложение для сообщения или None."""
@@ -170,24 +185,27 @@ def max_send_text(chat, text, markup=None, media=None):
     import time
     for attempt in range(4):
         try:
-            http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
-            return
+            result=http(f"{base}/messages?chat_id={urllib.parse.quote(str(chat))}", body, headers={"Authorization": token})
+            return ((result.get('message') or {}).get('body') or {}).get('mid') or True
         except urllib.error.HTTPError as e:
             detail = e.read().decode()
             if "not.ready" in detail and attempt < 3:
                 time.sleep(2); continue      # видео ещё обрабатывается
             raise urllib.error.HTTPError(e.url, e.code, detail, e.hdrs, None)
 
-def send_max_pending():
+def send_max_pending(book):
     """Отправляет ответы, у которых прошёл час после задания."""
     items, left, now = pending_read(), [], datetime.now(MSK)
     for it in items:
         due = datetime.fromisoformat(it["due"])
+        name=it.get('post') or it['due']
+        if book.get(name,{}).get('max_answer',{}).get('status')=='sent':continue
         if due > now:
             left.append(it); continue
         try:
             head = f"<b>Ответ к посту «{it['title']}»</b>" if it.get("title") else "<b>Ответы к заданиям</b>"
-            max_send_text(it["chat"], head + "\n\n" + it["text"])
+            mid=max_send_text(it["chat"], head + "\n\n" + it["text"])
+            record(book,name,'max_answer','sent',mid if isinstance(mid,str) else None)
             print("MAX: отправлены ответы к", it.get("post"))
         except Exception as e:
             detail = e.read().decode() if hasattr(e, "read") else str(e)
@@ -204,7 +222,7 @@ def send_max(p):
     body, answers = split_answers(p["text"])
     markup = None
     if p.get("button") and p.get("link"):
-        markup = {"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": p["link"]}]]}}
+        markup = {"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": button_link(p,'max')}]]}}
     media = None
     if p.get("animation"):
         mp4 = ROOT / p["animation"]
@@ -215,20 +233,26 @@ def send_max(p):
     elif p.get("image") and (ROOT / p["image"]).exists():
         media = max_upload("image", ROOT / p["image"])
     try:
-        max_send_text(chat, body, markup, media)
+        mid=max_send_text(chat, body, markup, media)
     except Exception as e:
         detail = e.read().decode() if hasattr(e, "read") else str(e)
         print("MAX: ошибка:", detail); return False
     print("MAX: отправлено")
+    return mid
+
+def queue_max_answer(p,book):
+    if book.get(p['name'],{}).get('max_answer',{}).get('status')=='sent':return
+    body,answers=split_answers(p['text'])
     if answers:
         items = pending_read()
+        if any(it.get('post')==p['name'] for it in items):return
         t = re.search(r"<b>(.*?)</b>", body)
-        items.append({"chat": str(chat), "text": answers, "post": p.get("name", ""),
+        sent=datetime.fromisoformat(book[p['name']]['max']['time'])
+        items.append({"chat": str(max_chat(p)), "text": answers, "post": p['name'],
                       "title": re.sub(r"<[^>]+>", "", t.group(1)).strip() if t else "",
-                      "due": (datetime.now(MSK) + timedelta(minutes=ANSWER_DELAY_MIN)).isoformat()})
+                      "due": (sent + timedelta(minutes=ANSWER_DELAY_MIN)).isoformat()})
         pending_write(items)
         print(f"MAX: ответы уйдут через {ANSWER_DELAY_MIN} минут")
-    return True
 
 def check_telegram():
     """Проверка: токен рабочий, бот администратор канала и может публиковать."""
@@ -246,9 +270,8 @@ def check_telegram():
     return ok
 
 def main():
-    send_max_pending()
-    if not check_telegram():
-        print("Проверка не пройдена, публикация остановлена"); sys.exit(1)
+    book=json.loads(DELIVERY.read_text('utf8')) if DELIVERY.exists() else {}
+    send_max_pending(book)
     state = json.loads(STATE.read_text(encoding="utf-8"))
     done = set(state.get("published", []))
     msgs = dict(state.get("messages", {}))
@@ -262,22 +285,33 @@ def main():
             print("Ошибка в файле:", e); errors += 1; continue
         if p["time"] > now: continue
         print(f"Публикую {path.name}")
-        sent = False
-        try:
-            if "telegram" in p["channels"]:
-                mid = send_telegram(p)
-                if mid:
-                    sent = True
-                    msgs[path.name] = mid
-            if "max" in p["channels"]:
-                p["name"] = path.name
-                sent = send_max(p) or sent
-        except Exception as e:
-            print("Ошибка отправки:", e); errors += 1; continue
-        if sent:
+        p["name"]=path.name
+        for channel in p['channels']:
+            status=book.get(path.name,{}).get(channel,{}).get('status')
+            if status in ('sent','expired'):continue
+            if now-p['time']>timedelta(days=1):
+                record(book,path.name,channel,'expired')
+                print(channel,'просрочен',path.name);continue
+            target=tg_chat(p) if channel=='telegram' else max_chat(p)
+            if not target:
+                if status!='unconfigured':record(book,path.name,channel,'unconfigured')
+                print(channel,'не настроен адрес канала',path.name);continue
+            try:
+                mid=send_telegram(p) if channel=='telegram' else send_max(p)
+            except Exception as exc:
+                print(channel,'ошибка',type(exc).__name__,getattr(exc,'code',''));mid=None
+            if not mid:
+                errors+=1;record(book,path.name,channel,'failed');continue
+            record(book,path.name,channel,'sent',None if mid is True else mid)
+            if channel=='telegram':msgs[path.name]=mid
+        if book.get(path.name,{}).get('max',{}).get('status')=='sent':
+            queue_max_answer(p,book)
+        if all(book[path.name][c]['status']=='sent' for c in p['channels']):
             done.add(path.name)
-    STATE.write_text(json.dumps({"published": sorted(done), "messages": msgs}, ensure_ascii=False, indent=2), encoding="utf-8")
+    state.update(published=sorted(done),messages=msgs)
+    save_json(STATE,state)
     sys.exit(1 if errors else 0)
 
 if __name__ == "__main__":
     main()
+
