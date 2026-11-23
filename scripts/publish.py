@@ -254,6 +254,35 @@ def queue_max_answer(p,book):
         pending_write(items)
         print(f"MAX: ответы уйдут через {ANSWER_DELAY_MIN} минут")
 
+def refresh_max_views(book,now):
+    token=os.environ.get('MAX_BOT_TOKEN')
+    if not token:return
+    day=now.date().isoformat()
+    targets={}
+    for deliveries in book.values():
+        for channel in ('max','max_answer'):
+            item=deliveries.get(channel,{})
+            mid=item.get('message_id')
+            if (mid and item.get('status')=='sent' and item.get('sample_day')!=day
+                    and now-datetime.fromisoformat(item['time'])<timedelta(days=9)):
+                targets[mid]=item
+    ids=list(targets)
+    for pos in range(0,len(ids),25):
+        batch=ids[pos:pos+25]
+        query=urllib.parse.urlencode({'message_ids':','.join(batch)})
+        try:
+            base=os.environ.get('MAX_API_BASE','https://platform-api2.max.ru')
+            data=http(base+'/messages?'+query,headers={'Authorization':token})
+        except Exception as exc:
+            print('MAX: статистика недоступна',type(exc).__name__);return
+        for msg in data.get('messages',[]):
+            mid=(msg.get('body') or {}).get('mid')
+            views=(msg.get('stat') or {}).get('views')
+            if mid in targets and isinstance(views,int):
+                targets[mid].update(views=views,views_at=now.isoformat(timespec='seconds'))
+        for mid in batch:targets[mid]['sample_day']=day
+        save_json(DELIVERY,book)
+
 def check_telegram():
     """Проверка: токен рабочий, бот администратор канала и может публиковать."""
     token, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_CHANNEL") or "@smekai_ru"
@@ -310,6 +339,7 @@ def main():
             done.add(path.name)
     state.update(published=sorted(done),messages=msgs)
     save_json(STATE,state)
+    refresh_max_views(book,now)
     sys.exit(1 if errors else 0)
 
 if __name__ == "__main__":

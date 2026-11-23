@@ -1,6 +1,9 @@
 name: Публикация постов
 
 on:
+  push:
+    branches: [main]
+    paths: ['posts/**', 'scripts/publish.py', '.github/workflows/publish.yml']
   schedule:
     - cron: "3,23,43 6-18 * * *"   # три раза в час с 09:03 до 21:43 по Москве: GitHub часть запусков пропускает
   workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
@@ -61,3 +64,4 @@ jobs:
             sleep 3
           done
           exit 1
+
