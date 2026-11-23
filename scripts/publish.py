@@ -12,6 +12,8 @@
 Ниже: текст поста. Разметка Telegram HTML: <b>жирный</b>, <i>курсив</i>, <a href="...">ссылка</a>.
 """
 import json, os, re, sys, urllib.request, urllib.parse, uuid
+from hashlib import sha256
+from html import unescape
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -133,14 +135,55 @@ def max_chat(p):
 SPOILER = re.compile(r"\s*Ответы?:\s*<tg-spoiler>(.*?)</tg-spoiler>\s*", re.S)
 PENDING = ROOT / "state" / "max_pending.json"
 ANSWER_DELAY_MIN = 60
+PUBLIC_ANSWERS = ROOT / "viktorina" / "razbory.json"
+
+def public_answer_card(post):
+    if post.get("channel", "").strip().lower() not in ("", "open"):
+        return None
+    if "max" not in post["channels"] or not post.get("name"):
+        return None
+    snippets = SPOILER.findall(post["text"])
+    if not snippets:
+        return None
+    def plain(fragment):
+        fragment = re.sub(r"<br\s*/?>", "\n", fragment, flags=re.I)
+        return unescape(re.sub(r"</?[a-zA-Z][^>]*>", "", fragment)).strip()
+    heading = re.search(r"<b>(.*?)</b>", post["text"], re.S)
+    title = plain(heading[1]) if heading else "Разбор задания"
+    answer = "\n\n".join(plain(fragment) for fragment in snippets).strip()
+    if not answer:
+        return None
+    key = sha256((post["name"] + "\n" + post["text"]).encode("utf-8")).hexdigest()
+    return key, {"title": title, "answer": answer}
+
+def max_question_content(post):
+    body, _ = split_answers(post["text"])
+    rows = []
+    card = public_answer_card(post)
+    if card:
+        key, value = card
+        try:
+            catalog = json.loads(PUBLIC_ANSWERS.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            catalog = {}
+        if isinstance(catalog, dict) and catalog.get(key) == value:
+            rows.append([{"type": "link", "text": "Проверить ответ",
+                          "url": SITE + "viktorina/razbor.html#" + key}])
+        else:
+            # An editorial correction may reach the feed before the website catalogue.
+            body = SPOILER.sub(lambda m: "\n\n<b>Ответ для самопроверки</b>\n" + m[1].strip() + "\n\n", post["text"]).strip()
+    if post.get("button") and post.get("link"):
+        rows.append([{"type": "link", "text": post["button"], "url": button_link(post, "max")}])
+    markup = {"type": "inline_keyboard", "payload": {"buttons": rows}} if rows else None
+    return body, markup
 
 def split_answers(text):
     """Отделяет ответы от задания. В MAX нет скрытого текста, поэтому ответы уходят позже."""
-    m = SPOILER.search(text)
-    if not m:
+    answers = SPOILER.findall(text)
+    if not answers:
         return text.replace("<tg-spoiler>", "").replace("</tg-spoiler>", ""), ""
     body = SPOILER.sub("\n\n", text).strip()+"\n\nРазбор появится здесь отдельным сообщением."
-    return body, m.group(1).strip()
+    return body, "\n\n".join(answer.strip() for answer in answers)
 
 def pending_read():
     if PENDING.exists():
@@ -219,10 +262,7 @@ def send_max(p):
         print("MAX: нет MAX_BOT_TOKEN, пропускаю"); return False
     if not chat:
         print("MAX: канал для этого поста не задан, пропускаю"); return False
-    body, answers = split_answers(p["text"])
-    markup = None
-    if p.get("button") and p.get("link"):
-        markup = {"type": "inline_keyboard", "payload": {"buttons": [[{"type": "link", "text": p["button"], "url": button_link(p,'max')}]]}}
+    body, markup = max_question_content(p)
     media = None
     if p.get("animation"):
         mp4 = ROOT / p["animation"]

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Разбор задания · СМЕКАЙ с Мысликом</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #22263d; background: #f7f6fc; font: 1.125rem/1.6 system-ui, sans-serif; }
+    main { width: min(38rem, calc(100% - 2rem)); margin: clamp(1rem, 8vh, 5rem) auto; }
+    header { display: flex; align-items: center; gap: .65rem; margin: 0 0 1.3rem; font-weight: 650; }
+    header img { width: 2.5rem; height: 2.5rem; object-fit: contain; }
+    article { padding: clamp(1.25rem, 5vw, 2.5rem); background: #fff; border: 1px solid #e0deef; border-radius: 1.4rem; }
+    h1 { font-size: clamp(1.4rem, 4vw, 2rem); line-height: 1.2; margin: 0 0 1rem; }
+    p { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+    a, button { color: #43349a; font: inherit; }
+    button { margin-top: 1rem; padding: .4rem .8rem; cursor: pointer; }
+    nav { padding: .9rem .3rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <header><img src="/assets/brand/mark-myslik.png" alt="">СМЕКАЙ с Мысликом</header>
+    <article aria-live="polite">
+      <h1 id="title">Разбор задания</h1>
+      <p id="answer">Загружаем ответ…</p>
+      <button id="retry" type="button" hidden>Попробовать ещё раз</button>
+      <noscript>Для просмотра ответа включите JavaScript или прочитайте разбор в канале MAX.</noscript>
+    </article>
+    <nav><a href="/viktorina/">Перейти к викторине</a></nav>
+  </main>
+  <script>
+    const title = document.getElementById('title');
+    const answer = document.getElementById('answer');
+    const retry = document.getElementById('retry');
+    async function showAnswer() {
+      const key = location.hash.slice(1);
+      retry.hidden = true;
+      title.textContent = 'Разбор задания';
+      answer.textContent = 'Откройте задание в MAX и нажмите «Проверить ответ».';
+      if (!/^[a-f0-9]{64}$/.test(key)) return;
+      answer.textContent = 'Загружаем ответ…';
+      try {
+        const response = await fetch('razbory.json', {cache: 'no-cache'});
+        if (!response.ok) throw new Error();
+        const card = (await response.json())[key];
+        if (location.hash.slice(1) !== key) return;
+        if (!card) {
+          answer.textContent = 'Разбор по этой ссылке не найден. Проверьте ссылку в задании.';
+          return;
+        }
+        title.textContent = card.title;
+        answer.textContent = card.answer;
+        document.title = card.title + ' · СМЕКАЙ с Мысликом';
+      } catch {
+        if (location.hash.slice(1) !== key) return;
+        answer.textContent = 'Не удалось загрузить ответ. Проверьте подключение к интернету.';
+        retry.hidden = false;
+      }
+    }
+    retry.addEventListener('click', showAnswer);
+    window.addEventListener('hashchange', showAnswer);
+    showAnswer();
+  </script>
+</body>
+</html>
