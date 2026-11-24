@@ -34,5 +34,20 @@
       "views_at": "2026-11-24T06:27:36+03:00",
       "sample_day": "2026-11-24"
     }
+  },
+  "2026-11-24-1830-fazy-luny.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-24T19:59:02+03:00",
+      "message_id": 72
+    },
+    "max": {
+      "status": "sent",
+      "time": "2026-11-24T19:59:06+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a20e7f310c7f1d",
+      "views": 1,
+      "views_at": "2026-11-24T19:59:02+03:00",
+      "sample_day": "2026-11-24"
+    }
   }
 }
