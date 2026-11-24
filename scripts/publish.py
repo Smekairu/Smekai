@@ -42,6 +42,10 @@ def save_json(path, value):
     tmp.replace(path)
 
 def button_link(post,channel):
+    if post.get('link') in ('duel1','duel2'):
+        seed = '20261127' if post['link']=='duel1' else '20261204'
+        query = urllib.parse.urlencode({'mode':'class','round':seed,'utm_source':channel,'utm_campaign':post['link']})
+        return SITE + 'viktorina/?' + query
     return MENTOR[channel] if post.get('link')=='mentor' else post.get('link')
 
 def record(book,name,channel,status,mid=None):
@@ -173,7 +177,11 @@ def max_question_content(post):
             # An editorial correction may reach the feed before the website catalogue.
             body = SPOILER.sub(lambda m: "\n\n<b>Ответ для самопроверки</b>\n" + m[1].strip() + "\n\n", post["text"]).strip()
     if post.get("button") and post.get("link"):
-        rows.append([{"type": "link", "text": post["button"], "url": button_link(post, "max")}])
+        link_row = [{"type": "link", "text": post["button"], "url": button_link(post, "max")}]
+        if post.get("link") in ("duel1", "duel2"):
+            rows.insert(0, link_row)
+        else:
+            rows.append(link_row)
     markup = {"type": "inline_keyboard", "payload": {"buttons": rows}} if rows else None
     return body, markup
 
