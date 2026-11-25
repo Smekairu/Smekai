@@ -4,9 +4,9 @@
       "status": "sent",
       "time": "2026-11-23T10:48:48+03:00",
       "message_id": "mid.ffffb7e08c79c52c01a2076105cb3357",
-      "views": 3,
-      "views_at": "2026-11-24T06:27:36+03:00",
-      "sample_day": "2026-11-24"
+      "views": 4,
+      "views_at": "2026-11-25T04:15:54+03:00",
+      "sample_day": "2026-11-25"
     }
   },
   "2026-11-23-0900-math.md": {
@@ -30,9 +30,9 @@
       "status": "sent",
       "time": "2026-11-23T20:26:55+03:00",
       "message_id": "mid.ffffb7e08c79c52c01a209724b277795",
-      "views": 3,
-      "views_at": "2026-11-24T06:27:36+03:00",
-      "sample_day": "2026-11-24"
+      "views": 4,
+      "views_at": "2026-11-25T04:15:54+03:00",
+      "sample_day": "2026-11-25"
     }
   },
   "2026-11-24-1830-fazy-luny.md": {
@@ -45,9 +45,17 @@
       "status": "sent",
       "time": "2026-11-24T19:59:06+03:00",
       "message_id": "mid.ffffb7e08c79c52c01a20e7f310c7f1d",
+      "views": 2,
+      "views_at": "2026-11-25T04:15:54+03:00",
+      "sample_day": "2026-11-25"
+    },
+    "max_answer": {
+      "status": "sent",
+      "time": "2026-11-25T04:15:54+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a210460566731e",
       "views": 1,
-      "views_at": "2026-11-24T19:59:02+03:00",
-      "sample_day": "2026-11-24"
+      "views_at": "2026-11-25T04:15:54+03:00",
+      "sample_day": "2026-11-25"
     }
   }
 }
