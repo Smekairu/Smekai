@@ -57,5 +57,20 @@
       "views_at": "2026-11-25T04:15:54+03:00",
       "sample_day": "2026-11-25"
     }
+  },
+  "2026-11-25-1830-zadacha-vozrast-ostatok.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-25T19:49:10+03:00",
+      "message_id": 73
+    },
+    "max": {
+      "status": "sent",
+      "time": "2026-11-25T19:49:13+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a2139c82021169",
+      "views": 1,
+      "views_at": "2026-11-25T19:49:09+03:00",
+      "sample_day": "2026-11-25"
+    }
   }
 }
