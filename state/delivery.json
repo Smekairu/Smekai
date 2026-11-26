@@ -80,5 +80,20 @@
       "views_at": "2026-11-26T03:50:26+03:00",
       "sample_day": "2026-11-26"
     }
+  },
+  "2026-11-26-1830-fakt-bukva-yo.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-26T19:26:01+03:00",
+      "message_id": 74
+    },
+    "max": {
+      "status": "sent",
+      "time": "2026-11-26T19:26:05+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a218adae7f0bf5",
+      "views": 1,
+      "views_at": "2026-11-26T19:26:00+03:00",
+      "sample_day": "2026-11-26"
+    }
   }
 }
