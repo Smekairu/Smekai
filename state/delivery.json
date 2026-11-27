@@ -95,5 +95,20 @@
       "views_at": "2026-11-27T03:47:06+03:00",
       "sample_day": "2026-11-27"
     }
+  },
+  "2026-11-27-1830-viktorina-nyuton.md": {
+    "telegram": {
+      "status": "sent",
+      "time": "2026-11-27T19:11:31+03:00",
+      "message_id": 75
+    },
+    "max": {
+      "status": "sent",
+      "time": "2026-11-27T19:11:32+03:00",
+      "message_id": "mid.ffffb7e08c79c52c01a21dc6b96b3a26",
+      "views": 1,
+      "views_at": "2026-11-27T19:11:30+03:00",
+      "sample_day": "2026-11-27"
+    }
   }
 }
